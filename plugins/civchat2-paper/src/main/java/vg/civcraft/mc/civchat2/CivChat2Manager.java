@@ -21,6 +21,7 @@ import vg.civcraft.mc.civchat2.event.GroupChatEvent;
 import vg.civcraft.mc.civchat2.event.PrivateMessageEvent;
 import vg.civcraft.mc.civchat2.utility.CivChat2Config;
 import vg.civcraft.mc.civchat2.utility.CivChat2FileLogger;
+import vg.civcraft.mc.civchat2.utility.CivChat2SettingsManager;
 import vg.civcraft.mc.civchat2.utility.ScoreboardHUD;
 import vg.civcraft.mc.civmodcore.chat.ChatUtils;
 import vg.civcraft.mc.civmodcore.utilities.TextUtil;
@@ -32,30 +33,19 @@ import vg.civcraft.mc.namelayer.permission.PermissionType;
 public class CivChat2Manager {
 
 	private CivChat2Config config;
-
 	private CivChat2FileLogger chatLog;
-
 	private CivChat2 instance;
-
 	private CivChatDAO DBM;
-
 	// chatChannels in hashmap with (Player 1 name, player 2 name)
 	private HashMap<UUID, UUID> chatChannels;
-
 	// groupChatChannels have (Player, Group)
 	private final HashMap<UUID, Group> groupChatChannels;
-
 	// replyList has (playerName, whotoreplyto)
 	private final HashMap<UUID, UUID> replyList;
-
 	private final Set<UUID> afkPlayers;
-
 	private ScoreboardHUD scoreboardHUD;
-
-	protected static final GroupManager GM = NameAPI.getGroupManager();
-
 	private String defaultColor;
-
+	private CivChat2SettingsManager settingsManager;
 	private static Map<UUID, String> customNames = new HashMap<>();
 
 	public CivChat2Manager(CivChat2 pluginInstance) {
@@ -70,6 +60,7 @@ public class CivChat2Manager {
 		replyList = new HashMap<>();
 		afkPlayers = new HashSet<>();
 		scoreboardHUD = new ScoreboardHUD();
+		settingsManager = pluginInstance.getCivChat2SettingsManager();
 	}
 
 	/**
@@ -151,10 +142,10 @@ public class CivChat2Manager {
 			sender.sendMessage(parse(ChatStrings.chatPlayerAfk));
 			return;
 			// Player is ignoring the sender
-		} else if (DBM.isIgnoringPlayer(receiver.getUniqueId(), sender.getUniqueId())) {
+		} else if (settingsManager.isIgnoringPlayer(receiver.getUniqueId(), sender.getUniqueId())) {
 			sender.sendMessage(parse(ChatStrings.chatPlayerIgnoringYou));
 			return;
-		} else if (DBM.isIgnoringPlayer(sender.getUniqueId(), receiver.getUniqueId())) {
+		} else if (settingsManager.isIgnoringPlayer(sender.getUniqueId(), receiver.getUniqueId())) {
 			sender.sendMessage(parse(ChatStrings.chatNeedToUnignore, receiverName));
 			return;
 		}
@@ -215,7 +206,7 @@ public class CivChat2Manager {
 		Set<String> receivers = new HashSet<>();
 		// Loop through players and send to those that are close enough
 		for (Player receiver : recipients) {
-			if (!DBM.isIgnoringPlayer(receiver.getUniqueId(), sender.getUniqueId())) {
+			if (!settingsManager.isIgnoringPlayer(receiver.getUniqueId(), sender.getUniqueId())) {
 				if (receiver.getWorld().equals(sender.getWorld())) {
 					double receiverDistance = location.distance(receiver.getLocation());
 					if (receiverDistance <= range) {
@@ -371,10 +362,10 @@ public class CivChat2Manager {
 		String formatted = parse(ChatStrings.chatGroupMessage, group.getName(), senderName, message);
 
 		for (Player receiver : members) {
-			if (DBM.isIgnoringGroup(receiver.getUniqueId(), group.getName())) {
+			if (settingsManager.isIgnoringGroup(receiver.getUniqueId(), group.getGroupId())) {
 				continue;
 			}
-			if (DBM.isIgnoringPlayer(receiver.getUniqueId(), sender.getUniqueId())) {
+			if (settingsManager.isIgnoringPlayer(receiver.getUniqueId(), sender.getUniqueId())) {
 				continue;
 			}
 			receiver.sendMessage(formatted);

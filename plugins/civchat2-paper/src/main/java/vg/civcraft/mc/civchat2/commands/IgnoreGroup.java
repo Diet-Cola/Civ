@@ -9,8 +9,11 @@ import vg.civcraft.mc.civchat2.ChatStrings;
 import vg.civcraft.mc.civchat2.CivChat2;
 import vg.civcraft.mc.civchat2.CivChat2Manager;
 import vg.civcraft.mc.civchat2.database.CivChatDAO;
+import vg.civcraft.mc.civchat2.utility.CivChat2SettingsManager;
 import vg.civcraft.mc.namelayer.GroupManager;
 import vg.civcraft.mc.namelayer.group.Group;
+
+import java.util.List;
 
 public class IgnoreGroup extends BaseCommand {
 
@@ -23,20 +26,21 @@ public class IgnoreGroup extends BaseCommand {
 			player.sendMessage(ChatStrings.chatGroupNotFound);
 			return;
 		}
-		String ignore = group.getName();
-		CivChatDAO db = CivChat2.getInstance().getDatabaseManager();
-		if (!db.isIgnoringGroup(player.getUniqueId(), ignore)) {
-			db.addIgnoredGroup(player.getUniqueId(), ignore);
+
+		CivChat2SettingsManager settingsManager = CivChat2.getInstance().getCivChat2SettingsManager();
+		List<Integer> ignoredGroups = settingsManager.getIgnoredGroups(player.getUniqueId());
+		int groupID = group.getGroupId();
+		if (ignoredGroups.contains(groupID)) {
+			settingsManager.modifyIgnoredGroups(player.getUniqueId(), groupID, false);
+			player.sendMessage(String.format(ChatStrings.chatStoppedIgnoring, group.getName()));
+		} else {
+			settingsManager.modifyIgnoredGroups(player.getUniqueId(), group.getGroupId(), true);
 			CivChat2Manager chatMan = CivChat2.getInstance().getCivChat2Manager();
-			player.sendMessage(String.format(ChatStrings.chatNowIgnoring, ignore));
+			player.sendMessage(String.format(ChatStrings.chatNowIgnoring, group.getName()));
 			if (group.equals(chatMan.getGroupChatting(player))) {
 				chatMan.removeGroupChat(player);
 				player.sendMessage(ChatStrings.chatMovedToGlobal);
 			}
-			return;
-		} else {
-			db.removeIgnoredGroup(player.getUniqueId(), ignore);
-			player.sendMessage(String.format(ChatStrings.chatStoppedIgnoring, ignore));
 		}
 	}
 }

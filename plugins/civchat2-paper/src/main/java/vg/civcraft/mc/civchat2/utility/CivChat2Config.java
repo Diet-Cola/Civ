@@ -86,6 +86,8 @@ public class CivChat2Config {
 		return config.getBoolean("chat.dynamicColoring");
 	}
 
+	public boolean shouldConvertFromDBtoPlayerSettings() { return config.getBoolean("general.should_convert_from_db", false);}
+
 	public synchronized String getColorAtDistance(double distance) {
 
 		if (chatColor == null) {

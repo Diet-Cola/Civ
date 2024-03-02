@@ -13,6 +13,7 @@ import vg.civcraft.mc.civchat2.ChatStrings;
 import vg.civcraft.mc.civchat2.CivChat2;
 import vg.civcraft.mc.civchat2.CivChat2Manager;
 import vg.civcraft.mc.civchat2.database.CivChatDAO;
+import vg.civcraft.mc.civchat2.utility.CivChat2SettingsManager;
 
 
 public class Tell extends BaseCommand {
@@ -23,6 +24,7 @@ public class Tell extends BaseCommand {
 	@CommandCompletion("@allplayers @nothing")
 	public void execute(Player player, @Optional String targetPlayer, @Optional String chatMessage) {
 		CivChat2Manager chatMan = CivChat2.getInstance().getCivChat2Manager();
+		CivChat2SettingsManager settingsManager = CivChat2.getInstance().getCivChat2SettingsManager();
 		if (targetPlayer == null && chatMessage == null) {
 			UUID chattingWith = chatMan.getChannel(player);
 			if (chattingWith != null) {
@@ -54,13 +56,12 @@ public class Tell extends BaseCommand {
 			chatMan.sendPrivateMsg(player, receiver, chatMessage);
 			return;
 		} else {
-			CivChatDAO db = CivChat2.getInstance().getDatabaseManager();
-			if (db.isIgnoringPlayer(player.getUniqueId(), receiver.getUniqueId())) {
+			if (settingsManager.isIgnoringPlayer(player.getUniqueId(), receiver.getUniqueId())) {
 				player.sendMessage(String.format(ChatStrings.chatNeedToUnignore, receiver.getDisplayName()));
 				return;
 			}
 
-			if (db.isIgnoringPlayer(receiver.getUniqueId(), player.getUniqueId())) {
+			if (settingsManager.isIgnoringPlayer(receiver.getUniqueId(), player.getUniqueId())) {
 				player.sendMessage(ChatStrings.chatPlayerIgnoringYou);
 				return;
 			}

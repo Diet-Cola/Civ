@@ -56,7 +56,7 @@ public class GroupChat extends BaseCommand {
 			player.sendMessage(ChatStrings.chatGroupNoPerms);
 			return;
 		}
-		if (CivChat2.getInstance().getDatabaseManager().isIgnoringGroup(player.getUniqueId(), group.getName())) {
+		if (CivChat2.getInstance().getCivChat2SettingsManager().isIgnoringGroup(player.getUniqueId(), group.getGroupId())) {
 			player.sendMessage(String.format(ChatStrings.chatNeedToUnignore, group.getName()));
 			return;
 		}

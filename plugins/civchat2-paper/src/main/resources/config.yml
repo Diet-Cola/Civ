@@ -11,6 +11,11 @@ chat:
   #so yIncreaseScale=10 will be 10 extra radius per block they go up, 1 would be 1 extra radius per block
   #Coded formula globalChatRange = globalChatRange + (globalChatRange * ((yIncreaseScale/1000) * #blocksaboveydist)))
   yIncreaseScale: 1
+general:
+  #Legacy setting, if your server was set up before changing the way players ignore each other, set this to true. it will convert
+  #database data to player settings data. Otherwise if you are creating a fresh server, set to false.
+  #Having this setting to false also means you do not need to connect to a db or set up credentials below!
+  should_convert_from_db: false
 info:
   #debug: lots of debugging logging will show up in the console def=false
   debug: false
@@ -21,6 +26,7 @@ info:
   loginAnnounce: true
   #chatRangeWarn: warns new players about the local chat limit.
   chatRangeWarn: true
+#Double check the should_convert_from_db option before filling out credentials!!!
 mysql:
   host: localhost
   dbname: ''

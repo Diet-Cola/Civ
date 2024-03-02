@@ -1,6 +1,10 @@
 package vg.civcraft.mc.civchat2.utility;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import vg.civcraft.mc.civchat2.CivChat2;
@@ -10,6 +14,8 @@ import vg.civcraft.mc.civmodcore.players.settings.impl.BooleanSetting;
 import vg.civcraft.mc.civmodcore.players.settings.impl.DisplayLocationSetting;
 import vg.civcraft.mc.civmodcore.players.settings.impl.EnumSetting;
 import vg.civcraft.mc.civmodcore.players.settings.impl.LongSetting;
+import vg.civcraft.mc.civmodcore.players.settings.impl.StringSetting;
+import vg.civcraft.mc.civmodcore.players.settings.impl.collection.ListSetting;
 
 public class CivChat2SettingsManager {
 
@@ -22,6 +28,8 @@ public class CivChat2SettingsManager {
 	private DisplayLocationSetting chatGroupLocation;
 	private LongSetting chatUnmuteTimer;
 	private EnumSetting<KillMessageFormat> killMessageFormat;
+	private ListSetting<UUID> ignoredPlayers;
+	private ListSetting<Integer> ignoredGroups;
 
 	public CivChat2SettingsManager() {
 		initSettings();
@@ -65,6 +73,12 @@ public class CivChat2SettingsManager {
 
 		killMessageFormat = new EnumSetting<>(CivChat2.getInstance(), KillMessageFormat.WITH, "Kill Message Format", "killMessageFormat", new ItemStack(Material.WRITABLE_BOOK), "Choose your kill message format", true, KillMessageFormat.class);
 		PlayerSettingAPI.registerSetting(killMessageFormat, menu);
+
+		ignoredPlayers = new ListSetting<>(CivChat2.getInstance(), "civChatIgnoredPlayers", "civChatIgnoredPlayers", null, "Ignored Players", UUID.class);
+		PlayerSettingAPI.registerSetting(ignoredPlayers, null);
+
+		ignoredGroups = new ListSetting<>(CivChat2.getInstance(), "civChatIgnoredGroups", "civChatIgnoredGroups", null, "Ignored Groups", Integer.class);
+		PlayerSettingAPI.registerSetting(ignoredGroups, null);
 	}
 	
 	public LongSetting getGlobalChatMuteSetting() {
@@ -102,6 +116,67 @@ public class CivChat2SettingsManager {
 	public KillMessageFormat getKillMessageFormat(UUID uuid) {
 		return killMessageFormat.getValue(uuid);
 	}
+
+	public List<UUID> getIgnoredPlayers(UUID uuid) {return ignoredPlayers.getValue(uuid);}
+
+	public List<Integer> getIgnoredGroups(UUID uuid) {return ignoredGroups.getValue(uuid);}
+
+	public void setIgnoredPlayers(UUID player, List<UUID> ignoredPlayers) {
+		this.ignoredPlayers.setValue(player, ignoredPlayers);
+	}
+
+	/**
+	 * Modifies a players ignored player list
+	 * @param player Player we are modifying the ignoring player list of
+	 * @param ignoredPlayer Target player UUID we are ignoring
+	 * @param adding Flag to determine whether adding or removing from the list, True for adding to list, false for removing from ignoring list
+	 */
+	public void modifyIgnoredPlayer(UUID player, UUID ignoredPlayer, boolean adding) {
+		List<UUID> tempIgnoredPlayers = getIgnoredPlayers(player);
+		if (!tempIgnoredPlayers.contains(ignoredPlayer)) {
+			return;
+		}
+		if (adding) {
+			tempIgnoredPlayers.add(ignoredPlayer);
+			setIgnoredPlayers(player, tempIgnoredPlayers);
+			return;
+		}
+		tempIgnoredPlayers.remove(ignoredPlayer);
+		setIgnoredPlayers(player, tempIgnoredPlayers);
+	}
+
+	public void setIgnoredGroups(UUID player, List<Integer> ignoredGroups) {
+		this.ignoredGroups.setValue(player, ignoredGroups);
+	}
+
+	/**
+	 * Modifies a players ignored group list
+	 * @param player Player we are modifying the ignoring player list of
+	 * @param ignoredGroup Target group id we are ignoring
+	 * @param adding Flag to determine whether adding or removing from the list, True for adding to list, false for removing from ignoring list
+	 */
+	public void modifyIgnoredGroups(UUID player, Integer ignoredGroup, boolean adding) {
+		List<Integer> tempIgnoredGroups = getIgnoredGroups(player);
+		if (!tempIgnoredGroups.contains(ignoredGroup)) {
+			return;
+		}
+		if (adding) {
+			tempIgnoredGroups.add(ignoredGroup);
+			setIgnoredGroups(player, tempIgnoredGroups);
+			return;
+		}
+		tempIgnoredGroups.remove(ignoredGroup);
+		setIgnoredGroups(player, tempIgnoredGroups);
+	}
+
+	public boolean isIgnoringPlayer(UUID player, UUID ignoredPlayer) {
+		return getIgnoredPlayers(player).contains(ignoredPlayer);
+	}
+
+	public boolean isIgnoringGroup(UUID player, Integer groupID){
+		return getIgnoredGroups(player).contains(groupID);
+	}
+
 
 	public enum KillMessageFormat {
 		FOR(

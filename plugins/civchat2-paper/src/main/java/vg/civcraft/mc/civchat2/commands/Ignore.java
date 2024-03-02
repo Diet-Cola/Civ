@@ -10,6 +10,10 @@ import org.bukkit.entity.Player;
 import vg.civcraft.mc.civchat2.ChatStrings;
 import vg.civcraft.mc.civchat2.CivChat2;
 import vg.civcraft.mc.civchat2.database.CivChatDAO;
+import vg.civcraft.mc.civchat2.utility.CivChat2SettingsManager;
+
+import java.util.List;
+import java.util.UUID;
 
 public class Ignore extends BaseCommand {
 
@@ -27,15 +31,16 @@ public class Ignore extends BaseCommand {
 			player.sendMessage(ChatStrings.chatCantIgnoreSelf);
 			return;
 		}
-		CivChatDAO db = CivChat2.getInstance().getDatabaseManager();
-		if (!db.isIgnoringPlayer(player.getUniqueId(), ignoredPlayer.getUniqueId())) {
+		CivChat2SettingsManager settingsManager = CivChat2.getInstance().getCivChat2SettingsManager();
+		List<UUID> ignoredPlayers = settingsManager.getIgnoredPlayers(player.getUniqueId());
+		if (!ignoredPlayers.contains(ignoredPlayer.getName())) {
 			// Player added to the list
-			db.addIgnoredPlayer(player.getUniqueId(), ignoredPlayer.getUniqueId());
+			settingsManager.modifyIgnoredPlayer(player.getUniqueId(), ignoredPlayer.getUniqueId(), true);
 			player.sendMessage(String.format(ChatStrings.chatNowIgnoring, ignoredPlayer.getDisplayName()));
 			return;
 		} else {
 			// Player removed from the list
-			db.removeIgnoredPlayer(player.getUniqueId(), ignoredPlayer.getUniqueId());
+			settingsManager.modifyIgnoredPlayer(player.getUniqueId(), ignoredPlayer.getUniqueId(), false);
 			player.sendMessage(String.format(ChatStrings.chatStoppedIgnoring, ignoredPlayer.getDisplayName()));
 			return;
 		}

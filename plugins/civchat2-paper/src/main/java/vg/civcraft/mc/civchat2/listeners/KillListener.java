@@ -80,7 +80,7 @@ public class KillListener implements Listener {
 				continue;
 			}
 			if (!settingsMan.getReceiveKillsFromIgnored(p.getUniqueId())
-					&& dao.isIgnoringPlayer(p.getUniqueId(), killer.getUniqueId())) {
+					&& settingsMan.isIgnoringPlayer(p.getUniqueId(), killer.getUniqueId())) {
 				continue;
 			}
 			p.sendMessage(msg);

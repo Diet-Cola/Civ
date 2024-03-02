@@ -6,6 +6,7 @@ import java.util.List;
 import vg.civcraft.mc.civchat2.commands.CivChatCommandManager;
 import vg.civcraft.mc.civchat2.database.CivChatDAO;
 import vg.civcraft.mc.civchat2.listeners.CivChat2Listener;
+import vg.civcraft.mc.civchat2.listeners.DatabaseToPlayerSettingListener;
 import vg.civcraft.mc.civchat2.listeners.KillListener;
 import vg.civcraft.mc.civchat2.utility.CivChat2Config;
 import vg.civcraft.mc.civchat2.utility.CivChat2FileLogger;
@@ -41,7 +42,9 @@ public class CivChat2 extends ACivMod {
 		log = new CivChat2Log();
 		log.initializeLogger(instance);
 		fileLog = new CivChat2FileLogger();
-		databaseManager = new CivChatDAO();
+		if (config.shouldConvertFromDBtoPlayerSettings()) {
+			databaseManager = new CivChatDAO();
+		}
 		settingsManager = new CivChat2SettingsManager();
 		chatMan = new CivChat2Manager(instance);
 		log.debug("Debug Enabled");
@@ -69,6 +72,9 @@ public class CivChat2 extends ACivMod {
 	private void registerCivChatEvents() {
 		getServer().getPluginManager().registerEvents(new CivChat2Listener(chatMan), this);
 		getServer().getPluginManager().registerEvents(new KillListener(config, databaseManager, settingsManager), this);
+		if (config.shouldConvertFromDBtoPlayerSettings()) {
+			getServer().getPluginManager().registerEvents(new DatabaseToPlayerSettingListener(settingsManager), this);
+		}
 	}
 
 	public void registerNameLayerPermissions() {
