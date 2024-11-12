@@ -48,7 +48,7 @@ public final class ScoreBoardAPI {
         return HEADERS.getOrDefault(uuid, DEFAULT_HEADER);
     }
 
-    static void updateAllBoards(Player p) {
+    public static void updateAllBoards(Player p) {
         for (CivScoreBoard board : boards.values()) {
             board.set(p, board.get(p));
         }

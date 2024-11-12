@@ -39,6 +39,7 @@ public class SidebarOffCommand extends BaseCommand {
             return;
         }
         ScoreBoardAPI.purge(target);
+        ScoreBoardAPI.updateAllBoards(target);
         sender.sendMessage(Component.text("Sidebar settings disabled for player " + target.getName(), NamedTextColor.YELLOW));
     }
 }
