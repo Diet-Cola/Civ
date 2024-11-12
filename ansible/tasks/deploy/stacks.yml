@@ -8,6 +8,17 @@
   loop:
     - { path: '/opt/stacks/minecraft', enabled: setting.minecraft.enabled }
 
+- name: Deploy Stacks | Create User Folders
+  become: false
+  when:
+    - "'swarm_manager' in group_names"
+    - item.enabled
+  file:
+    path: '{{item.path}}'
+    state: directory
+  loop:
+    - { path: '~/stacks/minecraft', enabled: setting.minecraft.enabled }
+
 - name: Deploy Stacks | Create Volume Folders
   when:
       - "'swarm_manager' in group_names"
@@ -43,18 +54,31 @@
       - { path: 'minecraft/proxy-config', enabled: setting.minecraft.enabled }
       - { path: 'minecraft/proxy-plugins', enabled: setting.minecraft.enabled }
 
-- name: Deploy Stacks | Copy Files
+- name: Deploy Stacks | Synchronize Files
+  become: false
   when:
-      - "'swarm_manager' in group_names"
-      - item.enabled
-  copy:
-      src: '{{item.file}}'
-      dest: '/opt/stacks/{{item.target}}'
+    - "'swarm_manager' in group_names"
+    - item.enabled
+  ansible.posix.synchronize:
+    src: '{{item.file}}'
+    dest: '~/stacks/{{item.target}}'
+    delete: true
   loop:
-      - { file: '../../files/paper-config', target: 'minecraft', enabled: setting.minecraft.enabled }
-      - { file: '../../files/proxy-config', target: 'minecraft', enabled: setting.minecraft.enabled }
-      - { file: '../../build/paper-plugins', target: 'minecraft', enabled: setting.minecraft.enabled }
-      - { file: '../../build/proxy-plugins', target: 'minecraft', enabled: setting.minecraft.enabled }
+    - { file: '../../files/paper-config', target: 'minecraft', enabled: setting.minecraft.enabled }
+    - { file: '../../files/proxy-config', target: 'minecraft', enabled: setting.minecraft.enabled }
+    - { file: '../../build/paper-plugins', target: 'minecraft', enabled: setting.minecraft.enabled }
+    - { file: '../../build/proxy-plugins', target: 'minecraft', enabled: setting.minecraft.enabled }
+
+- name: Deploy Stacks | Copy Files
+  shell: 'cp -r /home/{{ansible_user}}/stacks/{{item.file}} /opt/stacks/{{item.file}}'
+  when:
+    - "'swarm_manager' in group_names"
+    - item.enabled
+  loop:
+    - { file: 'minecraft/paper-config', enabled: setting.minecraft.enabled }
+    - { file: 'minecraft/proxy-config', enabled: setting.minecraft.enabled }
+    - { file: 'minecraft/paper-plugins', enabled: setting.minecraft.enabled }
+    - { file: 'minecraft/proxy-plugins', enabled: setting.minecraft.enabled }
 
 - name: Deploy Stacks | Deploy Stacks
   when:
