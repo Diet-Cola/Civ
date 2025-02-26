@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -81,6 +82,11 @@ public class ModeListener implements Listener {
             return;
         }
         updateDisplayedInformation(pme.getPlayer(), to);
+        if (Bastion.getSettingManager().showBastionFields(pme.getPlayer().getUniqueId())) {
+            Bastion.getVisualiserUtils().showFieldToPlayer(pme.getPlayer());
+        } else {
+            Bastion.getVisualiserUtils().clearFieldsForPlayer(pme.getPlayer());
+        }
     }
 
     /**

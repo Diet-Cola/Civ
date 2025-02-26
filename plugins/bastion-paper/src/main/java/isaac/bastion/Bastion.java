@@ -17,6 +17,7 @@ import isaac.bastion.storage.Database;
 import isaac.bastion.utils.BastionSettingManager;
 import java.util.LinkedList;
 import java.util.logging.Level;
+import isaac.bastion.utils.BastionVisualiserUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import vg.civcraft.mc.civmodcore.ACivMod;
 import vg.civcraft.mc.civmodcore.dao.DatabaseCredentials;
@@ -32,6 +33,7 @@ public final class Bastion extends ACivMod {
     private static BastionGroupStorage groupStorage;
     private static BastionSettingManager settingManager;
     private static CommonSettings commonSettings;
+    private static BastionVisualiserUtils visualiserUtils;
 
     @Override
     public void onEnable() {
@@ -52,6 +54,7 @@ public final class Bastion extends ACivMod {
         BastionType.startRegenAndErosionTasks();
         registerListeners();
         setupCommands();
+        visualiserUtils = new BastionVisualiserUtils();
     }
 
     @Override
@@ -136,6 +139,10 @@ public final class Bastion extends ACivMod {
 
     public static BastionSettingManager getSettingManager() {
         return settingManager;
+    }
+
+    public static BastionVisualiserUtils getVisualiserUtils() {
+        return visualiserUtils;
     }
 
     public static CommonSettings getCommonSettings() {
