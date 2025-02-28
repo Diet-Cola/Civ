@@ -14,13 +14,13 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import vg.civcraft.mc.civmodcore.players.scoreboard.bottom.BottomLine;
 import vg.civcraft.mc.civmodcore.players.scoreboard.bottom.BottomLineAPI;
 import vg.civcraft.mc.civmodcore.players.scoreboard.side.CivScoreBoard;
@@ -62,12 +62,30 @@ public class ModeListener implements Listener {
                 updateDisplayedInformation(Bukkit.getPlayer(player), Bukkit.getPlayer(player).getLocation());
             }
         });
+        settingMan.getShowBastionFieldsSetting().registerListener(new SettingChangeListener<Boolean>() {
+            @Override
+            public void handle(UUID player, PlayerSetting<Boolean> setting, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    Bastion.getVisualiserUtils().startVisualTask(Bukkit.getPlayer(player));
+                } else {
+                    Bastion.getVisualiserUtils().stopVisualTask(Bukkit.getPlayer(player));
+                }
+            }
+        });
         this.placePerm = PermissionType.getPermission(Permissions.BASTION_PLACE);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent pje) {
         updateDisplayedInformation(pje.getPlayer(), pje.getPlayer().getLocation());
+        if (Bastion.getSettingManager().showBastionFields(pje.getPlayer().getUniqueId())) {
+            Bastion.getVisualiserUtils().startVisualTask(pje.getPlayer());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlayerLeave(PlayerQuitEvent event) {
+        Bastion.getVisualiserUtils().stopVisualTask(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -82,11 +100,6 @@ public class ModeListener implements Listener {
             return;
         }
         updateDisplayedInformation(pme.getPlayer(), to);
-        if (Bastion.getSettingManager().showBastionFields(pme.getPlayer().getUniqueId())) {
-            Bastion.getVisualiserUtils().showFieldToPlayer(pme.getPlayer());
-        } else {
-            Bastion.getVisualiserUtils().clearFieldsForPlayer(pme.getPlayer());
-        }
     }
 
     /**

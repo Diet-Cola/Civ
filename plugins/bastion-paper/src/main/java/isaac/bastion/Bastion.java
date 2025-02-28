@@ -61,6 +61,7 @@ public final class Bastion extends ACivMod {
     public void onDisable() {
         blockStorage.close();
         groupStorage.close();
+        visualiserUtils.shutdown();
     }
 
     public String getPluginName() {
