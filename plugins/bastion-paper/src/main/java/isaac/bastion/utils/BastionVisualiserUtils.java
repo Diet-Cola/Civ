@@ -27,15 +27,14 @@ public class BastionVisualiserUtils {
     private Map<Player, Set<BastionBlock>> bastionsNearPlayer;
 
     public BastionVisualiserUtils() {
-        this.taskPerPlayer = new HashMap<>();
         this.fieldsForPlayer = new HashMap<>();
         this.bastionsNearPlayer = new HashMap<>();
+        this.taskPerPlayer = new HashMap<>();
     }
 
     public void startVisualTask(Player player) {
-        ScheduledTask runnable = Bukkit.getAsyncScheduler().runAtFixedRate(Bastion.getPlugin(), task -> {
-            showFieldsToPlayer(player);
-        }, 0, 50, TimeUnit.MILLISECONDS);
+        ScheduledTask runnable = Bukkit.getAsyncScheduler().runAtFixedRate(Bastion.getPlugin(), task ->
+            showFieldsToPlayer(player), 0, 50, TimeUnit.MILLISECONDS);
         this.taskPerPlayer.put(player, runnable);
     }
 

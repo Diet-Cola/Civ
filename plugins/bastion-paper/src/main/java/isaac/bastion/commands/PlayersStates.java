@@ -46,18 +46,20 @@ public class PlayersStates {
             mode = Mode.NORMAL;
         }
 
-        if (mode == Mode.VISUAL) {
-            Bastion.getSettingManager().toggleBastionFields(player.getUniqueId());
-        }
-
         UUID pid = player.getUniqueId();
 
         Mode old = playersModes.get(pid);
+        if (old == Mode.VISUAL) {
+            Bastion.getSettingManager().getShowBastionFieldsSetting().setValue(player.getUniqueId(), false);
+        }
 
         if (old != null && old != mode && old != Mode.NORMAL) {
             player.sendMessage(ChatColor.YELLOW + "Bastion " + old.name() + " mode off");
         }
         player.sendMessage(ChatColor.GREEN + "Bastion " + mode.name() + " mode on");
+        if (mode == Mode.VISUAL) {
+            Bastion.getSettingManager().getShowBastionFieldsSetting().setValue(player.getUniqueId(), true);
+        }
 
         playersModes.put(pid, mode);
     }
