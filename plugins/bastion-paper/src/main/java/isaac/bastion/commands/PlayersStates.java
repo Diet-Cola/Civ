@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 public class PlayersStates {
 
     static public enum Mode {
-        NORMAL, INFO, DELETE, OFF, BASTION, MATURE
+        NORMAL, INFO, DELETE, OFF, BASTION, MATURE, VISUAL
     }
 
     static private Map<UUID, Mode> playersModes = new HashMap<>();
@@ -44,6 +44,10 @@ public class PlayersStates {
     public static void setModeForPlayer(Player player, Mode mode) {
         if (mode == null) {
             mode = Mode.NORMAL;
+        }
+
+        if (mode == Mode.VISUAL) {
+            Bastion.getSettingManager().toggleBastionFields(player.getUniqueId());
         }
 
         UUID pid = player.getUniqueId();

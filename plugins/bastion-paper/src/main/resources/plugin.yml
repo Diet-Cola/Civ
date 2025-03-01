@@ -34,6 +34,10 @@ commands:
     description: Insta matures any bastion left clicked
     usage: /bsm
     permission: Bastion.admin
+  bsv:
+    description: Toggles bastion visuals
+    usage: /bsv
+    permission: Bastion.normal
 permissions:
   Bastion.*:
     description: Gives access to all Bastion commands

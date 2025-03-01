@@ -44,8 +44,10 @@ public class BastionVisualiserUtils {
         if (task == null) {
             return;
         }
-        clearFieldsForPlayer(player);
         task.cancel();
+        Bukkit.getAsyncScheduler().runDelayed(Bastion.getPlugin(), runnable -> {
+            clearFieldsForPlayer(player);
+        }, 50, TimeUnit.MILLISECONDS);
         this.taskPerPlayer.remove(player);
     }
 
@@ -53,7 +55,7 @@ public class BastionVisualiserUtils {
         this.taskPerPlayer.values().forEach(ScheduledTask::cancel);
     }
 
-    private HashMap<Location, BlockData> buildFrameAroundBastionLocation(Location location, Player player) {
+    private HashMap<Location, BlockData> createFrame(Location location, Player player) {
         HashMap<Location, BlockData> blocksToChange = new HashMap<>();
         BastionBlock bastion = Bastion.getBastionStorage().getBastionBlock(location);
         int radius = bastion.getType().getEffectRadius();
@@ -70,7 +72,7 @@ public class BastionVisualiserUtils {
             for (int xPoint = x1; xPoint <= x2; xPoint++) {
                 for (int yPoint = y1; yPoint <= y2; yPoint++) {
                     Location newLoc = new Location(world, xPoint, yPoint, z1);
-                    if (!newLoc.isChunkLoaded()) {
+                    if (newLoc.getBlock().getType() != Material.AIR) {
                         continue;
                     }
                     if (bastion.inField(newLoc)) {
@@ -82,7 +84,7 @@ public class BastionVisualiserUtils {
             for (int xPoint = x1; xPoint <= x2; xPoint++) {
                 for (int yPoint = y1; yPoint <= y2; yPoint++) {
                     Location newLoc = new Location(world, xPoint, yPoint, z2);
-                    if (!newLoc.isChunkLoaded()) {
+                    if (newLoc.getBlock().getType() != Material.AIR) {
                         continue;
                     }
                     if (bastion.inField(newLoc)) {
@@ -93,7 +95,7 @@ public class BastionVisualiserUtils {
             for (int zPoint = z1; zPoint <= z2; zPoint++) {
                 for (int yPoint = y1; yPoint <= y2; yPoint++) {
                     Location newLoc = new Location(world, x1, yPoint, zPoint);
-                    if (!newLoc.isChunkLoaded()) {
+                    if (newLoc.getBlock().getType() != Material.AIR) {
                         continue;
                     }
                     if (bastion.inField(newLoc)) {
@@ -104,7 +106,7 @@ public class BastionVisualiserUtils {
             for (int zPoint = z1; zPoint <= z2; zPoint++) {
                 for (int yPoint = y1; yPoint <= y2; yPoint++) {
                     Location newLoc = new Location(world, x2, yPoint, zPoint);
-                    if (!newLoc.isChunkLoaded()) {
+                    if (newLoc.getBlock().getType() != Material.AIR) {
                         continue;
                     }
                     if (bastion.inField(newLoc)) {
@@ -121,23 +123,14 @@ public class BastionVisualiserUtils {
 
     private void showFieldsToPlayer(Player player) {
         Set<BastionBlock> bastionBlocks = getBastionsInRenderDistance(player);
-        Map<Location, BlockData> frames = new HashMap<>();
+        Map<Location, BlockData> frames = getBlocksChangedForPlayer(player);
         for (BastionBlock bastion : bastionBlocks) {
-            Map<Location, BlockData> frame = buildFrameAroundBastionLocation(bastion.getLocation(), player);
+            Map<Location, BlockData> frame = createFrame(bastion.getLocation(), player);
             player.sendMultiBlockChange(frame);
             frames.putAll(frame);
         }
+        frames.putAll(getBlocksChangedForPlayer(player));
         this.fieldsForPlayer.put(player, frames);
-        cleanUpUnloadedFields(player);
-    };
-
-    private void cleanUpUnloadedFields(Player player) {
-        getBlocksChangedForPlayer(player).keySet().forEach(location -> {
-            if (!location.isChunkLoaded() || !location.getWorld().getUID().equals(player.getWorld().getUID())) {
-                //Block update should be handed by chunk being unloaded/loaded
-                getBlocksChangedForPlayer(player).keySet().remove(location);
-            }
-        });
     }
 
     private void clearFieldsForPlayer(Player player) {
@@ -145,11 +138,10 @@ public class BastionVisualiserUtils {
         if (changedBlocks == null || changedBlocks.isEmpty()) {
             return;
         }
-        Set<Location> locs = changedBlocks.keySet();
-        for (Location block : locs) {
-            player.sendBlockChange(block, block.getBlock().getBlockData());
-            changedBlocks.remove(block);
-        }
+        changedBlocks.keySet().forEach(loc -> {
+            player.sendBlockChange(loc, loc.getBlock().getBlockData());
+        });
+        this.fieldsForPlayer.remove(player);
     }
 
     private Set<BastionBlock> getBastionsInRenderDistance(Player player) {
@@ -162,7 +154,6 @@ public class BastionVisualiserUtils {
                 nearby.add(bastionBlock);
             } else {
                 nearby.remove(bastionBlock);
-                getBastionsNearbyPlayer(player).remove(bastionBlock);
             }
         });
         this.bastionsNearPlayer.put(player, nearby);

@@ -124,6 +124,7 @@ public final class Bastion extends ACivMod {
         getCommand("bsb").setExecutor(new ModeChangeCommand(Mode.BASTION));
         getCommand("bsf").setExecutor(new ModeChangeCommand(Mode.OFF));
         getCommand("bsm").setExecutor(new ModeChangeCommand(Mode.MATURE));
+        getCommand("bsv").setExecutor(new ModeChangeCommand(Mode.VISUAL));
     }
 
     public static Bastion getPlugin() {
