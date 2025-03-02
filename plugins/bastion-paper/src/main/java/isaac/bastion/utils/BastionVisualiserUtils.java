@@ -57,6 +57,10 @@ public class BastionVisualiserUtils {
     private HashMap<Location, BlockData> createFrame(Location location, Player player) {
         HashMap<Location, BlockData> blocksToChange = new HashMap<>();
         BastionBlock bastion = Bastion.getBastionStorage().getBastionBlock(location);
+        if (bastion == null) {
+            //Bastion has been broken/deleted
+            return new HashMap<>();
+        }
         int radius = bastion.getType().getEffectRadius();
 
         int x1 = location.getBlockX() - radius;
@@ -68,51 +72,81 @@ public class BastionVisualiserUtils {
         int z2 = z1 + (radius * 2);
 
         World world = location.getWorld();
-            for (int xPoint = x1; xPoint <= x2; xPoint++) {
-                for (int yPoint = y1; yPoint <= y2; yPoint++) {
-                    Location newLoc = new Location(world, xPoint, yPoint, z1);
-                    if (newLoc.getBlock().getType() != Material.AIR) {
+        //Circle field
+        if (!bastion.getType().isSquare()) {
+            Set<Location> field = new HashSet<>();
+            for (int x = x1; x <= x2; x++) {
+                for (int z = z1; z <= z2; z++){
+                    Location newLoc = new Location(world, x, y1, z);
+                    if (newLoc.equals(location)) {
                         continue;
                     }
-                    if (bastion.inField(newLoc)) {
-                        blocksToChange.put(newLoc, getMaterialForLocation(newLoc, player).createBlockData());
-                    }
-
-                }
-            }
-            for (int xPoint = x1; xPoint <= x2; xPoint++) {
-                for (int yPoint = y1; yPoint <= y2; yPoint++) {
-                    Location newLoc = new Location(world, xPoint, yPoint, z2);
-                    if (newLoc.getBlock().getType() != Material.AIR) {
-                        continue;
-                    }
-                    if (bastion.inField(newLoc)) {
-                        blocksToChange.put(newLoc, getMaterialForLocation(newLoc, player).createBlockData());
+                    if (location.distanceSquared(newLoc) > (radius - 1) * (radius - 1) && bastion.inField(newLoc)) {
+                        field.add(newLoc);
                     }
                 }
             }
-            for (int zPoint = z1; zPoint <= z2; zPoint++) {
-                for (int yPoint = y1; yPoint <= y2; yPoint++) {
-                    Location newLoc = new Location(world, x1, yPoint, zPoint);
-                    if (newLoc.getBlock().getType() != Material.AIR) {
-                        continue;
-                    }
-                    if (bastion.inField(newLoc)) {
-                        blocksToChange.put(newLoc, getMaterialForLocation(newLoc, player).createBlockData());
-                    }
+            field.add(location.clone().add(0, 0, (radius - 1)));
+            field.add(location.clone().add((radius - 1), 0, 0));
+            field.add(location.clone().subtract((radius - 1), 0, 0));
+            field.add(location.clone().subtract(0, 0, (radius - 1)));
+            Set<Location> verticality = new HashSet<>();
+            field.forEach(loc -> {
+                for (int y = loc.getBlockY(); y <= world.getMaxHeight(); y++) {
+                    verticality.add(loc.clone().set(loc.x(), y, loc.z()));
+                }
+            });
+            field.addAll(verticality);
+            field.forEach(block -> {
+                blocksToChange.put(block, getMaterialForLocation(block, player).createBlockData());
+            });
+            return blocksToChange;
+        }
+        //Square field
+        for (int xPoint = x1; xPoint <= x2; xPoint++) {
+            for (int yPoint = y1; yPoint <= y2; yPoint++) {
+                Location newLoc = new Location(world, xPoint, yPoint, z1);
+                if (newLoc.getBlock().getType() != Material.AIR) {
+                    continue;
+                }
+                if (bastion.inField(newLoc)) {
+                    blocksToChange.put(newLoc, getMaterialForLocation(newLoc, player).createBlockData());
                 }
             }
-            for (int zPoint = z1; zPoint <= z2; zPoint++) {
-                for (int yPoint = y1; yPoint <= y2; yPoint++) {
-                    Location newLoc = new Location(world, x2, yPoint, zPoint);
-                    if (newLoc.getBlock().getType() != Material.AIR) {
-                        continue;
-                    }
-                    if (bastion.inField(newLoc)) {
-                        blocksToChange.put(newLoc, getMaterialForLocation(newLoc, player).createBlockData());
-                    }
+        }
+        for (int xPoint = x1; xPoint <= x2; xPoint++) {
+            for (int yPoint = y1; yPoint <= y2; yPoint++) {
+                Location newLoc = new Location(world, xPoint, yPoint, z2);
+                if (newLoc.getBlock().getType() != Material.AIR) {
+                    continue;
+                }
+                if (bastion.inField(newLoc)) {
+                    blocksToChange.put(newLoc, getMaterialForLocation(newLoc, player).createBlockData());
                 }
             }
+        }
+        for (int zPoint = z1; zPoint <= z2; zPoint++) {
+            for (int yPoint = y1; yPoint <= y2; yPoint++) {
+                Location newLoc = new Location(world, x1, yPoint, zPoint);
+                if (newLoc.getBlock().getType() != Material.AIR) {
+                    continue;
+                }
+                if (bastion.inField(newLoc)) {
+                    blocksToChange.put(newLoc, getMaterialForLocation(newLoc, player).createBlockData());
+                }
+            }
+        }
+        for (int zPoint = z1; zPoint <= z2; zPoint++) {
+            for (int yPoint = y1; yPoint <= y2; yPoint++) {
+                Location newLoc = new Location(world, x2, yPoint, zPoint);
+                if (newLoc.getBlock().getType() != Material.AIR) {
+                    continue;
+                }
+                if (bastion.inField(newLoc)) {
+                    blocksToChange.put(newLoc, getMaterialForLocation(newLoc, player).createBlockData());
+                }
+            }
+        }
         return blocksToChange;
     }
 
