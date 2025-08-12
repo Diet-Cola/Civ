@@ -7,7 +7,9 @@ import com.github.devotedmc.hiddenore.listeners.WorldGenerationListener;
 import com.github.devotedmc.hiddenore.tracking.BreakTracking;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -20,8 +22,8 @@ public class HiddenOre extends JavaPlugin {
     private static CommandHandler commandHandler;
 
     private static BreakTracking tracking;
-    private BukkitTask trackingSave;
-    private BukkitTask trackingMapSave;
+    private ScheduledTask trackingSave;
+    private ScheduledTask trackingMapSave;
 
     private static BlockBreakListener breakHandler;
     private static ExploitListener exploitHandler;
@@ -37,17 +39,13 @@ public class HiddenOre extends JavaPlugin {
 
         tracking = new BreakTracking();
         tracking.load();
-        trackingSave = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
-            public void run() {
-                tracking.save();
-            }
-        }, Config.trackSave, Config.trackSave);
+        trackingSave = Bukkit.getAsyncScheduler().runAtFixedRate(HiddenOre.getPlugin(), task -> {
+            tracking.save();
+        }, Config.trackSave, Config.trackSave, TimeUnit.MILLISECONDS);
 
-        trackingMapSave = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
-            public void run() {
-                tracking.saveMap();
-            }
-        }, Config.mapSave, Config.mapSave);
+        trackingMapSave = Bukkit.getAsyncScheduler().runAtFixedRate(HiddenOre.getPlugin(), task -> {
+            tracking.saveMap();
+        }, Config.mapSave, Config.mapSave, TimeUnit.MILLISECONDS);
 
 
         exploitHandler = new ExploitListener(plugin);

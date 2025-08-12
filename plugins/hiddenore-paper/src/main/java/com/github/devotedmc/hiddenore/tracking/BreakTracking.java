@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -169,17 +170,13 @@ public class BreakTracking {
     }
 
     public void liveSave() {
-        Bukkit.getScheduler().runTaskLaterAsynchronously(HiddenOre.getPlugin(), new Runnable() {
-            public void run() {
-                save();
-            }
-        }, 0);
+        Bukkit.getAsyncScheduler().runDelayed(HiddenOre.getPlugin(), task -> {
+            save();
+        }, 0, TimeUnit.MILLISECONDS);
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(HiddenOre.getPlugin(), new Runnable() {
-            public void run() {
-                saveMap();
-            }
-        }, 0);
+        Bukkit.getAsyncScheduler().runDelayed(HiddenOre.getPlugin(), task -> {
+            saveMap();
+        }, 0, TimeUnit.MILLISECONDS);
 
     }
 

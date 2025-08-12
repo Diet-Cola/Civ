@@ -9,6 +9,12 @@ RB:
 - rb command not working
 - Maybe revisit ChunkMeta schedulers in RBChunkCache (iterateAll)
 
+HO:
+- hiddenore generate command broken
+- No exceptions for world access in testing? - this feels wrong idk
+
+
+
 
 
 
