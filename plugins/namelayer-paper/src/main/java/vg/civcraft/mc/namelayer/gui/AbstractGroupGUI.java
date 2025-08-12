@@ -35,7 +35,7 @@ public abstract class AbstractGroupGUI {
 
     public static void matsInit() {
         if (ch == null) {
-            Bukkit.getScheduler().runTaskLater(NameLayerPlugin.getInstance(), new Runnable() {
+            Bukkit.getGlobalRegionScheduler().execute(NameLayerPlugin.getInstance(), new Runnable() {
 
                 @Override
                 public void run() {
@@ -44,7 +44,7 @@ public abstract class AbstractGroupGUI {
                         mats = ch.getMaterialClass();
                 }
 
-            }, 1);
+            });
         }
     }
 

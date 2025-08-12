@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitTask;
@@ -24,17 +26,17 @@ public final class MojangNames {
     private static final Map<String, UUID> PROFILES = Collections.synchronizedMap(
         new TreeMap<>(String.CASE_INSENSITIVE_ORDER));
     private static final String PROFILES_FILE = "mojang.dat";
-    private static final long SAVE_DELAY = 20 * 60; // 60 seconds' worth of ticks
-    private static BukkitTask SAVE_TASK;
+    private static final long SAVE_DELAY = 6000; // 1 min in MS
+    private static ScheduledTask SAVE_TASK;
 
     public static void init(final NameLayerPlugin plugin) {
         final Path mojangFile = plugin.getDataFile(PROFILES_FILE).toPath();
         // Load all the profiles that already exist
-        Bukkit.getScheduler().runTaskAsynchronously(
-            plugin, () -> load(plugin, mojangFile));
+        Bukkit.getAsyncScheduler().runNow(
+            plugin, task -> load(plugin, mojangFile));
         // Set up a process of saving profiles
-        SAVE_TASK = Bukkit.getScheduler().runTaskTimerAsynchronously(
-            plugin, () -> save(plugin, mojangFile), SAVE_DELAY, SAVE_DELAY);
+        SAVE_TASK = Bukkit.getAsyncScheduler().runAtFixedRate(
+            plugin, task -> save(plugin, mojangFile), SAVE_DELAY, SAVE_DELAY, TimeUnit.MILLISECONDS);
     }
 
     public static void reset(final NameLayerPlugin plugin) {

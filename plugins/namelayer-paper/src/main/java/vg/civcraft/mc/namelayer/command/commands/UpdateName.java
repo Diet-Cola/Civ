@@ -33,10 +33,8 @@ public class UpdateName extends BaseCommandMiddle {
         }
 
         if (newNameOrConfirm.isEmpty()) {
-            Bukkit.getScheduler().runTaskAsynchronously(
-                NameLayerPlugin.getInstance(), new Runnable() {
-                    @Override
-                    public void run() {
+            Bukkit.getAsyncScheduler().runNow(
+                NameLayerPlugin.getInstance(), task -> {
                         NameFetcher fetcher = new NameFetcher(Collections.singletonList(uuid));
                         Map<UUID, String> fetchedNames = null;
                         try {
@@ -79,7 +77,6 @@ public class UpdateName extends BaseCommandMiddle {
                             + newName
                             + "\". Run \"/nlun CONFIRM\" to update your name on the server to this name. Be careful though as this change can not be reverted!");
                         newNames.put(uuid, newName);
-                    }
                 });
             return;
         } else {

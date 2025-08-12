@@ -250,17 +250,14 @@ public class GroupManagerDao {
                 @Override
                 public Boolean call() {
                     // Procedures may not be initialized yet.
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(NameLayerPlugin.getInstance(), new Runnable() {
-                        @Override
-                        public void run() {
+                    Bukkit.getGlobalRegionScheduler().runDelayed(NameLayerPlugin.getInstance(), task ->  {
                             Group g = getGroup(NameLayerPlugin.getSpecialAdminGroup());
                             if (g == null) {
                                 createGroup(NameLayerPlugin.getSpecialAdminGroup(), null, null);
                             } else {
                                 removeAllMembers(g.getName());
                             }
-                        }
-                    });
+                    }, 1l);
                     return true;
                 }
             },

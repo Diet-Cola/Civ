@@ -43,7 +43,7 @@ public class GroupStats extends BaseCommandMiddle {
             return;
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(NameLayerPlugin.getInstance(), new StatsMessage(p, g));
+        Bukkit.getAsyncScheduler().runNow(NameLayerPlugin.getInstance(), task ->  new StatsMessage(p, g));
     }
 
     public List<String> tabComplete(CommandSender sender, String[] args) {

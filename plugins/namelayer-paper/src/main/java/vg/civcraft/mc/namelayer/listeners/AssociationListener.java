@@ -26,7 +26,7 @@ public class AssociationListener implements Listener {
     private ProfileInterface game;
 
     public AssociationListener() {
-        Bukkit.getScheduler().runTaskLater(NameLayerPlugin.getInstance(), new Runnable() {
+        Bukkit.getGlobalRegionScheduler().execute(NameLayerPlugin.getInstance(), new Runnable() {
 
             @Override
             public void run() {
@@ -37,7 +37,7 @@ public class AssociationListener implements Listener {
                 associations = NameAPI.getAssociationList();
             }
 
-        }, 1);
+        });
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

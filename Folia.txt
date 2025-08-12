@@ -13,6 +13,17 @@ HO:
 - hiddenore generate command broken
 - No exceptions for world access in testing? - this feels wrong idk
 
+NL:
+- Async task for NameLayer v3.0.6-F generated an exception
+  java.lang.NoSuchMethodError: 'java.util.Set net.minecraft.nbt.CompoundTag.keySet()'
+          at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.nbt.NbtCompound.keys(NbtCompound.java:52) ~[civmodcore-paper-3.0.6-F-all.jar:?]
+          at namelayer-paper-3.0.6-F.jar/vg.civcraft.mc.namelayer.MojangNames.load(MojangNames.java:58) ~[namelayer-paper-3.0.6-F.jar:?]
+ - nl gui command not working
+ - nl group commands work!
+
+ 
+
+
 
 
 
