@@ -63,6 +63,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 import static vg.civcraft.mc.civmodcore.config.ConfigHelper.parseTime;
 import static vg.civcraft.mc.civmodcore.config.ConfigHelper.parseTimeAsTicks;
@@ -139,14 +140,9 @@ public class ConfigParser {
         forceIncludeAll = config.getBoolean("force_include_default", false);
         // save factories on a regular base, unless disabled
         if (savingIntervall > 0) {
-            new BukkitRunnable() {
-
-                @Override
-                public void run() {
-                    FactoryMod.getInstance().getManager().saveFactories();
-
-                }
-            }.runTaskTimerAsynchronously(plugin, savingIntervall, savingIntervall);
+            Bukkit.getAsyncScheduler().runAtFixedRate(FactoryMod.getInstance(), task -> {
+                FactoryMod.getInstance().getManager().saveFactories();
+            }, savingIntervall, savingIntervall, TimeUnit.MINUTES);
         }
         int globalPylonLimit = config.getInt("global_pylon_limit");
         PylonRecipe.setGlobalLimit(globalPylonLimit);
@@ -490,9 +486,10 @@ public class ConfigParser {
     }
 
     public void enableFactoryDecay(ConfigurationSection config) {
-        long interval = parseTimeAsTicks(config.getString("decay_intervall"));
-        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, new FactoryGarbageCollector(), interval,
-            interval);
+        long interval = parseTimeAsTicks(config.getString("decay_intervall")) * 50;
+        plugin.getServer().getAsyncScheduler().runAtFixedRate(plugin, task ->
+                new FactoryGarbageCollector().run(), interval,
+            interval, TimeUnit.MILLISECONDS);
     }
 
     /**

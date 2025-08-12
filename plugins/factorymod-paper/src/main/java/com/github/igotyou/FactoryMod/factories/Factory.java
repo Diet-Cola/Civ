@@ -5,6 +5,7 @@ import com.github.igotyou.FactoryMod.interactionManager.IInteractionManager;
 import com.github.igotyou.FactoryMod.powerManager.IPowerManager;
 import com.github.igotyou.FactoryMod.repairManager.IRepairManager;
 import com.github.igotyou.FactoryMod.structures.MultiBlockStructure;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -23,7 +24,7 @@ public abstract class Factory implements Runnable {
     protected MultiBlockStructure mbs;
     protected int updateTime;
     protected String name;
-    protected int threadId;
+    protected ScheduledTask scheduledTask;
 
     public Factory(IInteractionManager im, IRepairManager rm, IPowerManager pm, MultiBlockStructure mbs,
                    int updateTime, String name) {
@@ -114,15 +115,17 @@ public abstract class Factory implements Runnable {
     public abstract void attemptToActivate(Player p, boolean onStartUp);
 
     public void scheduleUpdate() {
-        threadId = FactoryMod.getInstance().getServer().getScheduler()
-            .scheduleSyncDelayedTask(FactoryMod.getInstance(), this, getUpdateTime());
+        FactoryMod.getInstance().getServer().getGlobalRegionScheduler()
+            .runDelayed(FactoryMod.getInstance(), task -> {
+                this.run();
+            }, getUpdateTime());
     }
 
     public void turnFurnaceOn(Block f) {
         if (f.getType() != Material.FURNACE) {
             return;
         }
-        Bukkit.getScheduler().runTask(FactoryMod.getInstance(), () -> {
+        Bukkit.getRegionScheduler().run(FactoryMod.getInstance(), f.getLocation(), task -> {
             if (this.isActive()) {
                 Furnace furnace = (Furnace) f.getState();
                 furnace.setBurnTime(Short.MAX_VALUE);
@@ -141,7 +144,7 @@ public abstract class Factory implements Runnable {
         }
         FactoryMod fmPlugin = FactoryMod.getInstance();
         if (fmPlugin.isEnabled()) {
-            Bukkit.getScheduler().runTask(FactoryMod.getInstance(), () -> {
+            Bukkit.getRegionScheduler().execute(FactoryMod.getInstance(), f.getLocation(), () -> {
                 if (!this.isActive()) {
                     Furnace furnace = (Furnace) f.getState();
                     furnace.setBurnTime((short) 0);

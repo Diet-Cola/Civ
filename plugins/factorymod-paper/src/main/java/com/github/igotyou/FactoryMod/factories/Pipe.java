@@ -81,7 +81,7 @@ public class Pipe extends Factory {
     public void deactivate() {
         LoggingUtils.log("Deactivating " + getLogData());
         active = false;
-        Bukkit.getScheduler().cancelTask(threadId);
+        this.scheduledTask.cancel();
         turnFurnaceOff(((PipeStructure) mbs).getFurnace());
         runTime = 0;
     }

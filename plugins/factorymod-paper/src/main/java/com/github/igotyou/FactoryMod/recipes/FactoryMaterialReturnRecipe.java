@@ -74,10 +74,8 @@ public class FactoryMaterialReturnRecipe extends InputRecipe {
         for (Block b : fccf.getMultiBlockStructure().getRelevantBlocks()) {
             b.setType(Material.AIR);
         }
-        Bukkit.getScheduler().runTaskLater(FactoryMod.getInstance(),
-            new Runnable() {
-                @Override
-                public void run() {
+        Bukkit.getRegionScheduler().runDelayed(FactoryMod.getInstance(), fccf.getMultiBlockStructure().getCenter(),
+            task -> {
                     Location dropLoc = fccf.getMultiBlockStructure()
                         .getCenter();
                     for (Entry<ItemStack, Integer> items : FactoryMod.getInstance().
@@ -94,7 +92,6 @@ public class FactoryMaterialReturnRecipe extends InputRecipe {
                     dropLoc.getWorld().dropItemNaturally(dropLoc, new ItemStack(Material.CRAFTING_TABLE));
                     dropLoc.getWorld().dropItemNaturally(dropLoc, new ItemStack(Material.FURNACE));
                     dropLoc.getWorld().dropItemNaturally(dropLoc, new ItemStack((fccf.getChest()).getType()));
-                }
             }, 1L);
         return true;
     }

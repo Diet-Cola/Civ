@@ -90,7 +90,7 @@ public class Sorter extends Factory {
     public void deactivate() {
         LoggingUtils.log("Deactivating " + getLogData());
         LoggingUtils.logInventory(mbs.getCenter().getBlock());
-        Bukkit.getScheduler().cancelTask(threadId);
+        this.scheduledTask.cancel();
         turnFurnaceOff(((BlockFurnaceStructure) mbs).getFurnace());
         active = false;
     }

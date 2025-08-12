@@ -4,6 +4,7 @@ import com.github.igotyou.FactoryMod.FactoryMod;
 import com.github.igotyou.FactoryMod.FactoryModManager;
 import com.github.igotyou.FactoryMod.FactoryModPlayerSettings;
 import java.util.UUID;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -96,7 +97,7 @@ public class IOConfigSection extends StaticDisplaySection {
         return new Clickable(display) {
             private ClickableInventory inventory;
             private int slot;
-            private BukkitTask reBarrierTask;
+            private ScheduledTask reBarrierTask;
 
             @Override
             protected void clicked(Player player) {
@@ -173,7 +174,7 @@ public class IOConfigSection extends StaticDisplaySection {
                     if (reBarrierTask != null) {
                         reBarrierTask.cancel();
                     }
-                    reBarrierTask = Bukkit.getScheduler().runTaskLater(FactoryMod.getInstance(), () -> {
+                    reBarrierTask = Bukkit.getGlobalRegionScheduler().runDelayed(FactoryMod.getInstance(), task -> {
                         getItemStack().setType(Material.BARRIER);
                         inventory.setSlot(this, slot);
                         reBarrierTask = null;

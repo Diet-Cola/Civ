@@ -27,6 +27,13 @@ NL:
 CivChat2:
 - seems to work, need to test with pm'ing
 
+FM:
+- /fm gui broken
+- recipe selection gui broken when hitting crafting table
+- /item broken
+
+
+
 
 
 

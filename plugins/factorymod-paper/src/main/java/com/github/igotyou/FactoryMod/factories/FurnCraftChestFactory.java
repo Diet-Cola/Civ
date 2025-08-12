@@ -28,6 +28,7 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import com.github.igotyou.FactoryMod.utility.MultiInventoryWrapper;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -407,7 +408,7 @@ public class FurnCraftChestFactory extends Factory implements IIOFInventoryProvi
     public void deactivate() {
         if (active) {
             LoggingUtils.log("Deactivating " + getLogData());
-            Bukkit.getScheduler().cancelTask(threadId);
+            this.scheduledTask.cancel();
             turnFurnaceOff(getFurnace());
             active = false;
             // reset the production timer
@@ -471,7 +472,6 @@ public class FurnCraftChestFactory extends Factory implements IIOFInventoryProvi
     /**
      * Called by the manager each update cycle
      */
-    @Override
     public void run() {
         if (active && mbs.isComplete()) {
             // if the materials required to produce the current recipe are in
