@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
+import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -35,7 +36,7 @@ public class GlobalChunkMetaManager {
             registerWorld(idManager.getInternalWorldId(world), world);
         }
         Bukkit.getPluginManager().registerEvents(new ChunkMetaListener(this, ChunkMetaViewTracker.getInstance()), CivModCorePlugin.getInstance());
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CivModCorePlugin.getInstance(), () -> {
+        Bukkit.getGlobalRegionScheduler().runDelayed(CivModCorePlugin.getInstance(), task -> {
             for (World world : Bukkit.getWorlds()) {
                 for (Chunk chunk : world.getLoadedChunks()) {
                     loadChunkData(chunk);

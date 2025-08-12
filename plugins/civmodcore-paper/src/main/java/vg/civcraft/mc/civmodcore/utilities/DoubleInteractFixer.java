@@ -17,7 +17,7 @@ public class DoubleInteractFixer {
 
     public DoubleInteractFixer(Plugin plugin) {
         locations = new TreeMap<>();
-        Bukkit.getScheduler().runTaskTimer(plugin, () -> locations.clear(), 1L, 1L);
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, task -> locations.clear(), 1L, 1L);
     }
 
     /**

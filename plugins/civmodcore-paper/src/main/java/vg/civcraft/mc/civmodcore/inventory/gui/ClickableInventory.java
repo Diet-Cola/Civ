@@ -193,7 +193,7 @@ public class ClickableInventory {
     public void showInventory(Player p, boolean eventSafe) {
         if (p != null) {
             if (eventSafe) {
-                Bukkit.getScheduler().runTask(CivModCorePlugin.getInstance(), () -> {
+                p.getScheduler().run(CivModCorePlugin.getInstance(), task -> {}, () -> {
                     p.openInventory(inventory);
                     openInventories.put(p.getUniqueId(), this);
                 });

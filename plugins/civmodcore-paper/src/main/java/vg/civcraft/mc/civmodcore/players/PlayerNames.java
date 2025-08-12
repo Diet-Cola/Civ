@@ -23,13 +23,13 @@ public final class PlayerNames implements Listener {
 
     public PlayerNames(Plugin plugin) {
         names.clear();
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        Bukkit.getAsyncScheduler().runNow(plugin, task -> {
             OfflinePlayer[] players = Bukkit.getOfflinePlayers();
             List<String> namesList = Stream.of(players)
                 .map(OfflinePlayer::getName)
                 .filter(StringUtils::isNotBlank)
                 .toList();
-            Bukkit.getScheduler().runTask(plugin, () -> {
+            Bukkit.getGlobalRegionScheduler().execute(plugin, () -> {
                 names.addAll(namesList);
             });
         });

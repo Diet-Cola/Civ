@@ -39,7 +39,7 @@ public final class DelayedItemDrop {
 
     public static void dropAt(final Location l, final List<ItemStack> stacks) {
         // Schedule the item to drop 1 tick later
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CivModCorePlugin.getInstance(), () -> {
+        Bukkit.getRegionScheduler().runDelayed(CivModCorePlugin.getInstance(), l, task -> {
             for (ItemStack is : stacks) {
                 l.getWorld().dropItem(l.add(0.5, 0.5, 0.5), is).setVelocity(new Vector(0, 0.05, 0));
             }

@@ -1,0 +1,6 @@
+Folia notes:
+
+CMC:
+- config command not working
+- scoreboard api/bottomline api disabled
+

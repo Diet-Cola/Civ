@@ -4,11 +4,11 @@ plugins {
     id("xyz.jpenilla.run-paper")
 }
 
-version = "3.0.6"
+version = "3.0.6-F"
 
 dependencies {
     paperweight {
-        paperDevBundle(libs.versions.paper)
+        foliaDevBundle(libs.versions.paper)
     }
 
     api(libs.aikar.acf)
