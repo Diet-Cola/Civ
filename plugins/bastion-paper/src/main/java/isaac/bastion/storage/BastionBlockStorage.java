@@ -1,5 +1,6 @@
 package isaac.bastion.storage;
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import isaac.bastion.Bastion;
 import isaac.bastion.BastionBlock;
 import isaac.bastion.BastionType;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
@@ -40,7 +42,7 @@ public class BastionBlockStorage {
     private Set<BastionBlock> bastions;
     private Map<Integer, List<BastionBlock>> groups;
     private Map<Location, String> dead;
-    private int taskId;
+    private ScheduledTask task;
 
     private HashMap<Location, BastionType> pendingBastions;
 
@@ -61,19 +63,16 @@ public class BastionBlockStorage {
         this.db = db;
         this.log = log;
         long saveDelay = 86400000 / Bastion.getPlugin().getConfig().getLong("mysql.savesPerDay", 64);
-        taskId = new BukkitRunnable() {
-            @Override
-            public void run() {
-                update();
-            }
-        }.runTaskTimer(Bastion.getPlugin(), saveDelay, saveDelay).getTaskId();
+        task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(Bastion.getPlugin(), storage -> {
+            update();
+        }, saveDelay, saveDelay);
     }
 
     /**
      * Updates all remaining bastions and cancels the update task
      */
     public void close() {
-        Bukkit.getScheduler().cancelTask(taskId);
+        this.task.cancel();
         update();
     }
 

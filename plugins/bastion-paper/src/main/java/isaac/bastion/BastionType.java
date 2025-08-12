@@ -2,6 +2,7 @@ package isaac.bastion;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -426,33 +427,26 @@ public class BastionType {
     public static void startRegenAndErosionTasks() {
         for (BastionType type : types.values()) {
             if (type.erosionTime > 0) {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        Bastion.getPlugin().getLogger().log(Level.INFO, "Erosion task begin, found " +
-                            Bastion.getBastionStorage().getBastionsForType(type).size() + " to erode");
-                        for (BastionBlock bastion : Bastion.getBastionStorage().getBastionsForType(type)) {
-                            bastion.erode(1);
-                        }
-                        Bastion.getPlugin().getLogger().log(Level.INFO, "Erosion task ended, after erosion " +
-                            Bastion.getBastionStorage().getBastionsForType(type).size() + " remain");
+                Bukkit.getAsyncScheduler().runAtFixedRate(Bastion.getPlugin(), task -> {
+                    Bastion.getPlugin().getLogger().log(Level.INFO, "Erosion task begin, found " +
+                        Bastion.getBastionStorage().getBastionsForType(type).size() + " to erode");
+                    for (BastionBlock bastion : Bastion.getBastionStorage().getBastionsForType(type)) {
+                        bastion.erode(1);
                     }
-                }.runTaskTimerAsynchronously(Bastion.getPlugin(), type.erosionTime, type.erosionTime);
+                    Bastion.getPlugin().getLogger().log(Level.INFO, "Erosion task ended, after erosion " +
+                        Bastion.getBastionStorage().getBastionsForType(type).size() + " remain");
+                }, type.erosionTime, type.erosionTime, TimeUnit.MILLISECONDS);
             }
             if (type.regenTime > 0) {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        Bastion.getPlugin().getLogger().log(Level.INFO, "Regen task begin, found " +
-                            Bastion.getBastionStorage().getBastionsForType(type).size() + " to regen");
-                        for (BastionBlock bastion : Bastion.getBastionStorage().getBastionsForType(type)) {
-                            bastion.regen();
-                        }
-                        Bastion.getPlugin().getLogger().log(Level.INFO, "Regen task ended, after regen " +
-                            Bastion.getBastionStorage().getBastionsForType(type).size() + " remain");
-
+                Bukkit.getAsyncScheduler().runAtFixedRate(Bastion.getPlugin(), task -> {
+                    Bastion.getPlugin().getLogger().log(Level.INFO, "Regen task begin, found " +
+                        Bastion.getBastionStorage().getBastionsForType(type).size() + " to regen");
+                    for (BastionBlock bastion : Bastion.getBastionStorage().getBastionsForType(type)) {
+                        bastion.regen();
                     }
-                }.runTaskTimerAsynchronously(Bastion.getPlugin(), type.regenTime, type.regenTime);
+                    Bastion.getPlugin().getLogger().log(Level.INFO, "Regen task ended, after regen " +
+                        Bastion.getBastionStorage().getBastionsForType(type).size() + " remain");
+                }, type.regenTime, type.regenTime, TimeUnit.MILLISECONDS);
             }
         }
     }

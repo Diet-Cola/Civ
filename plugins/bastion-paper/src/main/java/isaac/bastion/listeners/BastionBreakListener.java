@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.logging.Level;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -39,17 +40,12 @@ public class BastionBreakListener implements Listener {
 
     private void dropBastionItem(Location loc, BastionType type, Player player, TextComponent chatMessage) {
         ItemStack item = type.getItemRepresentation();
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                loc.getWorld().dropItem(loc.add(0.5, 0.5, 0.5), item).setVelocity(new Vector(0, 0.05, 0));
-                ;
-
-                if (player != null && chatMessage != null) {
-                    player.spigot().sendMessage(chatMessage);
-                }
+        Bukkit.getRegionScheduler().runDelayed(Bastion.getPlugin(), loc, task -> {
+            loc.getWorld().dropItem(loc.add(0.5, 0.5, 0.5), item).setVelocity(new Vector(0, 0.05, 0));
+            if (player != null && chatMessage != null) {
+                player.spigot().sendMessage(chatMessage);
             }
-        }.runTaskLater(Bastion.getPlugin(), 1);
+        }, 1L);
         storage.deleteDeadBastion(loc); // just in case.
     }
 

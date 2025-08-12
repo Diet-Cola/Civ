@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -111,18 +112,15 @@ public class BastionInteractListener implements Listener {
 
             if (NameAPI.getGroupManager().hasAccess(reinforcement.getGroup(), player.getUniqueId(), PermissionType.getPermission(Permissions.BASTION_PLACE))) {
                 final Location loc = block.getLocation().clone();
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        if (blockStorage.createBastion(loc, type, player)) {
-                            TextComponent toSend = blockManager.bastionCreatedMessageComponent(loc);
-                            player.spigot().sendMessage(toSend);
-                        } else {
-                            blockStorage.addPendingBastion(loc, type);
-                            player.sendMessage(ChatColor.RED + "Failed to create bastion");
-                        }
+                Bukkit.getGlobalRegionScheduler().execute(Bastion.getPlugin(), () -> {
+                    if (blockStorage.createBastion(loc, type, player)) {
+                        TextComponent toSend = blockManager.bastionCreatedMessageComponent(loc);
+                        player.spigot().sendMessage(toSend);
+                    } else {
+                        blockStorage.addPendingBastion(loc, type);
+                        player.sendMessage(ChatColor.RED + "Failed to create bastion");
                     }
-                }.runTask(Bastion.getPlugin());
+                });
             } else {
                 player.sendMessage(ChatColor.RED + "You don't have the right permission");
             }
@@ -162,18 +160,15 @@ public class BastionInteractListener implements Listener {
             Bastion.getPlugin().getLogger().log(Level.INFO, "Registering to create a {0} bastion", type);
             final Location loc = block.getLocation().clone();
             // Can't do it immediately, as the reinforcement doesn't exist _during_ the create event.
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (blockStorage.createBastion(loc, type, player)) {
-                        TextComponent toSend = blockManager.bastionCreatedMessageComponent(loc);
-                        player.spigot().sendMessage(toSend);
-                    } else {
-                        blockStorage.addPendingBastion(loc, type);
-                        player.sendMessage(ChatColor.RED + "Failed to create bastion");
-                    }
+            Bukkit.getGlobalRegionScheduler().execute(Bastion.getPlugin(), () -> {
+                if (blockStorage.createBastion(loc, type, player)) {
+                    TextComponent toSend = blockManager.bastionCreatedMessageComponent(loc);
+                    player.spigot().sendMessage(toSend);
+                } else {
+                    blockStorage.addPendingBastion(loc, type);
+                    player.sendMessage(ChatColor.RED + "Failed to create bastion");
                 }
-            }.runTask(Bastion.getPlugin());
+            });
         } else {
             if (blockManager.changeBastionGroup(event.getPlayer(), event.getReinforcement(), block.getLocation()) == Boolean.FALSE) {
                 event.setCancelled(true);

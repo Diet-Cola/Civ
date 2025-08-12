@@ -4,6 +4,7 @@
 
 package isaac.bastion.storage;
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import isaac.bastion.Bastion;
 import isaac.bastion.BastionGroup;
 import java.sql.Connection;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
@@ -49,7 +51,7 @@ public class BastionGroupStorage {
     private Queue<Operation> localChanged = new ArrayDeque<>();
 
     private Map<Integer, BastionGroup> groups;
-    private int taskId;
+    private ScheduledTask task;
 
     private static final String selectAllGroups = "select * from bastion_groups order by bastion_group_id;";
     private static final String selectGroup = "select * from bastion_groups where bastion_group_id = ? and allowed_group_id = ?;";
@@ -61,20 +63,16 @@ public class BastionGroupStorage {
         this.groups = new HashMap<>();
         this.db = db;
         this.log = log;
-
-        this.taskId = new BukkitRunnable() {
-            @Override
-            public void run() {
-                updateChanged();
-            }
-        }.runTaskTimerAsynchronously(Bastion.getPlugin(), saveDelay, saveDelay).getTaskId();
+        this.task = Bukkit.getAsyncScheduler().runAtFixedRate(Bastion.getPlugin(), storage -> {
+            updateChanged();
+        }, saveDelay, saveDelay, TimeUnit.MILLISECONDS);
     }
 
     /**
      * Updates all remaining bastions and cancels the update task
      */
     public void close() {
-        Bukkit.getScheduler().cancelTask(this.taskId);
+        this.task.cancel();
         updateChanged();
     }
 

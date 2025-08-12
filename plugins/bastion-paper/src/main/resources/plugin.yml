@@ -5,6 +5,7 @@ author: spaceFountain
 authors: [ Rourke750, ProgrammerDan, Maxopoly, TealNerd, Aleksey-Terzi ]
 depend: [ CivModCore, Citadel, NameLayer ]
 api-version: 1.21.3
+folia-supported: true
 commands:
   Bastion:
     description: Base command for Bastion

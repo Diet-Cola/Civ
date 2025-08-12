@@ -1,5 +1,6 @@
 package isaac.bastion.manager;
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import isaac.bastion.Bastion;
 import isaac.bastion.BastionBlock;
 import isaac.bastion.storage.BastionBlockStorage;
@@ -384,7 +385,7 @@ public class EnderPearlManager {
 
         PriorityQueue<Flight> inFlight = new PriorityQueue<Flight>();
         Flight onTask = null;
-        int currentTask = -1;
+        ScheduledTask currentTask = null;
 
         void manage(Flight flight) {
             inFlight.add(flight);
@@ -398,8 +399,8 @@ public class EnderPearlManager {
         }
 
         private void next() {
-            if (currentTask != -1) {
-                Bukkit.getScheduler().cancelTask(currentTask);
+            if (currentTask != null) {
+                this.currentTask.cancel();
             }
 
             if (onTask != null) {
@@ -413,21 +414,18 @@ public class EnderPearlManager {
 
             if (onTask.timeToEnd() <= 0) {
                 onTask.cancel();
-                currentTask = -1;
+                currentTask.cancel();
                 onTask = null;
                 next();
                 return;
             }
 
-            currentTask = new BukkitRunnable() {
-                @Override
-                public void run() {
-                    onTask.cancel();
-                    onTask = null;
-                    currentTask = -1;
-                    next();
-                }
-            }.runTaskLater(Bastion.getPlugin(), onTask.timeToEnd()).getTaskId();
+            currentTask = Bukkit.getGlobalRegionScheduler().runDelayed(Bastion.getPlugin(), task -> {
+                onTask.cancel();
+                onTask = null;
+                currentTask.cancel();
+                next();
+            }, onTask.timeToEnd());
         }
     }
 

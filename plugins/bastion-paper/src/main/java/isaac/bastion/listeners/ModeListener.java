@@ -20,6 +20,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import vg.civcraft.mc.civmodcore.CivModCorePlugin;
 import vg.civcraft.mc.civmodcore.players.scoreboard.bottom.BottomLine;
 import vg.civcraft.mc.civmodcore.players.scoreboard.bottom.BottomLineAPI;
 import vg.civcraft.mc.civmodcore.players.scoreboard.side.CivScoreBoard;
@@ -38,13 +39,20 @@ public class ModeListener implements Listener {
 
     private PermissionType placePerm;
 
+    private boolean folia = CivModCorePlugin.isFolia();
+
     public ModeListener() {
-        this.bsiBoard = ScoreBoardAPI.createBoard("bsiDisplay");
-        this.bsiBottomLine = BottomLineAPI.createBottomLine("bsiDisplay", 3);
+        if (!folia) {
+            this.bsiBoard = ScoreBoardAPI.createBoard("bsiDisplay");
+            this.bsiBottomLine = BottomLineAPI.createBottomLine("bsiDisplay", 3);
+        }
         this.settingMan = Bastion.getSettingManager();
         settingMan.getBsiOverlay().registerListener(new SettingChangeListener<Boolean>() {
             @Override
             public void handle(UUID player, PlayerSetting<Boolean> setting, Boolean oldValue, Boolean newValue) {
+                if (folia) {
+                    return;
+                }
                 if (newValue) {
                     updateDisplayedInformation(Bukkit.getPlayer(player), Bukkit.getPlayer(player).getLocation());
                     return;
@@ -58,6 +66,9 @@ public class ModeListener implements Listener {
         settingMan.getBsiLocation().registerListener(new SettingChangeListener<String>() {
             @Override
             public void handle(UUID player, PlayerSetting<String> setting, String oldValue, String newValue) {
+                if (folia) {
+                    return;
+                }
                 updateDisplayedInformation(Bukkit.getPlayer(player), Bukkit.getPlayer(player).getLocation());
             }
         });
@@ -66,11 +77,17 @@ public class ModeListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent pje) {
+        if (folia) {
+            return;
+        }
         updateDisplayedInformation(pje.getPlayer(), pje.getPlayer().getLocation());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent pme) {
+        if (folia) {
+            return;
+        }
         Location to = pme.getTo();
         if (to == null) {
             return;
@@ -91,6 +108,9 @@ public class ModeListener implements Listener {
      * @param location to check for bastions
      */
     private void updateDisplayedInformation(Player player, Location location) {
+        if (folia) {
+            return;
+        }
         if (player == null || location == null) {
             return;
         }
@@ -150,6 +170,9 @@ public class ModeListener implements Listener {
      * @param text       Text to display
      */
     private void updateDisplaySetting(Player player, String text) {
+        if (folia) {
+            return;
+        }
         DisplayLocationSetting locSetting = settingMan.getBsiLocation();
         if (locSetting.showOnActionbar(player.getUniqueId())) {
             bsiBottomLine.updatePlayer(player, text);
@@ -160,6 +183,9 @@ public class ModeListener implements Listener {
     }
 
     private void hideAll(Player player) {
+        if (folia) {
+            return;
+        }
         bsiBottomLine.removePlayer(player);
         bsiBoard.hide(player);
     }
