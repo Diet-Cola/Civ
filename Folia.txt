@@ -21,7 +21,10 @@ NL:
  - nl gui command not working
  - nl group commands work!
 
- 
+ Citadel:
+- reinforcements gui not working
+
+
 
 
 

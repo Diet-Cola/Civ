@@ -99,7 +99,8 @@ public class Citadel extends ACivMod {
         reinManager.shutDown();
         dao.cleanupBatches();
         HandlerList.unregisterAll(this);
-        Bukkit.getScheduler().cancelTasks(this);
+        Bukkit.getGlobalRegionScheduler().cancelTasks(this);
+        Bukkit.getAsyncScheduler().cancelTasks(this);
     }
 
     public void reload() {

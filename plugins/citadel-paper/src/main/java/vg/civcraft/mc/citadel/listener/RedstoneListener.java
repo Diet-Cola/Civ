@@ -62,7 +62,7 @@ public class RedstoneListener implements Listener {
     public RedstoneListener(double maxRedstoneDistance) {
         this.maxRedstoneDistance = maxRedstoneDistance;
         this.authorizations = new HashMap<>();
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(Citadel.getInstance(), () -> authorizations.clear(), 1, 1);
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(Citadel.getInstance(), task -> authorizations.clear(), 1, 1);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

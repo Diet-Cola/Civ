@@ -178,20 +178,15 @@ public class EntityListener implements Listener {
     public void playerJoinEvent(PlayerJoinEvent event) {
         Player p = event.getPlayer();
         final UUID uuid = p.getUniqueId();
-
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                GroupManagerDao db = NameLayerPlugin.getGroupManagerDao();
-                for (String groupName : db.getGroupNames(uuid)) {
-                    if (NameAPI.getGroupManager().hasAccess(groupName, uuid,
-                        CitadelPermissionHandler.getBypass())) {
-                        GroupManager.getGroup(groupName).updateActivityTimeStamp();
-                    }
+        Bukkit.getAsyncScheduler().runNow(Citadel.getInstance(), task -> {
+            GroupManagerDao db = NameLayerPlugin.getGroupManagerDao();
+            for (String groupName : db.getGroupNames(uuid)) {
+                if (NameAPI.getGroupManager().hasAccess(groupName, uuid,
+                    CitadelPermissionHandler.getBypass())) {
+                    GroupManager.getGroup(groupName).updateActivityTimeStamp();
                 }
             }
-        }.runTaskAsynchronously(Citadel.getInstance());
+        });
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -261,7 +256,7 @@ public class EntityListener implements Listener {
         }
         player.sendMessage(ChatColor.RED + "You cannot place those on blocks you don't have permissions for.");
         event.setCancelled(true);
-        Bukkit.getScheduler().runTaskLater(Citadel.getInstance(), player::updateInventory, 1L);
+        player.getScheduler().execute(Citadel.getInstance(), player::updateInventory, null, 1L);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

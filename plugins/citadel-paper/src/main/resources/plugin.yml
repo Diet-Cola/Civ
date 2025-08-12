@@ -18,6 +18,7 @@ softdepend:
   - ProtocolLib
 description: Citadel allows you to make blocks difficult to break. When a block is reinforced, it must be broken many times before it is destroyed.
 api-version: 1.21.3
+folia-supported: true
 permissions:
   citadel.admin:
     default: op
