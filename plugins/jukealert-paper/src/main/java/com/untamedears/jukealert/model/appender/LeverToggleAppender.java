@@ -56,7 +56,7 @@ public class LeverToggleAppender extends ConfigurableSnitchAppender<LeverToggleC
             Powerable power = (Powerable) leverBlock.getBlockData();
             power.setPowered(true);
             leverBlock.setBlockData(power);
-            Bukkit.getScheduler().scheduleSyncDelayedTask(JukeAlert.getInstance(), () -> {
+            Bukkit.getRegionScheduler().runDelayed(JukeAlert.getInstance(), snitch.getLocation(), task -> {
                 power.setPowered(false);
                 leverBlock.setBlockData(power);
             }, 20L);

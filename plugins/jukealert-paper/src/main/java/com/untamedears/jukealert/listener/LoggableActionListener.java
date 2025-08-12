@@ -1,5 +1,6 @@
 package com.untamedears.jukealert.listener;
 
+import com.untamedears.jukealert.JukeAlert;
 import com.untamedears.jukealert.SnitchManager;
 import com.untamedears.jukealert.model.Snitch;
 import com.untamedears.jukealert.model.actions.abstr.SnitchAction;
@@ -88,7 +89,7 @@ public class LoggableActionListener implements Listener {
     }
 
     public void setupScheduler(Plugin plugin) {
-        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, task -> {
             try {
                 for (World world : Bukkit.getWorlds()) {
                     for (Player player : world.getPlayers()) {
@@ -96,13 +97,15 @@ public class LoggableActionListener implements Listener {
                         if (!(entity instanceof HappyGhast)) {
                             continue;
                         }
-                        handleSnitchEntry(player, entity.getLocation());
+                        player.getScheduler().run(JukeAlert.getInstance(), playerTask -> {
+                            handleSnitchEntry(player, entity.getLocation());
+                        }, null);
                     }
                 }
             } catch (RuntimeException ex) {
                 plugin.getLogger().log(Level.WARNING, "Ticking ghast positions", ex);
             }
-        }, 0, 1);
+        }, 1, 1);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

@@ -10,7 +10,7 @@ public class SnitchCullManager {
 
     public SnitchCullManager() {
         tracker = new ProgressTracker<>();
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(JukeAlert.getInstance(), tracker::processItems, 1L, 1L);
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(JukeAlert.getInstance(), task -> tracker.processItems(), 1L, 1L);
     }
 
     public void addCulling(DormantCullingAppender cull) {

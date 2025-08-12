@@ -62,7 +62,7 @@ public class Snitch extends LocationTrackable {
     }
 
     public void onChunkLoad(Block block) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(JukeAlert.getInstance(), this::checkPhysicalIntegrity);
+        Bukkit.getRegionScheduler().runDelayed(JukeAlert.getInstance(), block.getLocation(), task -> this.checkPhysicalIntegrity(), 1L);
     }
 
     /**

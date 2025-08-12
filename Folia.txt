@@ -32,6 +32,8 @@ FM:
 - recipe selection gui broken when hitting crafting table
 - /item broken
 
+JA:
+- /ja broken
 
 
 
