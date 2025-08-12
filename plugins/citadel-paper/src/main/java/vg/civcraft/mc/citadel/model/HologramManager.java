@@ -119,6 +119,7 @@ public class HologramManager {
             // showing a bit too much information if the player gets kicked while a holo is
             // already visible does not matter
             this.hasPermission = reinforcement.hasPermission(player, CitadelPermissionHandler.getInfo());
+            cachedPlayerLocation = player.getLocation();
         }
 
         void show() {
