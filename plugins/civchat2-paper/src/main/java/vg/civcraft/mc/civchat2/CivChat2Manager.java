@@ -25,6 +25,7 @@ import vg.civcraft.mc.civchat2.event.PrivateMessageEvent;
 import vg.civcraft.mc.civchat2.utility.CivChat2Config;
 import vg.civcraft.mc.civchat2.utility.CivChat2FileLogger;
 import vg.civcraft.mc.civchat2.utility.ScoreboardHUD;
+import vg.civcraft.mc.civmodcore.CivModCorePlugin;
 import vg.civcraft.mc.civmodcore.chat.ChatUtils;
 import vg.civcraft.mc.civmodcore.utilities.TextUtil;
 import vg.civcraft.mc.namelayer.GroupManager;
@@ -75,7 +76,9 @@ public class CivChat2Manager {
         groupChatChannels = new HashMap<>();
         replyList = new HashMap<>();
         afkPlayers = new HashMap<>();
-        scoreboardHUD = new ScoreboardHUD();
+        if (!CivModCorePlugin.isFolia()) {
+            scoreboardHUD = new ScoreboardHUD();
+        }
     }
 
     /**
@@ -101,7 +104,9 @@ public class CivChat2Manager {
         Preconditions.checkNotNull(player, "player");
 
         chatChannels.remove(player.getUniqueId());
-        scoreboardHUD.updateScoreboardHUD(player);
+        if (!CivModCorePlugin.isFolia()) {
+            scoreboardHUD.updateScoreboardHUD(player);
+        }
     }
 
     /**
@@ -121,7 +126,10 @@ public class CivChat2Manager {
         } else {
             chatChannels.put(player1.getUniqueId(), player2.getUniqueId());
         }
-        scoreboardHUD.updateScoreboardHUD(player1);
+        if (!CivModCorePlugin.isFolia()) {
+            scoreboardHUD.updateScoreboardHUD(player1);
+        }
+
     }
 
     /**
@@ -275,7 +283,9 @@ public class CivChat2Manager {
             afkPlayers.remove(player.getUniqueId());
         }
 
-        scoreboardHUD.updateAFKScoreboardHUD(player);
+        if (!CivModCorePlugin.isFolia()) {
+            scoreboardHUD.updateAFKScoreboardHUD(player);
+        }
         return afkStatus;
     }
 
@@ -291,12 +301,16 @@ public class CivChat2Manager {
         if (isPlayerAfk(player)) {
             afkPlayers.remove(player.getUniqueId());
 
-            scoreboardHUD.updateAFKScoreboardHUD(player);
+            if (!CivModCorePlugin.isFolia()) {
+                scoreboardHUD.updateAFKScoreboardHUD(player);
+            }
             return false;
         }
         afkPlayers.put(player.getUniqueId(), afkMsg);
 
-        scoreboardHUD.updateAFKScoreboardHUD(player);
+        if (!CivModCorePlugin.isFolia()) {
+            scoreboardHUD.updateAFKScoreboardHUD(player);
+        }
         return true;
     }
 
@@ -342,7 +356,9 @@ public class CivChat2Manager {
         Preconditions.checkNotNull(group, "group");
 
         groupChatChannels.put(player.getUniqueId(), group);
-        scoreboardHUD.updateScoreboardHUD(player);
+        if (!CivModCorePlugin.isFolia()) {
+            scoreboardHUD.updateScoreboardHUD(player);
+        }
     }
 
     /**
@@ -430,7 +446,9 @@ public class CivChat2Manager {
         Preconditions.checkNotNull(player, "player");
 
         groupChatChannels.remove(player.getUniqueId());
-        scoreboardHUD.updateScoreboardHUD(player);
+        if (!CivModCorePlugin.isFolia()) {
+            scoreboardHUD.updateScoreboardHUD(player);
+        }
     }
 
     /**

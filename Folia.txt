@@ -24,7 +24,8 @@ NL:
  Citadel:
 - reinforcements gui not working
 
-
+CivChat2:
+- seems to work, need to test with pm'ing
 
 
 
