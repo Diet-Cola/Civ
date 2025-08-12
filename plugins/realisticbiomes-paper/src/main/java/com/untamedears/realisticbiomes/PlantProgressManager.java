@@ -13,7 +13,9 @@ public class PlantProgressManager {
 
     public PlantProgressManager() {
         this.tracker = new ProgressTracker<>();
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(RealisticBiomes.getInstance(), this::processUpdates, 1L, 1L);
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(RealisticBiomes.getInstance(), task -> {
+            processUpdates();
+        }, 1l, 1l);
     }
 
     public void addChunk(RBChunkCache cache) {

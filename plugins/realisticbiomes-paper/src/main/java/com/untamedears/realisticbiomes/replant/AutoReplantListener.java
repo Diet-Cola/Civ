@@ -143,7 +143,7 @@ public class AutoReplantListener implements Listener {
     private void replantCrop(Block block, Material seed, PlayerInventory inventory) {
         Material plant = block.getType();
         BlockData data = block.getBlockData();
-        Bukkit.getScheduler().runTaskLater(RealisticBiomes.getInstance(), () -> {
+        Bukkit.getRegionScheduler().runDelayed(RealisticBiomes.getInstance(), block.getLocation() , task -> {
             if (!MaterialUtils.isAir(block.getType())) {
                 return;
             } else if (!removeSeedFromPlayerInv(inventory, seed)) {

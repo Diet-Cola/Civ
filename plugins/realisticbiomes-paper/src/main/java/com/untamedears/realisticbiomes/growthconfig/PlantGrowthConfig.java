@@ -12,8 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import net.minecraft.util.parsing.packrat.Atom;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -395,7 +399,11 @@ public class PlantGrowthConfig extends AbstractGrowthConfig {
             throw new IllegalStateException("Can not grow plant with different growth config, at " + plant.getLocation()
                 + " with " + plant.getGrowthConfig().getName() + ", but this is " + getName());
         }
-        if (!biomeGrowthConfig.canGrowIn(block.getBiome())) {
+        AtomicReference<Biome> biome = new AtomicReference<>();
+        Bukkit.getRegionScheduler().execute(RealisticBiomes.getInstance(), block.getLocation(), () -> {
+            biome.set(block.getBiome());
+        });
+        if (!biomeGrowthConfig.canGrowIn(biome.get())) {
             return Long.MAX_VALUE;
         }
         long totalTime = getPersistentGrowthTime(block);

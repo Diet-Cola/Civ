@@ -175,7 +175,7 @@ public class PlayerListener implements Listener {
         config.getGrower().setStage(plant, 0);
 
         plant.setCreationTime(System.currentTimeMillis());
-        Bukkit.getScheduler().runTask(RealisticBiomes.getInstance(), () -> {
+        Bukkit.getRegionScheduler().run(RealisticBiomes.getInstance(), block.getLocation() , task -> {
             RealisticBiomes.getInstance().getPlantLogicManager().updateGrowthTime(plant, block);
         });
     }
