@@ -80,7 +80,7 @@ public class HeliodorPlugin extends ACivMod {
             getServer().getPluginManager().registerEvents(new InfusionListener(infusionManager, chunkMetaView), this);
         }
 
-        Bukkit.getScheduler().runTaskTimer(this, this.recipes, 15 * 20, 15 * 20);
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, task -> this.recipes.run(), 15 * 20, 15 * 20);
 
         getCommand("heliodor").setExecutor(new HeliodorDebugCommand(veinCache, veinSpawner, oreLocationsKey));
 
@@ -150,5 +150,9 @@ public class HeliodorPlugin extends ACivMod {
     public void onDisable() {
         super.onDisable();
         this.veinCache.save();
+    }
+
+    public static HeliodorPlugin getInstance() {
+        return getInstance();
     }
 }

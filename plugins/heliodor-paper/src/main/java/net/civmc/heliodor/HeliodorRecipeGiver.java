@@ -43,16 +43,18 @@ public class HeliodorRecipeGiver implements Runnable {
             }
             NamespacedKey first = heliodorRecipes.get(ThreadLocalRandom.current().nextInt(heliodorRecipes.size()));
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if (!player.hasDiscoveredRecipe(first)) {
-                    for (ItemStack item : player.getInventory().getStorageContents()) {
-                        if ((item != null && !item.isEmpty()) && (HeliodorGem.isFinished(item)
-                            || MeteoricIron.isNugget(item)
-                            || MeteoricIron.isIngot(item))) {
-                            player.discoverRecipes(heliodorRecipes);
-                            break;
+                player.getScheduler().run(HeliodorPlugin.getInstance(), task -> {
+                    if (!player.hasDiscoveredRecipe(first)) {
+                        for (ItemStack item : player.getInventory().getStorageContents()) {
+                            if ((item != null && !item.isEmpty()) && (HeliodorGem.isFinished(item)
+                                || MeteoricIron.isNugget(item)
+                                || MeteoricIron.isIngot(item))) {
+                                player.discoverRecipes(heliodorRecipes);
+                                break;
+                            }
                         }
                     }
-                }
+                }, null);
             }
         } catch (RuntimeException ex) {
             JavaPlugin.getPlugin(HeliodorPlugin.class).getLogger().log(Level.WARNING, "Iterating inventories for heliodor", ex);

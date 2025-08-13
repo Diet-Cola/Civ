@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,7 +41,7 @@ public class VeinSpawner {
     }
 
     public void start() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this::trySpawns, 20 * 60, 20 * 60);
+        Bukkit.getAsyncScheduler().runAtFixedRate(plugin, task -> trySpawns(), 20 * 60, 20 * 60, TimeUnit.MILLISECONDS);
     }
 
     private void trySpawns() {

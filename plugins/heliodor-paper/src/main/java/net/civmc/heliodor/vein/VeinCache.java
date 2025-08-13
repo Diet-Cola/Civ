@@ -27,7 +27,7 @@ public class VeinCache {
     public void load() {
         this.veins.addAll(dao.getVeins());
 
-        Bukkit.getScheduler().runTaskTimer(plugin, this::save, 20 * 60, 20 * 60);
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, task -> save(), 20 * 60, 20 * 60);
     }
 
     public void save() {
@@ -37,7 +37,7 @@ public class VeinCache {
         if (Bukkit.isStopping()) {
             updateVeins(veins, additionalVeinBlocksMined, veinOresMined);
         } else {
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> updateVeins(veins, additionalVeinBlocksMined, veinOresMined));
+            Bukkit.getAsyncScheduler().runNow(plugin, task -> updateVeins(veins, additionalVeinBlocksMined, veinOresMined));
         }
     }
 
