@@ -120,3 +120,8 @@ RandomSpawn:
 
 EP:
 - Suspiciously straight forward
+
+CivDuties:
+- Straightforward
+
+

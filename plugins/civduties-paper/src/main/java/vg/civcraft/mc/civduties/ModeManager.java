@@ -77,11 +77,11 @@ public class ModeManager {
         double[] location = input.getDoubleArray("Pos", true);
         UUID worldUUID = new UUID(input.getLong("WorldUUIDMost", 0L), input.getLong("WorldUUIDLeast", 0L));
         Location targetLocation = new Location(Bukkit.getWorld(worldUUID), location[0], location[1], location[2]);
-        player.teleport(targetLocation);
+        player.teleportAsync(targetLocation);
         player.setGameMode(getGameModeByValue(input.getInt("playerGameType", 0)));
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CivDuties.getInstance(), () -> {
-            player.teleport(targetLocation);
-        }, 3L);
+        player.getScheduler().runDelayed(CivDuties.getInstance(), task -> {
+            player.teleportAsync(targetLocation);
+        }, null, 3L);
         CraftPlayer cPlayer = (CraftPlayer) player;
         cPlayer.getHandle().load(TagValueInput.createGlobal(ProblemReporter.DISCARDING, input.internal()));
 
