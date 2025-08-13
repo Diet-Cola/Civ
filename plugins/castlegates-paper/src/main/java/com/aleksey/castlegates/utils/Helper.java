@@ -183,7 +183,7 @@ public class Helper {
     }
 
     private static void dropItemAtLocation(final Location dropLocation, final ItemStack dropItem) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CastleGates.getInstance(), () -> {
+        Bukkit.getRegionScheduler().runDelayed(CastleGates.getInstance(), dropLocation, task -> {
             try {
                 Location newDropLocation = dropLocation.add(0.5, 0.5, 0.5);
                 dropLocation.getWorld().dropItem(newDropLocation, dropItem).setVelocity(new Vector(0, 0.05, 0));

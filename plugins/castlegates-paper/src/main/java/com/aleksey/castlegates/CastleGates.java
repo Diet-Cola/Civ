@@ -146,7 +146,8 @@ public class CastleGates extends JavaPlugin {
     public void onDisable() {
         _manager.close();
         _citadelManager.close();
-        getServer().getScheduler().cancelTasks(this);
+        getServer().getGlobalRegionScheduler().cancelTasks(this);
+        getServer().getAsyncScheduler().cancelTasks(this);
     }
 
     @Override
@@ -155,6 +156,6 @@ public class CastleGates extends JavaPlugin {
     }
 
     public static void runTask(Runnable task) {
-        _instance.getServer().getScheduler().runTask(_instance, task);
+        _instance.getServer().getGlobalRegionScheduler().execute(_instance, task);
     }
 }

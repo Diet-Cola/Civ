@@ -9,6 +9,7 @@ import java.util.HashMap;
 
 import com.aleksey.castlegates.CastleGates;
 import com.aleksey.castlegates.types.TimerMode;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -28,13 +29,13 @@ public class PlayerStateManager {
     }
 
     private final Map<Player, PlayerState> _states = new HashMap<>();
-    private final Map<Player, Integer> _tasks = new HashMap<>();
+    private final Map<Player, ScheduledTask> _tasks = new HashMap<>();
 
     public void clearPlayerMode(Player player) {
-        Integer taskId = _tasks.get(player);
+        ScheduledTask taskId = _tasks.get(player);
 
         if (taskId != null) {
-            Bukkit.getScheduler().cancelTask(taskId);
+            taskId.cancel();
         }
 
         PlayerState state = _states.get(player);
@@ -96,9 +97,9 @@ public class PlayerStateManager {
 
         final PlayerStateManager stateManager = this;
 
-        int taskId = Bukkit.getScheduler().runTaskTimer(
+        ScheduledTask taskId = Bukkit.getGlobalRegionScheduler().runAtFixedRate(
             CastleGates.getInstance(),
-            () -> {
+            task -> {
                 PlayerState state = stateManager._states.get(player);
                 if (state != null) {
                     long offTime = state.lastInteracted + 1000L * CastleGates.getConfigManager().getPlayerStateResetInSeconds();
@@ -110,7 +111,7 @@ public class PlayerStateManager {
             },
             20L * 30,
             20L * 30
-        ).getTaskId();
+        );
 
         _tasks.put(player, taskId);
     }
