@@ -75,11 +75,11 @@ public class CommandHandler implements CommandExecutor {
                                         for (String dropConf : block.getDrops()) {
                                             DropConfig drop = block.getDropConfig(dropConf);
                                             for (DropItemConfig item : drop.drops) {
-                                                player.getScheduler().runDelayed(plugin, voidTask -> {}, () -> {
+                                                player.getScheduler().runDelayed(plugin, dropTask -> {
                                                     sender.sendMessage(String.format("Block: %s, drop: %s", blockConf.toString(), dropConf));
                                                     Item dropped = player.getWorld().dropItem(player.getLocation().add(0, 1.0, 0), item.render(vmult));
                                                     dropped.setPickupDelay(20);
-                                                }, delay++);
+                                                }, null, delay++);
                                             }
                                         }
                                     }

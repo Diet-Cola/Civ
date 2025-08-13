@@ -33,7 +33,7 @@ public abstract class Dialog {
         Preconditions.checkNotNull(player, "Player cannot be null!");
         Preconditions.checkNotNull(plugin, "Plugin cannot be null!");
         this.player = player;
-        player.getScheduler().run(plugin, task -> {}, player::closeInventory);
+        player.getScheduler().run(plugin, task -> player.closeInventory(), null);
         this.conversation = new ConversationFactory(plugin)
             .withModality(false)
             .withLocalEcho(false)

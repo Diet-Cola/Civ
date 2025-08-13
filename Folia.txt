@@ -4,14 +4,12 @@ General:
 - All tick based schedulers are running faster due to being in ms rather than tick delays
 
 CMC:
-- config command not working
 - scoreboard api/bottomline api disabled
 - [11:04:07 INFO]: UUID of player Diet_Cola is 638af9c6-c734-45d9-b092-13a4e184f7f6
   [11:04:07 INFO]: [HorriblePlayerLoginEventHack] You have plugins listening to the PlayerLoginEvent, this will cause re-configuration APIs to be unavailable: [CivModCore]
 
 RB:
 - PlantGrowthConfig L402 - Is this the best way to grab the biome?
-- rb command not working
 - Maybe revisit ChunkMeta schedulers in RBChunkCache (iterateAll)
 - [00:32:17 ERROR]: [CivModCore] Failed to load chunk data
   org.bukkit.plugin.IllegalPluginAccessException: Plugin attempted to register task while disabled
@@ -51,7 +49,6 @@ RB:
           at java.base/java.lang.Thread.run(Thread.java:1583) ~[?:?]
 
 HO:
-- hiddenore generate command broken
 - No exceptions for world access in testing? - this feels wrong idk
 
 NL:
@@ -59,23 +56,17 @@ NL:
   java.lang.NoSuchMethodError: 'java.util.Set net.minecraft.nbt.CompoundTag.keySet()'
           at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.nbt.NbtCompound.keys(NbtCompound.java:52) ~[civmodcore-paper-3.0.6-F-all.jar:?]
           at namelayer-paper-3.0.6-F.jar/vg.civcraft.mc.namelayer.MojangNames.load(MojangNames.java:58) ~[namelayer-paper-3.0.6-F.jar:?]
- - nl gui command not working
- - nl group commands work!
 
  Citadel:
-- reinforcements gui not working
 - holomanager freaks out without protocol lib installed
 
 CivChat2:
 - seems to work, need to test with pm'ing
 
 FM:
-- /fm gui broken
 - recipe selection gui broken when hitting crafting table
-- /item broken
 
 JA:
-- /ja broken
 
 Bastion:
 - EnderPearlManager FlightTask mini class might need a review
