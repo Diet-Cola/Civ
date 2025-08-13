@@ -11,7 +11,9 @@ import com.programmerdan.minecraft.banstick.handler.BanStickImportHandler;
 import com.programmerdan.minecraft.banstick.handler.BanStickProxyHandler;
 import com.programmerdan.minecraft.banstick.handler.BanStickScrapeHandler;
 import com.programmerdan.minecraft.banstick.handler.BanStickTorUpdater;
+import org.bukkit.Bukkit;
 import vg.civcraft.mc.civmodcore.ACivMod;
+import java.util.concurrent.TimeUnit;
 
 public class BanStick extends ACivMod {
 
@@ -210,7 +212,9 @@ public class BanStick extends ACivMod {
         }
         try {
             this.logHandler = new BSLog(getConfig());
-            this.logHandler.runTaskTimerAsynchronously(this, this.logHandler.getDelay(), this.logHandler.getPeriod());
+            Bukkit.getAsyncScheduler().runAtFixedRate(this, task -> {
+                this.logHandler.run();
+            }, this.logHandler.getDelay(), this.logHandler.getPeriod(), TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             severe("Failed to set up ban log handler", e);
         }

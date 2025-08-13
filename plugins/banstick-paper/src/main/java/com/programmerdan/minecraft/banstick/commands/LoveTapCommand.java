@@ -69,9 +69,7 @@ public class LoveTapCommand implements CommandExecutor {
             }
             if (hasCIDR) { // MOAR, but aggregates.
                 sender.sendMessage(ChatColor.GREEN + "Please wait, searching for all contained IP records");
-                Bukkit.getScheduler().runTaskAsynchronously(BanStick.getPlugin(), new Runnable() {
-                    @Override
-                    public void run() {
+                Bukkit.getAsyncScheduler().runNow(BanStick.getPlugin(), task ->  {
                         List<BSIP> contains = BSIP.allContained(ipcheck, cidr);
                         if (contains != null && !contains.isEmpty()) {
                             sender.sendMessage(ChatColor.GREEN + "Found " + contains.size()
@@ -180,7 +178,6 @@ public class LoveTapCommand implements CommandExecutor {
                             sender.sendMessage(ChatColor.RED + "No IPs found contained by "
                                 + ChatColor.WHITE + ipcheck.toString() + "/" + cidr);
                         }
-                    }
                 });
             }
             // LESS, but details

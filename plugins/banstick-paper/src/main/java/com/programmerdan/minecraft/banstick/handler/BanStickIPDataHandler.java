@@ -15,6 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -39,7 +42,7 @@ import org.bukkit.scheduler.BukkitTask;
  */
 public class BanStickIPDataHandler extends BukkitRunnable {
 
-    private BukkitTask selfTask;
+    private ScheduledTask selfTask;
     private ConcurrentLinkedQueue<WeakReference<BSIP>> toCheck;
     private boolean enabled;
 
@@ -86,7 +89,9 @@ public class BanStickIPDataHandler extends BukkitRunnable {
     private void begin() {
         if (enabled) {
             currentFailures = 0;
-            selfTask = this.runTaskTimerAsynchronously(BanStick.getPlugin(), period, period);
+            selfTask = Bukkit.getAsyncScheduler().runAtFixedRate(BanStick.getPlugin(), task -> {
+                run();
+            }, period, period, TimeUnit.MILLISECONDS);
             BanStick.getPlugin().warning("Dynamic IP Data lookup task started.");
         }
     }
@@ -122,12 +127,9 @@ public class BanStickIPDataHandler extends BukkitRunnable {
             enabled = false;
             if (this.cooldownToReenable > 0) {
                 BanStick.getPlugin().severe("Too many failures; temporarily disabling BanStickIPData updater.");
-                Bukkit.getScheduler().runTaskLater(BanStick.getPlugin(), new Runnable() {
-                    @Override
-                    public void run() {
+                Bukkit.getGlobalRegionScheduler().runDelayed(BanStick.getPlugin(), task ->  {
                         currentFailures = 0;
                         enabled = true;
-                    }
                 }, this.cooldownToReenable);
             } else {
                 BanStick.getPlugin().severe("Too many failures; permanently disabling BanStickIPData updater.");

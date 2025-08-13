@@ -1,5 +1,6 @@
 package com.programmerdan.minecraft.banstick.handler;
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -10,7 +11,7 @@ import org.bukkit.scheduler.BukkitTask;
  */
 public abstract class ImportWorker implements Runnable {
 
-    private BukkitTask importTask;
+    private ScheduledTask importTask;
     private long delay = 100L;
     private boolean enable;
 
@@ -52,7 +53,7 @@ public abstract class ImportWorker implements Runnable {
         return 0;
     }
 
-    public void setTask(BukkitTask task) {
+    public void setTask(ScheduledTask task) {
         importTask = task;
     }
 

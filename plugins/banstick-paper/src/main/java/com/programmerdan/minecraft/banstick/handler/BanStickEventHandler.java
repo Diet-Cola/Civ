@@ -246,10 +246,7 @@ public class BanStickEventHandler implements Listener {
     public void joinMonitor(PlayerJoinEvent joinEvent) {
         final Player player = joinEvent.getPlayer();
         final Date playerNow = new Date();
-        Bukkit.getScheduler().runTaskAsynchronously(BanStick.getPlugin(), new Runnable() {
-
-            @Override
-            public void run() {
+        Bukkit.getAsyncScheduler().runNow(BanStick.getPlugin(), task ->  {
                 // Get or create player.
                 if (player == null) {
                     BanStick.getPlugin().debug("A player check event was scheduled, but that player is already gone?");
@@ -458,7 +455,6 @@ public class BanStickEventHandler implements Listener {
                     Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(),
                         "lovetap " + joinEvent.getPlayer().getName());
                 }
-            }
 
         });
     }
@@ -523,10 +519,7 @@ public class BanStickEventHandler implements Listener {
      */
     public static void doKickWithCheckup(final UUID puuid, final BSBan picked) {
         // now schedule a task to kick out the trash.
-        Bukkit.getScheduler().runTask(BanStick.getPlugin(), new Runnable() {
-
-            @Override
-            public void run() {
+        Bukkit.getGlobalRegionScheduler().run(BanStick.getPlugin(), task ->  {
                 Player player = Bukkit.getPlayer(puuid);
                 if (player != null) {
                     player.kickPlayer(picked.getMessage());
@@ -534,30 +527,25 @@ public class BanStickEventHandler implements Listener {
                     Bukkit.broadcast("Removing " + player.getDisplayName() + " due to " + picked.toString(),
                         "banstick.ips");
 
-                    new BukkitRunnable() {
-                        private int recheck;
-
-                        @Override
-                        public void run() {
-                            // let's keep checking to make sure they are gone
-                            recheck++;
-                            if (recheck % 10 == 9) {
-                                BanStick.getPlugin().warning("Trying to kick {0} due to {1}, on {2}th retry.", puuid,
-                                    picked, recheck);
-                            }
-                            Player player = Bukkit.getPlayer(puuid);
-                            if (player != null) {
-                                player.kickPlayer(picked.getMessage());
-                            } else {
-                                this.cancel();
-                            }
+                    player.getScheduler().runAtFixedRate(BanStick.getPlugin(), kickTask -> {
+                        int recheck = 0;
+                        // let's keep checking to make sure they are gone
+                        recheck++;
+                        if (recheck % 10 == 9) {
+                            BanStick.getPlugin().warning("Trying to kick {0} due to {1}, on {2}th retry.", puuid,
+                                picked, recheck);
                         }
-                    }.runTaskTimer(BanStick.getPlugin(), 10L, 10L);
+                        Player tempPlayer = Bukkit.getPlayer(puuid);
+                        if (tempPlayer != null) {
+                            tempPlayer.kickPlayer(picked.getMessage());
+                        } else {
+                            kickTask.cancel();
+                        }
+                    }, null, 10L, 10L);
                 } else {
                     BanStick.getPlugin().info("On return, banning " + puuid + " due to " + picked.toString());
                     Bukkit.broadcast("On return, banning " + puuid + " due to " + picked.toString(), "banstick.ips");
                 }
-            }
 
         });
     }

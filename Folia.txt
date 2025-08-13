@@ -84,4 +84,9 @@ RailSwitch:
 - suspiciously easy to convert
 
 BanStick:
-- 
+- Can't test on laptop
+- [12:28:29 INFO]: UUID of player Diet_Cola is 638af9c6-c734-45d9-b092-13a4e184f7f6
+  [12:28:29 INFO]: [HorriblePlayerLoginEventHack] You have plugins listening to the PlayerLoginEvent, this will cause re-configuration APIs to be unavailable: [BanStick, CivModCore]
+- doKickWithCheckUp in BanStickEventHandler might need review
+
+

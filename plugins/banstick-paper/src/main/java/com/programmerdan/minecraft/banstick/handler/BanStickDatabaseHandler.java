@@ -11,6 +11,7 @@ import com.programmerdan.minecraft.banstick.data.BSShare;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -109,45 +110,30 @@ public class BanStickDatabaseHandler {
         }
         BanStick.getPlugin().debug("DirtySave Period {0} Delay {1}", period, delay);
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(BanStick.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
+        Bukkit.getAsyncScheduler().runAtFixedRate(BanStick.getPlugin(), task ->  {
                 BanStick.getPlugin().debug("Player dirty save");
                 BSPlayer.saveDirty();
-            }
-        }, delay, period);
+        }, delay, period, TimeUnit.MILLISECONDS);
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(BanStick.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
+        Bukkit.getAsyncScheduler().runAtFixedRate(BanStick.getPlugin(), task ->  {
                 BanStick.getPlugin().debug("Ban dirty save");
                 BSBan.saveDirty();
-            }
-        }, delay + (period / 5), period);
+        }, delay + (period / 5), period, TimeUnit.MILLISECONDS);
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(BanStick.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
+        Bukkit.getAsyncScheduler().runAtFixedRate(BanStick.getPlugin(), task -> {
                 BanStick.getPlugin().debug("Session dirty save");
                 BSSession.saveDirty();
-            }
-        }, delay + ((period * 2) / 5), period);
+        }, delay + ((period * 2) / 5), period, TimeUnit.MILLISECONDS);
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(BanStick.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
+        Bukkit.getAsyncScheduler().runAtFixedRate(BanStick.getPlugin(), task ->  {
                 BanStick.getPlugin().debug("Share dirty save");
                 BSShare.saveDirty();
-            }
-        }, delay + ((period * 3) / 5), period);
+        }, delay + ((period * 3) / 5), period, TimeUnit.MILLISECONDS);
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(BanStick.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
+        Bukkit.getAsyncScheduler().runAtFixedRate(BanStick.getPlugin(), task ->  {
                 BanStick.getPlugin().debug("Proxy dirty save");
                 BSIPData.saveDirty();
-            }
-        }, delay + ((period * 4) / 5), period);
+        }, delay + ((period * 4) / 5), period, TimeUnit.MILLISECONDS);
 
         BanStick.getPlugin().info("Dirty save tasks started.");
     }
@@ -161,84 +147,59 @@ public class BanStickDatabaseHandler {
             final int batchsize = config.getInt("batch", 100);
 
             BanStick.getPlugin().debug("Preload Period {0} Delay {1} batch {2}", period, delay, batchsize);
-
-            new BukkitRunnable() {
-                private long lastId;
-
-                @Override
-                public void run() {
-                    BanStick.getPlugin().debug("IP preload {0}, lim {1}", lastId, batchsize);
-                    lastId = BSIP.preload(lastId, batchsize);
-                    if (lastId < 0) {
-                        this.cancel();
-                    }
+            Bukkit.getAsyncScheduler().runAtFixedRate(BanStick.getPlugin(), task -> {
+                long lastId = 0;
+                BanStick.getPlugin().debug("IP preload {0}, lim {1}", lastId, batchsize);
+                lastId = BSIP.preload(lastId, batchsize);
+                if (lastId < 0) {
+                    task.cancel();
                 }
-            }.runTaskTimerAsynchronously(BanStick.getPlugin(), delay, period);
+            }, delay, period, TimeUnit.MILLISECONDS);
 
-            new BukkitRunnable() {
-                private long lastId;
-
-                @Override
-                public void run() {
-                    BanStick.getPlugin().debug("Proxy preload {0}, lim {1}", lastId, batchsize);
-                    lastId = BSIPData.preload(lastId, batchsize);
-                    if (lastId < 0) {
-                        this.cancel();
-                    }
+            Bukkit.getAsyncScheduler().runAtFixedRate(BanStick.getPlugin(), task -> {
+                long lastId = 0;
+                BanStick.getPlugin().debug("Proxy preload {0}, lim {1}", lastId, batchsize);
+                lastId = BSIPData.preload(lastId, batchsize);
+                if (lastId < 0) {
+                    task.cancel();
                 }
-            }.runTaskTimerAsynchronously(BanStick.getPlugin(), delay + (period / 6), period);
+            }, delay + (period / 6), period, TimeUnit.MILLISECONDS);
 
-            new BukkitRunnable() {
-                private long lastId;
-
-                @Override
-                public void run() {
-                    BanStick.getPlugin().debug("Ban preload {0}, lim {1}", lastId, batchsize);
-                    lastId = BSBan.preload(lastId, batchsize, false);
-                    if (lastId < 0) {
-                        this.cancel();
-                    }
+            Bukkit.getAsyncScheduler().runAtFixedRate(BanStick.getPlugin(), task -> {
+                long lastId = 0;
+                BanStick.getPlugin().debug("Ban preload {0}, lim {1}", lastId, batchsize);
+                lastId = BSBan.preload(lastId, batchsize, false);
+                if (lastId < 0) {
+                    task.cancel();
                 }
-            }.runTaskTimerAsynchronously(BanStick.getPlugin(), delay + ((period * 2) / 6), period);
+            }, delay + ((period * 2) / 6), period, TimeUnit.MILLISECONDS);
 
-            new BukkitRunnable() {
-                private long lastId;
-
-                @Override
-                public void run() {
-                    BanStick.getPlugin().debug("Player preload {0}, lim {1}", lastId, batchsize);
-                    lastId = BSPlayer.preload(lastId, batchsize);
-                    if (lastId < 0) {
-                        this.cancel();
-                    }
+            Bukkit.getAsyncScheduler().runAtFixedRate(BanStick.getPlugin(), task -> {
+                long lastId = 0;
+                BanStick.getPlugin().debug("Player preload {0}, lim {1}", lastId, batchsize);
+                lastId = BSPlayer.preload(lastId, batchsize);
+                if (lastId < 0) {
+                    task.cancel();
                 }
-            }.runTaskTimerAsynchronously(BanStick.getPlugin(), delay + ((period * 3) / 6), period);
+            }, delay + ((period * 3) / 6), period, TimeUnit.MILLISECONDS);
 
-            new BukkitRunnable() {
-                private long lastId;
-
-                @Override
-                public void run() {
-                    BanStick.getPlugin().debug("Session preload {0}, lim {1}", lastId, batchsize);
-                    lastId = BSSession.preload(lastId, batchsize);
-                    if (lastId < 0) {
-                        this.cancel();
-                    }
+            Bukkit.getAsyncScheduler().runAtFixedRate(BanStick.getPlugin(), task -> {
+                long lastId = 0;
+                BanStick.getPlugin().debug("Session preload {0}, lim {1}", lastId, batchsize);
+                lastId = BSSession.preload(lastId, batchsize);
+                if (lastId < 0) {
+                    task.cancel();
                 }
-            }.runTaskTimerAsynchronously(BanStick.getPlugin(), delay + ((period * 4) / 6), period);
+            }, delay + ((period * 4) / 6), period, TimeUnit.MILLISECONDS);
 
-            new BukkitRunnable() {
-                private long lastId;
-
-                @Override
-                public void run() {
-                    BanStick.getPlugin().debug("Share preload {0}, lim {1}", lastId, batchsize);
-                    lastId = BSShare.preload(lastId, batchsize);
-                    if (lastId < 0) {
-                        this.cancel();
-                    }
+            Bukkit.getAsyncScheduler().runAtFixedRate(BanStick.getPlugin(), task -> {
+                long lastId = 0;
+                BanStick.getPlugin().debug("Share preload {0}, lim {1}", lastId, batchsize);
+                lastId = BSShare.preload(lastId, batchsize);
+                if (lastId < 0) {
+                    task.cancel();
                 }
-            }.runTaskTimerAsynchronously(BanStick.getPlugin(), delay + ((period * 5) / 6), period);
+            }, delay + ((period * 5) / 6), period, TimeUnit.MILLISECONDS);
         } else {
             BanStick.getPlugin().info("Preloading is disabled. Expect more lag on joins, lookups, and bans.");
         }

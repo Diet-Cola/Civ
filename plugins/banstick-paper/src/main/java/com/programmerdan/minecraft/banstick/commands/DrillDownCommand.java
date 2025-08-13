@@ -185,9 +185,7 @@ public class DrillDownCommand implements CommandExecutor {
         }
 
         sender.sendMessage(ChatColor.GRAY + "  " + ChatColor.ITALIC + "Preparing drilldown query...");
-        Bukkit.getScheduler().runTaskAsynchronously(BanStick.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
+        Bukkit.getAsyncScheduler().runNow(BanStick.getPlugin(), task ->  {
                 StringBuilder subString = new StringBuilder();
                 StringBuilder queryString = new StringBuilder();
                 for (int i = 0; i < values.size(); i += 2) {
@@ -418,7 +416,6 @@ public class DrillDownCommand implements CommandExecutor {
                     sender.sendMessage(ChatColor.DARK_GRAY + Integer.toString(found)
                         + " results in " + requestLen + " ms");
                 }
-            }
         });
         return true;
     }

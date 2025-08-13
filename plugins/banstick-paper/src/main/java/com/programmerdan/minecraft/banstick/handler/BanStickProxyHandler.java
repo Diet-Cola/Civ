@@ -5,6 +5,9 @@ import com.programmerdan.minecraft.banstick.BanStick;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitTask;
@@ -17,7 +20,7 @@ import org.bukkit.scheduler.BukkitTask;
 public class BanStickProxyHandler {
 
     ArrayList<ProxyLoader> loaders;
-    ArrayList<BukkitTask> loaderTasks;
+    ArrayList<ScheduledTask> loaderTasks;
 
     public BanStickProxyHandler(FileConfiguration config, ClassLoader classes) {
         setup(config.getConfigurationSection("proxy"), classes);
@@ -58,8 +61,11 @@ public class BanStickProxyHandler {
 
                     if (loader != null) {
                         try {
-                            BukkitTask loaderTask = loader.runTaskTimerAsynchronously(BanStick.getPlugin(),
-                                loader.getDelay(), loader.getPeriod());
+                            ProxyLoader finalLoader = loader;
+
+                            ScheduledTask loaderTask = Bukkit.getAsyncScheduler().runAtFixedRate(BanStick.getPlugin(), task -> {
+                                finalLoader.run();
+                            }, loader.getDelay(), loader.getPeriod(), TimeUnit.MILLISECONDS);
                             loaderTasks.add(loaderTask);
                         } catch (Exception e) {
                             BanStick.getPlugin().warning("Failed to activate proxy loader of type {0}",
@@ -81,7 +87,7 @@ public class BanStickProxyHandler {
         if (loaderTasks == null) {
             return;
         }
-        for (BukkitTask task : loaderTasks) {
+        for (ScheduledTask task : loaderTasks) {
             try {
                 task.cancel();
             } catch (Exception e) {

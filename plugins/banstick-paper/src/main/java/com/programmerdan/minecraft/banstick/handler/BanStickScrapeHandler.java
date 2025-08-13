@@ -5,6 +5,8 @@ import com.programmerdan.minecraft.banstick.BanStick;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -63,8 +65,10 @@ public class BanStickScrapeHandler {
 
                     if (loader != null) {
                         try {
-                            BukkitTask task = Bukkit.getScheduler().runTaskLaterAsynchronously(BanStick.getPlugin(),
-                                loader, loader.getDelay());
+                            ScraperWorker finalLoader = loader;
+                            ScheduledTask task = Bukkit.getAsyncScheduler().runDelayed(BanStick.getPlugin(), loaderTask -> {
+                                    finalLoader.run();
+                                }, loader.getDelay(), TimeUnit.MILLISECONDS);
                             loader.setTask(task);
                         } catch (Exception e) {
                             BanStick.getPlugin().warning("Failed to activate scraper worker of type {0}",

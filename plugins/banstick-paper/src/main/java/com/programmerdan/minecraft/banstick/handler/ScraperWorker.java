@@ -1,9 +1,11 @@
 package com.programmerdan.minecraft.banstick.handler;
 
 import com.programmerdan.minecraft.banstick.BanStick;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.scheduler.BukkitTask;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Middleweight wrapper. Put implementations into banstick.scraper classpath for autoloading.
@@ -14,7 +16,7 @@ import org.bukkit.scheduler.BukkitTask;
  */
 public abstract class ScraperWorker implements Runnable {
 
-    private BukkitTask currentTask;
+    private ScheduledTask currentTask;
     private boolean enabled;
     private long delay;
     private long period;
@@ -179,15 +181,15 @@ public abstract class ScraperWorker implements Runnable {
 
             if (this.errorCooldown > 0) {
                 BanStick.getPlugin().warning("Error threshold exceeded; cooldown engaged for {0}.", name());
-                this.currentTask = Bukkit.getScheduler().runTaskLaterAsynchronously(BanStick.getPlugin(),
-                    this, jitter(this.errorCooldown));
+                this.currentTask = Bukkit.getAsyncScheduler().runDelayed(BanStick.getPlugin(),
+                    task -> this.run(), jitter(this.errorCooldown), TimeUnit.MILLISECONDS);
             } else {
                 this.enabled = false;
                 BanStick.getPlugin().warning("Error threshold exceeded; {0} disabled.", name());
             }
         } else {
-            this.currentTask = Bukkit.getScheduler().runTaskLaterAsynchronously(BanStick.getPlugin(),
-                this, jitter(this.delay));
+            this.currentTask = Bukkit.getAsyncScheduler().runDelayed(BanStick.getPlugin(),
+                task -> this.run(), jitter(this.delay), TimeUnit.MILLISECONDS);
         }
     }
 
@@ -200,7 +202,7 @@ public abstract class ScraperWorker implements Runnable {
         }
     }
 
-    public void setTask(BukkitTask task) {
+    public void setTask(ScheduledTask task) {
         this.currentTask = task;
     }
 }

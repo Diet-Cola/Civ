@@ -14,6 +14,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -45,7 +49,7 @@ tor:
     private boolean banNewNodes;
 
     private List<TorList> torLists = new ArrayList<>();
-    private List<BukkitTask> torListUpdaters = new ArrayList<>();
+    private List<ScheduledTask> torListUpdaters = new ArrayList<>();
 
     /**
      * Given a file config, sets up tor monitors. If no tor setion? no tor.
@@ -188,7 +192,9 @@ tor:
                 }
             };
 
-            torListUpdaters.add(run.runTaskTimerAsynchronously(BanStick.getPlugin(), tor.delay, tor.period));
+            torListUpdaters.add(
+                Bukkit.getAsyncScheduler().runAtFixedRate(
+                    BanStick.getPlugin(), task -> run.run(), tor.delay, tor.period, TimeUnit.MILLISECONDS));
         }
     }
 
@@ -199,7 +205,7 @@ tor:
         if (torListUpdaters == null) {
             return;
         }
-        for (BukkitTask task : torListUpdaters) {
+        for (ScheduledTask task : torListUpdaters) {
             try {
                 task.cancel();
             } catch (Exception e) {
