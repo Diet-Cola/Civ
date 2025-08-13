@@ -5,6 +5,7 @@ import com.devotedmc.ExilePearl.config.PearlConfig;
 import com.devotedmc.ExilePearl.util.ExilePearlRunnable;
 import com.google.common.base.Preconditions;
 import java.util.logging.Level;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 
 abstract class ExilePearlTask implements ExilePearlRunnable {
@@ -15,7 +16,7 @@ abstract class ExilePearlTask implements ExilePearlRunnable {
     protected final ExilePearlApi pearlApi;
 
     protected boolean enabled = false;
-    protected int taskId = 0;
+    protected ScheduledTask task = null;
 
     public ExilePearlTask(final ExilePearlApi pearlApi) {
         Preconditions.checkNotNull(pearlApi, "pearlApi");
@@ -39,8 +40,8 @@ abstract class ExilePearlTask implements ExilePearlRunnable {
             return;
         }
 
-        taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(pearlApi, this, tickInterval, tickInterval);
-        if (taskId == -1) {
+        task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(pearlApi, pearlTask -> this.run(), tickInterval, tickInterval);
+        if (task == null) {
             pearlApi.log("Failed to start the task '%s'.", getTaskName());
             return;
         } else {
@@ -54,9 +55,8 @@ abstract class ExilePearlTask implements ExilePearlRunnable {
      */
     public void stop() {
         if (enabled) {
-            Bukkit.getScheduler().cancelTask(taskId);
+            task.cancel();
             enabled = false;
-            taskId = 0;
             pearlApi.log("Stopped the task '%s'.", getTaskName());
         }
     }

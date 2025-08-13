@@ -10,3 +10,4 @@ commands:
     description: Legacy prison pearl commands
     aliases: [ pplocate, ppl, ppfree, ppf, ppbroadcast, ppb, ppconfirm, ppsilence ]
 api-version: 1.21.3
+folia-supported: true

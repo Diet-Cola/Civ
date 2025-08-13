@@ -88,6 +88,15 @@ BanStick:
 - [12:28:29 INFO]: UUID of player Diet_Cola is 638af9c6-c734-45d9-b092-13a4e184f7f6
   [12:28:29 INFO]: [HorriblePlayerLoginEventHack] You have plugins listening to the PlayerLoginEvent, this will cause re-configuration APIs to be unavailable: [BanStick, CivModCore]
 - doKickWithCheckUp in BanStickEventHandler might need review
+- [13:09:00 WARN]: [BanStick] Async task for BanStick v2.0.1-F generated an exception
+  org.bukkit.plugin.IllegalPluginAccessException: Plugin attempted to register task while disabled
+          at io.papermc.paper.threadedregions.scheduler.FoliaAsyncScheduler.runDelayed(FoliaAsyncScheduler.java:97) ~[folia-1.21.8.jar:?]
+          at banstick-paper-2.0.1-F-all.jar/com.programmerdan.minecraft.banstick.handler.ScraperWorker.run(ScraperWorker.java:191) ~[banstick-paper-2.0.1-F-all.jar:?]
+          at banstick-paper-2.0.1-F-all.jar/com.programmerdan.minecraft.banstick.handler.ScraperWorker.lambda$run$1(ScraperWorker.java:192) ~[banstick-paper-2.0.1-F-all.jar:?]
+          at io.papermc.paper.threadedregions.scheduler.FoliaAsyncScheduler$AsyncScheduledTask.run(FoliaAsyncScheduler.java:217) ~[folia-1.21.8.jar:?]
+          at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144) ~[?:?]
+          at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642) ~[?:?]
+          at java.base/java.lang.Thread.run(Thread.java:1583) ~[?:?]
 
 RandomSpawn:
 - This is an error every few seconds
@@ -108,4 +117,6 @@ RandomSpawn:
           at io.papermc.paper.threadedregions.TickRegionScheduler$RegionScheduleHandle.runTick(TickRegionScheduler.java:418) ~[folia-1.21.8.jar:1.21.8-2-4ed5b66]
           at ca.spottedleaf.concurrentutil.scheduler.SchedulerThreadPool$TickThreadRunner.run(SchedulerThreadPool.java:546) ~[concurrentutil-0.0.3.jar:?]
           at java.base/java.lang.Thread.run(Thread.java:1583) ~[?:?]
--
+
+EP:
+- Suspiciously straight forward

@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
@@ -199,7 +200,7 @@ final class CorePearlManager implements PearlManager {
             if (pearl.getPearlType() == PearlType.PRISON) {
                 dropInventory(player);
                 if (pearlApi.getPearlConfig().getShouldFreeTeleport() && (reason == PearlFreeReason.FREED_BY_PLAYER || reason == PearlFreeReason.PEARL_THROWN)) {
-                    player.teleport(pearl.getLocation().add(0, 0.5, 0));
+                    player.teleportAsync(pearl.getLocation().add(0, 0.5, 0));
                 } else {
                     SpawnUtil.spawnPlayer(player, pearlApi.getPearlConfig().getMainWorld());
                 }
@@ -425,7 +426,11 @@ final class CorePearlManager implements PearlManager {
                 pearl.setReturnLocation(pearl.getPlayer().getLocation());
                 pearl.setSummoned(true);
                 summonRequests.removeCooldown(pearl.getPlayerId());
-                return pearl.getPlayer().teleport(summoner);
+                try {
+                    return pearl.getPlayer().teleportAsync(summoner.getLocation()).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         return false;
@@ -440,7 +445,7 @@ final class CorePearlManager implements PearlManager {
                 Location returnLoc = pearl.getReturnLocation();
                 if (returnLoc == null)
                     returnLoc = pearlApi.getPearlConfig().getPrisonWorld().getSpawnLocation().add(0, 0.5, 0);
-                pearl.getPlayer().teleport(returnLoc);
+                pearl.getPlayer().teleportAsync(returnLoc);
                 pearl.setSummoned(false);
                 pearl.setReturnLocation(null);
                 return true;
@@ -473,13 +478,8 @@ final class CorePearlManager implements PearlManager {
             if (item == null) continue;
             if (item.getType() == Material.ENDER_PEARL) continue;
             inv.clear(i);
-            Bukkit.getScheduler().runTask(pearlApi, new Runnable() {
-
-                @Override
-                public void run() {
+            Bukkit.getRegionScheduler().execute(pearlApi, loc, () -> {
                     world.dropItemNaturally(loc, item);
-                }
-
             });
         }
     }

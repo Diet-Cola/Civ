@@ -142,11 +142,9 @@ public class PlayerListener implements Listener, Configurable {
             }
             event.setResult(null);
             // This is needed because of client side shenanigans
-            Bukkit.getScheduler().runTaskLater(pearlApi, () -> {
-                for (final Player viewer : InventoryUtils.getViewingPlayers(inventory)) {
-                    viewer.updateInventory();
-                }
-            }, 1L);
+            for (final Player viewer : InventoryUtils.getViewingPlayers(inventory)) {
+                viewer.getScheduler().runDelayed(pearlApi, task -> viewer.updateInventory(), null, 1L);
+            }
             break;
         }
     }

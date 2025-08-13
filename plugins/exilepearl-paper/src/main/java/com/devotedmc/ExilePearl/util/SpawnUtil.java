@@ -16,7 +16,7 @@ public class SpawnUtil {
      * @param world  The world in which to spawn the player
      */
     public static void spawnPlayer(Player player, World world) {
-        player.teleport(chooseSpawn(world).add(0, 0.5, 0));
+        player.teleportAsync(chooseSpawn(world).add(0, 0.5, 0));
     }
 
     public static Location chooseSpawn(World world) {
