@@ -89,4 +89,23 @@ BanStick:
   [12:28:29 INFO]: [HorriblePlayerLoginEventHack] You have plugins listening to the PlayerLoginEvent, this will cause re-configuration APIs to be unavailable: [BanStick, CivModCore]
 - doKickWithCheckUp in BanStickEventHandler might need review
 
-
+RandomSpawn:
+- This is an error every few seconds
+- Updated all teleport calls to use teleportAsync
+- [12:48:03 ERROR]: [ca.spottedleaf.moonrise.common.util.TickThread] Thread failed main thread check: Async chunk retrieval, context=[thread=Region Scheduler Thread #0,class=io.papermc.paper.threadedregions.TickRegionScheduler$TickThreadRunner,region={null}], world=world, chunk_pos=[-6, -2]
+  java.lang.Throwable: null
+          at ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(TickThread.java:88) ~[folia-1.21.8.jar:1.21.8-2-4ed5b66]
+          at org.bukkit.craftbukkit.CraftWorld.getChunkAt(CraftWorld.java:379) ~[folia-1.21.8.jar:1.21.8-2-4ed5b66]
+          at randomspawn-paper-3.0.4-F.jar/me.josvth.randomspawn.spawn.BlockingSpawnSelector.getValidY(BlockingSpawnSelector.java:263) ~[randomspawn-paper-3.0.4-F.jar:?]
+          at randomspawn-paper-3.0.4-F.jar/me.josvth.randomspawn.spawn.BlockingSpawnSelector.chooseSpawn(BlockingSpawnSelector.java:211) ~[randomspawn-paper-3.0.4-F.jar:?]
+          at randomspawn-paper-3.0.4-F.jar/me.josvth.randomspawn.spawn.BlockingSpawnSelector.getRandomSpawnLocationAsync(BlockingSpawnSelector.java:71) ~[randomspawn-paper-3.0.4-F.jar:?]
+          at randomspawn-paper-3.0.4-F.jar/me.josvth.randomspawn.spawn.AsyncSpawnSelector.lambda$queue$2(AsyncSpawnSelector.java:69) ~[randomspawn-paper-3.0.4-F.jar:?]
+          at io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler.lambda$execute$0(FoliaGlobalRegionScheduler.java:47) ~[folia-1.21.8.jar:?]
+          at io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler$GlobalScheduledTask.run(FoliaGlobalRegionScheduler.java:179) ~[folia-1.21.8.jar:?]
+          at io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler.tick(FoliaGlobalRegionScheduler.java:37) ~[folia-1.21.8.jar:?]
+          at io.papermc.paper.threadedregions.RegionizedServer.globalTick(RegionizedServer.java:307) ~[folia-1.21.8.jar:1.21.8-2-4ed5b66]
+          at io.papermc.paper.threadedregions.RegionizedServer$GlobalTickTickHandle.tickRegion(RegionizedServer.java:161) ~[folia-1.21.8.jar:1.21.8-2-4ed5b66]
+          at io.papermc.paper.threadedregions.TickRegionScheduler$RegionScheduleHandle.runTick(TickRegionScheduler.java:418) ~[folia-1.21.8.jar:1.21.8-2-4ed5b66]
+          at ca.spottedleaf.concurrentutil.scheduler.SchedulerThreadPool$TickThreadRunner.run(SchedulerThreadPool.java:546) ~[concurrentutil-0.0.3.jar:?]
+          at java.base/java.lang.Thread.run(Thread.java:1583) ~[?:?]
+-

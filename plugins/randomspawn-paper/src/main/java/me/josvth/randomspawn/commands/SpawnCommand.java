@@ -50,7 +50,7 @@ public class SpawnCommand extends AbstractCommand {
 
         Location spawn = plugin.chooseSpawn(world);
 
-        target.teleport(spawn);
+        target.teleportAsync(spawn);
 
         target.setMetadata("lasttimerandomspawned", new FixedMetadataValue(plugin, System.currentTimeMillis()));
 

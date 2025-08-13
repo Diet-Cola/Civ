@@ -36,7 +36,7 @@ public class AsyncSpawnSelector implements SpawnSelector, Listener {
         for (String world : worlds) {
             this.worlds.put(world, null);
         }
-        Bukkit.getScheduler().runTaskTimer(plugin, this::cycleLocations, 20 * 40, 20 * 40);
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, task -> this.cycleLocations(), 20*40, 20*40);
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         for (World world : Bukkit.getWorlds()) {
             on(new WorldLoadEvent(world));
@@ -61,7 +61,7 @@ public class AsyncSpawnSelector implements SpawnSelector, Listener {
     }
 
     private void queue(String worldName, ArrayBlockingQueue<Location> queue, BiFunction<World, Boolean, CompletableFuture<Location>> function) {
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        Bukkit.getGlobalRegionScheduler().execute(plugin, () -> {
             World world = worlds.get(worldName);
             if (world == null) {
                 return;

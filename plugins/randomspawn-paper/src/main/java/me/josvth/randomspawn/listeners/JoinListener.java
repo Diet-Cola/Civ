@@ -60,7 +60,7 @@ public class JoinListener implements Listener {
         List<String> spawnPointFlags = plugin.yamlHandler.worlds.getStringList(worldName + ".spawnpointson");
 
         if (!randomSpawnFlags.contains("firstjoin") && !spawnPointFlags.contains("firstjoin")) {
-            player.teleport(getFirstSpawn(world));
+            player.teleportAsync(getFirstSpawn(world));
             plugin.logDebug(playerName + " is teleported to the first spawn of " + worldName);
             return;
         }
@@ -77,7 +77,7 @@ public class JoinListener implements Listener {
 
             if (newSpawn != null) {
                 plugin.sendGround(player, newSpawn);
-                player.teleport(newSpawn.add(0, 3, 0));
+                player.teleportAsync(newSpawn.add(0, 3, 0));
                 player.setMetadata("lasttimerandomspawned", new FixedMetadataValue(plugin, System.currentTimeMillis()));
 
                 if (plugin.yamlHandler.worlds.getBoolean(worldName + ".keeprandomspawns", false)) {
@@ -101,7 +101,7 @@ public class JoinListener implements Listener {
 
             plugin.sendGround(player, spawnLocation);
 
-            player.teleport(spawnLocation.add(0, 3, 0));
+            player.teleportAsync(spawnLocation.add(0, 3, 0));
 
             player.setMetadata("lasttimerandomspawned", new FixedMetadataValue(plugin, System.currentTimeMillis()));
 
@@ -116,7 +116,7 @@ public class JoinListener implements Listener {
         }
 
         // neither spawnpoints nor randomspawn were successful (or both were disabled)
-        player.teleport(getFirstSpawn(world));
+        player.teleportAsync(getFirstSpawn(world));
         plugin.logDebug(playerName + " is teleported to the first spawn of " + worldName);
     }
 

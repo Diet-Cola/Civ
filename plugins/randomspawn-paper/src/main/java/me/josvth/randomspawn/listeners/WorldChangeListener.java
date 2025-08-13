@@ -50,7 +50,7 @@ public class WorldChangeListener implements Listener {
 
             plugin.sendGround(player, spawnLocation);
 
-            player.teleport(spawnLocation.add(0, 5, 0));
+            player.teleportAsync(spawnLocation.add(0, 5, 0));
 
             player.setMetadata("lasttimerandomspawned", new FixedMetadataValue(plugin, System.currentTimeMillis()));
 

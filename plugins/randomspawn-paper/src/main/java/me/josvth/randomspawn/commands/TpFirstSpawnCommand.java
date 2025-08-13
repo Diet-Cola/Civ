@@ -32,7 +32,7 @@ public class TpFirstSpawnCommand extends AbstractCommand {
 
             Location firstSpawn = new Location(player.getWorld(), x, y, z, yaw, pitch);
 
-            player.teleport(firstSpawn);
+            player.teleportAsync(firstSpawn);
 
             plugin.playerInfo(player, "You've been teleported to the first spawn location of this world!");
         } else {

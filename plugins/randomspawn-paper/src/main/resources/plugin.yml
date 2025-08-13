@@ -5,6 +5,7 @@ author: Josvth
 depend: [ BanStick ]
 softdepend: [ Bastion ]
 api-version: 1.21.3
+folia-supported: true
 commands:
   randomspawn:
     description: The main command.
