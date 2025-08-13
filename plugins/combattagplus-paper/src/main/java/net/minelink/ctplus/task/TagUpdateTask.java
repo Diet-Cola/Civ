@@ -34,7 +34,7 @@ public final class TagUpdateTask extends BukkitRunnable {
         // Cancel if player went offline
         Player player = plugin.getPlayerCache().getPlayer(playerId);
         if (player == null) {
-            cancel();
+            tasks.get(playerId).cancel();
             return;
         }
 
@@ -53,7 +53,7 @@ public final class TagUpdateTask extends BukkitRunnable {
             if (!plugin.getSettings().getUntagMessage().isEmpty()) {
                 player.sendMessage(plugin.getSettings().getUntagMessage());
             }
-            cancel();
+            tasks.get(playerId).cancel();
             return;
         }
 
