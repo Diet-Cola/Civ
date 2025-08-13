@@ -1,5 +1,6 @@
 package net.minelink.ctplus.task;
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.minelink.ctplus.CombatTagPlus;
 
 import org.bukkit.Bukkit;
@@ -16,7 +17,7 @@ import java.util.UUID;
 
 public final class SafeLogoutTask extends BukkitRunnable {
 
-    private final static Map<UUID, SafeLogoutTask> tasks = new HashMap<>();
+    private final static Map<UUID, ScheduledTask> tasks = new HashMap<>();
 
     private final CombatTagPlus plugin;
 
@@ -102,18 +103,17 @@ public final class SafeLogoutTask extends BukkitRunnable {
 
         // Run the task every few ticks for accuracy
         SafeLogoutTask task = new SafeLogoutTask(plugin, player, logoutTime);
-        task.runTaskTimer(plugin, 0, 5);
+        ScheduledTask runningTask = player.getScheduler().runAtFixedRate(plugin, playerTask -> task.run(), null, 1L, 5L);
 
         // Cache the task
-        tasks.put(player.getUniqueId(), task);
+        tasks.put(player.getUniqueId(), runningTask);
     }
 
     public static boolean hasTask(Player player) {
-        SafeLogoutTask task = tasks.get(player.getUniqueId());
+        ScheduledTask task = tasks.get(player.getUniqueId());
         if (task == null) return false;
 
-        BukkitScheduler s = Bukkit.getScheduler();
-        if (s.isQueued(task.getTaskId()) || s.isCurrentlyRunning(task.getTaskId())) {
+        if (!task.isCancelled()) {
             return true;
         }
 
@@ -122,7 +122,7 @@ public final class SafeLogoutTask extends BukkitRunnable {
     }
 
     public static boolean isFinished(Player player) {
-        return hasTask(player) && tasks.get(player.getUniqueId()).finished;
+        return hasTask(player) && tasks.get(player.getUniqueId()).getExecutionState() == ScheduledTask.ExecutionState.FINISHED;
     }
 
     public static boolean cancel(Player player) {
@@ -130,7 +130,7 @@ public final class SafeLogoutTask extends BukkitRunnable {
         if (!hasTask(player)) return false;
 
         // Cancel logout task
-        Bukkit.getScheduler().cancelTask(tasks.get(player.getUniqueId()).getTaskId());
+        tasks.get(player.getUniqueId()).cancel();
 
         // Remove task early to prevent exploits
         tasks.remove(player.getUniqueId());
@@ -139,15 +139,14 @@ public final class SafeLogoutTask extends BukkitRunnable {
     }
 
     public static void purgeFinished() {
-        Iterator<SafeLogoutTask> iterator = tasks.values().iterator();
-        BukkitScheduler s = Bukkit.getScheduler();
+        Iterator<ScheduledTask> iterator = tasks.values().iterator();
 
         // Loop over each task
         while (iterator.hasNext()) {
-            int taskId = iterator.next().getTaskId();
+            ScheduledTask taskId = iterator.next();
 
             // Remove entry if task isn't running anymore
-            if (!s.isQueued(taskId) && !s.isCurrentlyRunning(taskId)) {
+            if (taskId.isCancelled()) {
                 iterator.remove();
             }
         }

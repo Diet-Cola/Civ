@@ -1,5 +1,7 @@
 package net.minelink.ctplus.task;
 
+import io.papermc.paper.threadedregions.scheduler.RegionScheduler;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.minelink.ctplus.CombatTagPlus;
 import net.minelink.ctplus.Tag;
 import net.minelink.ctplus.util.BarUtils;
@@ -16,7 +18,7 @@ import java.util.UUID;
 
 public final class TagUpdateTask extends BukkitRunnable {
 
-    private final static Map<UUID, Integer> tasks = new HashMap<>();
+    private final static Map<UUID, ScheduledTask> tasks = new HashMap<>();
 
     private final CombatTagPlus plugin;
 
@@ -71,42 +73,39 @@ public final class TagUpdateTask extends BukkitRunnable {
         // Do nothing if player is a NPC
         if (plugin.getNpcPlayerHelper().isNpc(p)) return;
 
-        final BukkitScheduler s = Bukkit.getScheduler();
+        final RegionScheduler s = Bukkit.getRegionScheduler();
 
         // Schedule the task to run on next tick
-        s.scheduleSyncDelayedTask(plugin, new Runnable() {
-            @Override
-            public void run() {
+        s.run(plugin,  p.getLocation(), task ->  {
                 // Do nothing if player isn't tagged or online
                 if (!plugin.getTagManager().isTagged(p.getUniqueId()) || !p.isOnline()) {
                     return;
                 }
 
                 UUID playerId = p.getUniqueId();
-                Integer taskId = tasks.get(playerId);
+                ScheduledTask playerTask = tasks.get(playerId);
 
                 // Do nothing if player already has an active task
-                if (taskId != null && (s.isQueued(taskId) || s.isCurrentlyRunning(taskId))) {
+                if (playerTask != null) {
                     return;
                 }
 
                 // Create new repeating task
-                taskId = new TagUpdateTask(plugin, p).runTaskTimer(plugin, 0, 5).getTaskId();
-                tasks.put(playerId, taskId);
-            }
+
+                playerTask = p.getScheduler().runAtFixedRate(plugin, newTask -> new TagUpdateTask(plugin, p).run(), null, 1L, 5L);
+                tasks.put(playerId, playerTask);
         });
     }
 
     public static void purgeFinished() {
-        Iterator<Integer> iterator = tasks.values().iterator();
-        BukkitScheduler s = Bukkit.getScheduler();
+        Iterator<ScheduledTask> iterator = tasks.values().iterator();
 
         // Loop over each task
         while (iterator.hasNext()) {
-            int taskId = iterator.next();
+            ScheduledTask taskId = iterator.next();
 
             // Remove entry if task isn't running anymore
-            if (!s.isQueued(taskId) && !s.isCurrentlyRunning(taskId)) {
+            if (taskId.isCancelled()) {
                 iterator.remove();
             }
         }
@@ -121,11 +120,10 @@ public final class TagUpdateTask extends BukkitRunnable {
                 BarUtils.removeBar(player);
             }
 
-            int taskId = tasks.get(uuid);
-            BukkitScheduler s = Bukkit.getScheduler();
+            ScheduledTask taskId = tasks.get(uuid);
 
-            if (s.isQueued(taskId) || s.isCurrentlyRunning(taskId)) {
-                s.cancelTask(taskId);
+            if (!taskId.isCancelled()) {
+                taskId.cancel();
             }
 
             iterator.remove();

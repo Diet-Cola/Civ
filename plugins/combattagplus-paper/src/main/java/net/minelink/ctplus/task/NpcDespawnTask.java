@@ -1,5 +1,6 @@
 package net.minelink.ctplus.task;
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.minelink.ctplus.CombatTagPlus;
 import net.minelink.ctplus.Npc;
 
@@ -11,7 +12,7 @@ public class NpcDespawnTask implements Runnable {
 
     private long time;
 
-    private int taskId;
+    private ScheduledTask taskId;
 
     public NpcDespawnTask(CombatTagPlus plugin, Npc npc, long time) {
         this.plugin = plugin;
@@ -32,11 +33,11 @@ public class NpcDespawnTask implements Runnable {
     }
 
     public void start() {
-        taskId = plugin.getServer().getScheduler().runTaskTimer(plugin, this, 1, 1).getTaskId();
+        taskId = plugin.getServer().getGlobalRegionScheduler().runAtFixedRate(plugin, task -> this.run(), 1, 1);
     }
 
     public void stop() {
-        plugin.getServer().getScheduler().cancelTask(taskId);
+        this.taskId.cancel();
     }
 
     @Override

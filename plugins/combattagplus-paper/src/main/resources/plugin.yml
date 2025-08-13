@@ -5,6 +5,7 @@ authors: [ Byteflux, Sudzzy ]
 main: net.minelink.ctplus.CombatTagPlus
 softdepend: [ BarAPI, PlayerHeads, WorldGuard, Factions, BossBarAPI, ActionBarAPI, mcMMO ]
 api-version: 1.21.3
+folia-supported: true
 commands:
   combattagplus:
     aliases: [ ctplus, ct, combattag ]

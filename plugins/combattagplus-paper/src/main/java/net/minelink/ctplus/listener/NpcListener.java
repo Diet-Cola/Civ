@@ -65,12 +65,8 @@ public final class NpcListener implements Listener {
         plugin.getTagManager().untag(id);
 
         // Despawn NPC on the next tick
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-            @Override
-            public void run() {
-                plugin.getNpcManager().despawn(npc, NpcDespawnReason.DEATH);
-            }
-        });
+        Bukkit.getRegionScheduler().runDelayed(plugin, event.getEntity().getLocation(),
+            task -> plugin.getNpcManager().despawn(npc, NpcDespawnReason.DEATH), 1L);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
@@ -114,12 +110,8 @@ public final class NpcListener implements Listener {
         plugin.getTagManager().untag(player.getUniqueId());
 
         // Save NPC player data on next tick
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-            @Override
-            public void run() {
-                plugin.getNpcPlayerHelper().syncOffline(player);
-            }
-        });
+        Bukkit.getRegionScheduler().run(plugin, event.getEntity().getLocation(),
+            task -> plugin.getNpcPlayerHelper().syncOffline(player));
     }
 
     @EventHandler
@@ -131,25 +123,34 @@ public final class NpcListener implements Listener {
         final UUID playerId = event.getUniqueId();
         if (!plugin.getNpcManager().npcExists(playerId)) return;
 
-        // Synchronously save the NPC's player data
-        Future<?> future = Bukkit.getScheduler().callSyncMethod(plugin, new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                Npc npc = plugin.getNpcManager().getSpawnedNpc(playerId);
-                if (npc == null) return null;
+        //FOLIA: Is this going to need reworking?
+        //See below code for pre-folia
+        Bukkit.getGlobalRegionScheduler().execute(plugin, () -> {
+            Npc npc = plugin.getNpcManager().getSpawnedNpc(playerId);
+            if (npc == null) return;
 
-                plugin.getNpcPlayerHelper().syncOffline(npc.getEntity());
-                return null;
-            }
+            plugin.getNpcPlayerHelper().syncOffline(npc.getEntity());
         });
 
-        // Wait for the save to complete
-        // TODO: There must be a better way of doing this?
-        try {
-            future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        // Synchronously save the NPC's player data
+//        Future<?> future = Bukkit.getScheduler().callSyncMethod(plugin, new Callable<Void>() {
+//            @Override
+//            public Void call() throws Exception {
+//                Npc npc = plugin.getNpcManager().getSpawnedNpc(playerId);
+//                if (npc == null) return null;
+//
+//                plugin.getNpcPlayerHelper().syncOffline(npc.getEntity());
+//                return null;
+//            }
+//        });
+//
+//        // Wait for the save to complete
+//        // TODO: There must be a better way of doing this?
+//        try {
+//            future.get();
+//        } catch (InterruptedException | ExecutionException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     @EventHandler

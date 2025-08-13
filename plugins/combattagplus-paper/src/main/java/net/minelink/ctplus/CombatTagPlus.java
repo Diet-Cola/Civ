@@ -116,13 +116,10 @@ public final class CombatTagPlus extends JavaPlugin {
         ForceFieldTask.run(this);
 
         // Periodic task for purging unused data
-        Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
-            @Override
-            public void run() {
-                getTagManager().purgeExpired();
-                TagUpdateTask.purgeFinished();
-                SafeLogoutTask.purgeFinished();
-            }
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, task -> {
+            getTagManager().purgeExpired();
+            TagUpdateTask.purgeFinished();
+            SafeLogoutTask.purgeFinished();
         }, 3600, 3600);
     }
 

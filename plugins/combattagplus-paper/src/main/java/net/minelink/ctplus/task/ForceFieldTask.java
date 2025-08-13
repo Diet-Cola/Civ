@@ -1,6 +1,7 @@
 package net.minelink.ctplus.task;
 
 import net.minelink.ctplus.CombatTagPlus;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -36,12 +37,16 @@ public class ForceFieldTask extends BukkitRunnable {
                 validLocations.put(playerId, loc);
             } else if (validLocations.containsKey(playerId)) {
                 // Teleport the player to the last valid PVP-enabled location.
-                player.teleport(validLocations.get(playerId));
+                player.getScheduler().run(plugin, task -> {
+                    player.teleportAsync(validLocations.get(playerId));
+                }, null);
             }
         }
     }
 
     public static void run(CombatTagPlus plugin) {
-        new ForceFieldTask(plugin).runTaskTimer(plugin, 1, 1);
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, task -> {
+            new ForceFieldTask(plugin).run();
+        }, 1L, 1L);
     }
 }

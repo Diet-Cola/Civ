@@ -60,12 +60,9 @@ public final class BarUtils {
             @Override
             public void setMessage(final Player player, String message, int timeout) {
                 setMessage(player, message, 100F);
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        removeBar(player);
-                    }
-                }.runTaskLater(plugin, 20 * timeout);
+                player.getScheduler().runDelayed(plugin, task -> {
+                    removeBar(player);
+                }, null, 20 * timeout);
             }
 
             @Override
