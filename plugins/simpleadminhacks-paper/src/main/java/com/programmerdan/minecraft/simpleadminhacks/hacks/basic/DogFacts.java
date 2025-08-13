@@ -36,7 +36,7 @@ public class DogFacts extends BasicHack {
     public void startRunnable(List<String> announcements) {
         long interval = ConfigHelper.parseTimeAsTicks(intervalTime);
         int tickOffset = (int) (Math.random() * (interval));
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, task -> {
             if (announcements.isEmpty()) {
                 return;
             }

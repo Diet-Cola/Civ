@@ -115,7 +115,7 @@ public class PortalModifyHack extends BasicHack {
             if (portalEvent.isCancelled() || portalEvent.getTo() == null || portalEvent.getTo().getWorld() == null) {
                 continue;
             }
-            player.teleport(portalEvent.getTo(), PlayerTeleportEvent.TeleportCause.END_PORTAL);
+            player.teleportAsync(portalEvent.getTo(), PlayerTeleportEvent.TeleportCause.END_PORTAL);
             if (portalEvent.getTo().getWorld().getName().equals(targetWorld)) {
                 spawnExit(entry.getValue());
             }

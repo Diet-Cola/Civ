@@ -283,7 +283,7 @@ public final class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> imp
             OneTimeTeleport.this.grantedTimestamps.setValue(requestingPlayer.getUniqueId(), OTT_UNAVAILABLE);
 
             OneTimeTeleport.this.logger.info("Player[" + requestingPlayer.getName() + "] has OTT-teleported from [" + WorldUtils.getBlockLocation(requestingPlayer.getLocation()) + "] to [" + sender.getName() + "] at [" + WorldUtils.getBlockLocation(sender.getLocation()) + "]");
-            requestingPlayer.teleport(sender.getLocation());
+            requestingPlayer.teleportAsync(sender.getLocation());
             sender.sendMessage(Component.text(requestingPlayer.getName() + " has been teleported to you!", NamedTextColor.GREEN));
             requestingPlayer.sendMessage(Component.text("You have been teleported to " + sender.getName() + "!", NamedTextColor.GREEN));
         }

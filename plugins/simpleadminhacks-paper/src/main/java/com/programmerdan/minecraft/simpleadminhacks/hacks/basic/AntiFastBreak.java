@@ -161,13 +161,13 @@ public final class AntiFastBreak extends BasicHack {
         plugin().debug("Attempting to decrement token count for " + player.getName());
         if (!this.violationLimiter.pullToken(player)) {
             plugin().debug("Could not decrement token count for " + player.getName() + ", punishing...");
-            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin(), () -> {
+            player.getScheduler().runDelayed(plugin(), task -> {
                 this.punishCooldown.putOnCoolDown(player.getUniqueId());
                 if (this.loggerLimiter.pullToken(player.getUniqueId()) || plugin().isDebugEnabled()) {
                     plugin().warning(player.getName() + " is possibly using civ break, fast break detected");
                 }
                 player.sendMessage(ChatColor.RED + "You are breaking blocks too fast");
-            });
+            }, null, 1L);
         }
     }
 

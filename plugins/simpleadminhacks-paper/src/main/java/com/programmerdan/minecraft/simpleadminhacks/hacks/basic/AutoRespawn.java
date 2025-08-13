@@ -67,7 +67,7 @@ public final class AutoRespawn extends BasicHack {
             plugin().info("Player [" + player.getName() + "] died, respawning.");
             // This is necessary as respawning the player IMMEDIATELY means also not allowing the
             // death process to occur (such as dropping items) to occur prior to the respawn.
-            Bukkit.getScheduler().runTask(this.plugin, () -> autoRespawnPlayer(player));
+            player.getScheduler().run(this.plugin, task -> autoRespawnPlayer(player), null);
         } else {
             plugin().info("Player [" + player.getName() + "] died, " +
                 "setting respawn timer: " + this.respawnDelay);
@@ -87,7 +87,7 @@ public final class AutoRespawn extends BasicHack {
             plugin().info("Player [" + player.getName() + "] logged in while dead, respawning.");
             // This is necessary as respawning the player IMMEDIATELY means also not allowing the
             // death process to occur (such as dropping items) to occur prior to the respawn.
-            Bukkit.getScheduler().runTask(this.plugin, () -> autoRespawnPlayer(player));
+            player.getScheduler().run(this.plugin, task -> autoRespawnPlayer(player), null);
         } else {
             plugin().info("Player [" + player.getName() + "] logged in while dead, " +
                 "setting respawn timer: " + this.loginRespawnDelay);

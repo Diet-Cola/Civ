@@ -166,7 +166,7 @@ public class GoldBlockElevators extends BasicHack {
         adjustedLocation.setYaw(player.getLocation().getYaw());
         adjustedLocation.setPitch(player.getLocation().getPitch());
         player.playSound(adjustedLocation, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 8.0F);
-        player.teleport(adjustedLocation);
+        player.teleportAsync(adjustedLocation);
         return true;
     }
 }

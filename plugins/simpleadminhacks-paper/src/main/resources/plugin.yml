@@ -6,6 +6,7 @@ version: ${version}
 depend: [ CivModCore ]
 softdepend: [ CombatTagPlus, NameLayer, Citadel, ProtocolLib, BanStick, ExilePearl ]
 api-version: 1.21.3
+folia-supported: true
 commands:
   hacks:
     description: Shows the various hacks and fixes supported by this plugin and controls them

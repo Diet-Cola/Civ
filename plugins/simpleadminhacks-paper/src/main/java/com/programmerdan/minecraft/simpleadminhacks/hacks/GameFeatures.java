@@ -493,7 +493,7 @@ public class GameFeatures extends SimpleHack<GameFeaturesConfig> implements List
             }
             final Player player = (Player) passenger;
             final Location vehicleLocation = vehicle.getLocation();
-            Bukkit.getScheduler().runTaskLater(plugin(), () -> {
+            Bukkit.getRegionScheduler().runDelayed(plugin(), vehicleLocation, task -> {
                 if (!TeleportUtil.tryToTeleportVertically(player, vehicleLocation, "exiting vehicle")) {
                     player.setHealth(0.000000D);
                     plugin().log(Level.INFO, "Player '%s' exiting vehicle: killed", player.getName());
@@ -514,12 +514,12 @@ public class GameFeatures extends SimpleHack<GameFeaturesConfig> implements List
             passengers.removeIf((passenger -> !(passenger instanceof Player)));
             passengers.forEach((passenger) -> {
                 final Player player = (Player) passenger;
-                Bukkit.getScheduler().runTaskLater(plugin(), () -> {
+                player.getScheduler().runDelayed(plugin(), task -> {
                     if (!TeleportUtil.tryToTeleportVertically(player, vehicleLocation, "in destroyed vehicle")) {
                         player.setHealth(0.000000D);
                         plugin().log(Level.INFO, String.format("Player '%s' exiting vehicle: killed", player.getName()));
                     }
-                }, 2L);
+                }, null, 2L);
             });
         }
     }
@@ -588,12 +588,12 @@ public class GameFeatures extends SimpleHack<GameFeaturesConfig> implements List
             case NETHERITE_HOE:
             case NETHERITE_SWORD:
                 event.setResult(new ItemStack(Material.AIR));
-                Bukkit.getScheduler().runTask(this.plugin, () -> {
                     for (Player player : InventoryUtils.getViewingPlayers(smithingTable)) {
-                        player.updateInventory();
-                        player.sendMessage(ChatColor.RED + "Vanilla netherite crafting is disabled!");
+                        player.getScheduler().run(this.plugin, task -> {
+                            player.updateInventory();
+                            player.sendMessage(ChatColor.RED + "Vanilla netherite crafting is disabled!");
+                        }, null);
                     }
-                });
                 break;
         }
     }

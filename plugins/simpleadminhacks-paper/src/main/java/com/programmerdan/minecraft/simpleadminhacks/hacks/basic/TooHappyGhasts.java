@@ -20,7 +20,7 @@ public class TooHappyGhasts extends BasicHack {
     @Override
     public void onEnable() {
         super.onEnable();
-        Bukkit.getScheduler().runTaskTimer(SimpleAdminHacks.instance(), () -> {
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(SimpleAdminHacks.instance(), task -> {
             try {
                 for (World world : Bukkit.getWorlds()) {
                     for (Player player : world.getPlayers()) {
@@ -28,20 +28,23 @@ public class TooHappyGhasts extends BasicHack {
                         if (!(entity instanceof HappyGhast)) {
                             continue;
                         }
-                        if (entity.getY() > 316) {
-                            Location loc = entity.getLocation();
-                            loc.setY(315.5);
-                            for (Entity passenger : entity.getPassengers()) {
-                                entity.removePassenger(passenger);
+                        entity.getScheduler().run(this.plugin, ghastTask -> {
+                            if (entity.getY() > 316) {
+                                Location loc = entity.getLocation();
+                                loc.setY(315.5);
+                                for (Entity passenger : entity.getPassengers()) {
+                                    entity.removePassenger(passenger);
+                                }
+                                entity.teleportAsync(loc);
                             }
-                            entity.teleport(loc);
-                        }
+                        }, null);
+
                     }
                 }
             } catch (RuntimeException ex) {
                 SimpleAdminHacks.instance().getLogger().log(Level.WARNING, "Ticking ghast positions", ex);
             }
-        }, 0, 1);
+        }, 1, 1);
     }
 
     @Override

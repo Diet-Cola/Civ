@@ -59,7 +59,7 @@ public class ReinforcedChestBreak extends SimpleHack<ReinforcedChestBreakConfig>
         manager = Citadel.getInstance().getReinforcementManager();
         messenger = new Messenger();
 
-        Bukkit.getScheduler().runTaskTimer(plugin(), messenger, 0, config.getDelay() * 20);
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin(), task -> messenger.run(), 1L, config.getDelay() * 20);
     }
 
     @Override

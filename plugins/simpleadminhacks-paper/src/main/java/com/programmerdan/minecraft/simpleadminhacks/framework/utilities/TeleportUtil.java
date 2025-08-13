@@ -44,7 +44,7 @@ public class TeleportUtil {
         }
         if (performTeleport) {
             player.setVelocity(new Vector());
-            player.teleport(loc);
+            player.teleportAsync(loc);
             SimpleAdminHacks.instance().log(String.format(
                 "Player '%s' %s: Teleported to %s",
                 player.getName(), reason, loc.toString()));
@@ -75,7 +75,7 @@ public class TeleportUtil {
                     loc.setX(Math.floor(loc.getX()) + 0.500000D);
                     loc.setY(loc.getY() + 1.02D);
                     loc.setZ(Math.floor(loc.getZ()) + 0.500000D);
-                    player.teleport(loc);
+                    player.teleportAsync(loc);
                     SimpleAdminHacks.instance().log(String.format(
                         "Player '%s' %s: Teleported to %s",
                         player.getName(), reason, loc.toString()));

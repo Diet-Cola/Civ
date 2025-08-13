@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -147,7 +148,7 @@ public class Insight extends SimpleHack<InsightConfig> implements CommandExecuto
         }
     }
 
-    private BukkitTask remap = null;
+    private ScheduledTask remap = null;
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void postPluginLoad(PluginEnableEvent e) {
@@ -158,13 +159,10 @@ public class Insight extends SimpleHack<InsightConfig> implements CommandExecuto
             remap.cancel();
         }
 
-        remap = Bukkit.getScheduler().runTaskLater(plugin(), new Runnable() {
-            @Override
-            public void run() {
+        remap = Bukkit.getGlobalRegionScheduler().runDelayed(plugin(), task ->  {
                 //event.block
-                rebounders.forEach(e -> reboundHandlers(e));
-            }
-        }, 60l); // 3 seconds
+                rebounders.forEach(event -> reboundHandlers(event));
+        }, 3000L); // 3 seconds
     }
 
     /**

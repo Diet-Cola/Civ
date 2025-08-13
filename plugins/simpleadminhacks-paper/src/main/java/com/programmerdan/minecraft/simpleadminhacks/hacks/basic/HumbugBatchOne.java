@@ -376,7 +376,7 @@ public class HumbugBatchOne extends BasicHack {
             }
         }
         if (foundWater) {
-            Bukkit.getScheduler().runTask(SimpleAdminHacks.instance(), () -> e.getBlock().setType(Material.AIR));
+            Bukkit.getRegionScheduler().execute(SimpleAdminHacks.instance(), e.getBlock().getLocation(), () -> e.getBlock().setType(Material.AIR));
         }
     }
 

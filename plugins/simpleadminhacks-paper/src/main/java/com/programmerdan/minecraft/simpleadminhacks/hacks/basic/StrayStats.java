@@ -64,7 +64,7 @@ public final class StrayStats extends BasicHack {
         @CommandPermission("simpleadmin.stats")
         public void compileStatistics(final CommandSender sender) {
             sender.sendMessage(ChatColor.GOLD + "Starting to compile player join statistics!");
-            Bukkit.getScheduler().runTaskAsynchronously(plugin(), () -> {
+            Bukkit.getAsyncScheduler().runNow(plugin(), task -> {
                 try (final var file = new FileWriter(new File(plugin().getDataFolder(), "playerJoinStats.csv"))) {
                     try (final var connection = BanStickDatabaseHandler.getInstanceData().getConnection();
                          final var statement = connection.prepareStatement(

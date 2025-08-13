@@ -340,7 +340,7 @@ public final class OldEnchanting extends BasicHack {
                 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.1F,
                     (RANDOM.nextFloat() - RANDOM.nextFloat()) * 0.35f + 0.9f);
                 event.setExperience(0);
-                bottle.teleport(player);
+                bottle.teleportAsync(player.getLocation());
             }
         }
     }
@@ -442,11 +442,9 @@ public final class OldEnchanting extends BasicHack {
             if (event.getResult() != null) {
                 event.setResult(null);
                 // This is needed because of client side shenanigans
-                Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
-                    for (final Player viewer : InventoryUtils.getViewingPlayers(inventory)) {
-                        viewer.updateInventory();
-                    }
-                }, 1L);
+                for (final Player viewer : InventoryUtils.getViewingPlayers(inventory)) {
+                    viewer.getScheduler().run(this.plugin, task -> viewer.updateInventory(), null);
+                }
             }
         }
     }

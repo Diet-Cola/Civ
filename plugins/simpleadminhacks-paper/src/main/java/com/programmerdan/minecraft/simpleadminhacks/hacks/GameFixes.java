@@ -214,7 +214,7 @@ public class GameFixes extends SimpleHack<GameFixesConfig> implements Listener {
     public void onTouchBedrock(PlayerInteractEvent event) {
         if (config.isEnabled() && config.maintainFlatBedrock() && event.getClickedBlock() != null
             && event.getClickedBlock().getType() == Material.BEDROCK && event.getClickedBlock().getY() > 0) {
-            Bukkit.getScheduler().runTask(plugin(), () -> {
+            Bukkit.getRegionScheduler().execute(plugin(), event.getClickedBlock().getLocation(), () -> {
                 event.getClickedBlock().setType(Material.STONE);
             });
         }

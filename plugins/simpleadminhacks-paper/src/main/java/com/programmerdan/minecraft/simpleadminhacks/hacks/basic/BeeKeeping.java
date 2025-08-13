@@ -108,14 +108,14 @@ public final class BeeKeeping extends BasicHack {
         final var angerTarget = bee.getPersistentAngerTarget();
         final var goalTarget = bee.getTarget();
         final var angerLevel = bee.getRemainingPersistentAngerTime();
-        Bukkit.getScheduler().runTask(this.plugin, () -> {
+        attacker.getScheduler().run(this.plugin, task -> {
             bee.setHasStung(false);
             // Reset the above values
             bee.setLastHurtByMob(lastDamageCause);
             bee.setPersistentAngerTarget(angerTarget);
             bee.setTarget(goalTarget, EntityTargetEvent.TargetReason.FORGOT_TARGET); // Params: target, cause, emit event
             bee.setRemainingPersistentAngerTime(angerLevel);
-        });
+        }, null);
     }
 
     // ------------------------------------------------------------
