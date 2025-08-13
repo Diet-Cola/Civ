@@ -6,6 +6,8 @@ General:
 CMC:
 - config command not working
 - scoreboard api/bottomline api disabled
+- [11:04:07 INFO]: UUID of player Diet_Cola is 638af9c6-c734-45d9-b092-13a4e184f7f6
+  [11:04:07 INFO]: [HorriblePlayerLoginEventHack] You have plugins listening to the PlayerLoginEvent, this will cause re-configuration APIs to be unavailable: [CivModCore]
 
 RB:
 - PlantGrowthConfig L402 - Is this the best way to grab the biome?
@@ -78,4 +80,8 @@ JA:
 Bastion:
 - EnderPearlManager FlightTask mini class might need a review
 
+RailSwitch:
+- suspiciously easy to convert
 
+BanStick:
+- 
