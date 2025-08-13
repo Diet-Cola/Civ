@@ -54,13 +54,13 @@ public class NameColors extends ACivMod implements Listener {
             CivChat2.getInstance().getCivChat2Manager().removeCustomName(player.getUniqueId());
             if (getServer().getPluginManager().isPluginEnabled("TAB")) {
                 //TAB is enabled, so lets reset the player name.
-                Bukkit.getScheduler().runTaskLater(this, () -> {
+                player.getScheduler().execute(this, () -> {
                     TabPlayer tabPlayer = TabAPI.getInstance()
                         .getPlayer(player.getUniqueId());
                     if (tabPlayer != null) {
                         TabAPI.getInstance().getTabListFormatManager().setName(tabPlayer, null);
                     }
-                }, 20l);
+                }, null, 20L);
             }
         } else {
             if (color == NameColorSetting.RAINBOW_COLOR) {
@@ -69,13 +69,13 @@ public class NameColors extends ACivMod implements Listener {
                 if (getServer().getPluginManager().isPluginEnabled("TAB")) {
                     //TAB enabled, so now we need to re-apply this name as a "custom name"
                     //Side note: we do this temporarily so players if they lose their permission don't keep their colored name in TAB.
-                    Bukkit.getScheduler().runTaskLater(this, () -> {
+                    player.getScheduler().execute(this, () -> {
                         TabPlayer tabPlayer = TabAPI.getInstance()
                             .getPlayer(player.getUniqueId());
                         if (tabPlayer != null) {
                             TabAPI.getInstance().getTabListFormatManager().setName(tabPlayer, rainbowify(player.getName()));
                         }
-                    }, 20);
+                    }, null,20);
                 }
                 return;
             }
@@ -84,13 +84,13 @@ public class NameColors extends ACivMod implements Listener {
             //Same deal as for rainbow
             if (getServer().getPluginManager().isPluginEnabled("TAB")) {
                 //We delay just in-case TAB hasn't loaded the player into memory yet.
-                Bukkit.getScheduler().runTaskLater(this, () -> {
+                player.getScheduler().execute(this, () -> {
                     TabPlayer tabPlayer = TabAPI.getInstance()
                         .getPlayer(player.getUniqueId());
                     if (tabPlayer != null) {
                         TabAPI.getInstance().getTabListFormatManager().setName(tabPlayer, color + player.getName() + ChatColor.RESET);
                     }
-                }, 20);
+                }, null,  20);
             }
         }
     }

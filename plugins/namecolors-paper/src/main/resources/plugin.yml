@@ -6,6 +6,7 @@ depend: [ CivModCore, CivChat2 ]
 softdepend:
   - TAB
 api-version: 1.21.3
+folia-supported: true
 commands:
   namecolor:
     description: "Give your name a nice color!"
