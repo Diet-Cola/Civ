@@ -3,7 +3,7 @@ plugins {
     id("com.gradleup.shadow")
 }
 
-version = "2.0.3"
+version = "2.0.3-F"
 
 dependencies {
     paperweight {

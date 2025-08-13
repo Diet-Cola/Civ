@@ -20,7 +20,7 @@ public class IngameCommandHandler extends AbstractRequestHandler {
         String command = input.get("command").getAsString();
         Logger logger = KiraBukkitGatewayPlugin.getInstance().getLogger();
         logger.info("Running command '" + command + "' for " + runner.toString());
-        Bukkit.getScheduler().runTask(KiraBukkitGatewayPlugin.getInstance(), () -> {
+        Bukkit.getGlobalRegionScheduler().execute(KiraBukkitGatewayPlugin.getInstance(), () -> {
             PseudoPlayer player = new PseudoPlayer(runner, channelId);
             try {
                 Bukkit.getServer().dispatchCommand(player, command);

@@ -4,6 +4,7 @@ author: Maxopoly
 version: ${version}
 depend: [ LuckPerms, CivModCore, NameLayer, CivChat2 ]
 api-version: 1.21.3
+folia-supported: true
 permissions:
   kira.public:
     default: true

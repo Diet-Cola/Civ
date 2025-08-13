@@ -36,9 +36,9 @@ public class GroupChatMessageHandler extends RabbitInput {
             return;
         }
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(KiraBukkitGatewayPlugin.getInstance(), () -> {
+        Bukkit.getGlobalRegionScheduler().runDelayed(KiraBukkitGatewayPlugin.getInstance(), task -> {
             CivChat2.getInstance().getCivChat2Manager().sendGroupMsg(fakeSender, foundGroup, message);
-        });
+        }, 1L);
     }
 
 }
