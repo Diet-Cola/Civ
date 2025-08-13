@@ -2,6 +2,7 @@ name: EssenceGlue
 version: ${version}
 main: com.github.maxopoly.essenceglue.EssenceGluePlugin
 api-version: 1.21.3
+folia-supported: true
 depend: [ CivModCore, BanStick, ExilePearl ]
 softdepend: [ Votifier ]
 authors: [ Maxopoly ]

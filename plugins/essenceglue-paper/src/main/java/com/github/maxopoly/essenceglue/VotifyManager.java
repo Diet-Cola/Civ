@@ -46,7 +46,7 @@ public class VotifyManager implements Listener {
             handOutVotingReward(player, vote);
             return;
         }
-        Bukkit.getScheduler().runTaskAsynchronously(EssenceGluePlugin.instance(), () -> {
+        Bukkit.getAsyncScheduler().runNow(EssenceGluePlugin.instance(), task -> {
             //Mojang API rate limit is 600 requests per 10 minutes, which is not a problem for now
             UUID uuid = NewNameResolver.getUUIDForMojangName(vote.getUsername());
             if (uuid == null) {
@@ -59,9 +59,9 @@ public class VotifyManager implements Listener {
                     .info("Found uuid " + uuid + " but could not find player for vote from " + vote.getUsername());
                 return;
             }
-            Bukkit.getScheduler().runTask(EssenceGluePlugin.instance(), () -> {
+            altPlayer.getScheduler().run(EssenceGluePlugin.instance(), playerTask -> {
                 handOutVotingReward(altPlayer, vote);
-            });
+            }, null);
         });
     }
 
@@ -109,9 +109,9 @@ public class VotifyManager implements Listener {
                     new ClickEvent(ClickEvent.Action.OPEN_URL, site.getVotingUrl().replace("%PLAYER%", p.getName())));
                 text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                     new Text("Click to open the voting link for " + site.getName())));
-                Bukkit.getScheduler().runTaskLater(EssenceGluePlugin.instance(), () -> {
+                p.getScheduler().runDelayed(EssenceGluePlugin.instance(), task -> {
                     p.sendMessage(text);
-                }, 20L);
+                }, null, 20L);
             }
         }
     }

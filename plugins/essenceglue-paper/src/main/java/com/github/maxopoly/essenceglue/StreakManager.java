@@ -47,7 +47,7 @@ public class StreakManager {
             "Essence and voting related settings", new ItemStack(Material.ENDER_EYE));
         PlayerSettingAPI.registerSetting(receiveRewards, menu);
         PlayerSettingAPI.registerSetting(showSitesOnLogin, menu);
-        Bukkit.getScheduler().runTaskTimer(plugin, this::updateAll, 20 * 60L, 20 * 60L);
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, task -> updateAll(), 20 * 60L, 20 * 60L);
         this.streakDelay = streakDelay;
         this.streakGracePeriod = streakGracePeriod;
         this.currentOnlineTime = new TreeMap<>();
