@@ -5,6 +5,7 @@ version: ${version}
 depend: [CivModCore, ProtocolLib]
 softdepend: [CombatTagPlus, Citadel, Bastion]
 api-version: 1.21.3
+folia-supported: true
 permissions:
     finale.op:
         default: op

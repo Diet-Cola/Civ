@@ -29,7 +29,7 @@ public class CardinalCommand extends BaseCommand {
 
         if (targetDirection == null) {
             double newYaw = Math.rint(currLocation.getYaw() / 45) * 45;
-            player.teleport(new Location(player.getWorld(), currLocation.getX(), currLocation.getY(),
+            player.teleportAsync(new Location(player.getWorld(), currLocation.getX(), currLocation.getY(),
                 currLocation.getZ(), (float) newYaw, currLocation.getPitch()));
             return;
         }
@@ -66,6 +66,6 @@ public class CardinalCommand extends BaseCommand {
                 return;
         }
 
-        player.teleport(location);
+        player.teleportAsync(location);
     }
 }

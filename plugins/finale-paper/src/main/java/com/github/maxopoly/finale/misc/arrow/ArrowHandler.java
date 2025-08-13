@@ -39,14 +39,9 @@ public class ArrowHandler {
         this.allyCollide = allyCollide;
         this.allyExemptArrowTypes = allyExemptArrowTypes;
 
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                progressFragments();
-            }
-
-        }.runTaskTimer(Finale.getPlugin(), 0L, 1L);
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(Finale.getPlugin(), task -> {
+            progressFragments();
+        }, 1L, 1L);
     }
 
     public void progressFragments() {

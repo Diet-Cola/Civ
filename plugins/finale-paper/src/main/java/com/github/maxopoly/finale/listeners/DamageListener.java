@@ -202,14 +202,9 @@ public class DamageListener implements Listener {
         }
         // see
         // https://bukkit.org/threads/whats-up-with-setnodamageticks.141901/#post-1638021
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Finale.getPlugin(), new Runnable() {
-
-            @Override
-            public void run() {
+        player.getScheduler().runDelayed(Finale.getPlugin(), task ->  {
                 player.setNoDamageTicks(0);
-            }
-
-        }, 1L);
+        }, null, 1L);
     }
 
     @EventHandler

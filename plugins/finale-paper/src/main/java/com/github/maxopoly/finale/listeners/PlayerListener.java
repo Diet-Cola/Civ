@@ -49,18 +49,13 @@ public class PlayerListener implements Listener {
         }
         // see
         // https://bukkit.org/threads/whats-up-with-setnodamageticks.141901/#post-1638021
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Finale.getPlugin(), new Runnable() {
-
-            @Override
-            public void run() {
+        victim.getScheduler().runDelayed(Finale.getPlugin(), task ->  {
                 Integer ticks = manager.getInvulnerableTicks().get(e.getCause());
                 if (ticks == null) {
                     return;
                 }
                 victim.setNoDamageTicks(ticks - 1);
-            }
-
-        }, 1L);
+        }, null,1L);
     }
 
     @EventHandler

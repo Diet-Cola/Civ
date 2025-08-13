@@ -35,23 +35,18 @@ public class ShieldListener implements Listener {
             }
 
             Player player = event.getPlayer();
-            new BukkitRunnable() {
-
-                @Override
-                public void run() {
-                    if (player.isBlocking()) {
-                        ShieldHandler shieldHandler = Finale.getPlugin().getManager().getShieldHandler();
-                        shieldHandler.activateShieldBash(player);
-                        cancel();
-                        return;
-                    }
-                    if (player.hasActiveItem()) {
-                        return;
-                    }
-                    cancel();
+            player.getScheduler().runAtFixedRate(Finale.getPlugin(), task -> {
+                if (player.isBlocking()) {
+                    ShieldHandler shieldHandler = Finale.getPlugin().getManager().getShieldHandler();
+                    shieldHandler.activateShieldBash(player);
+                    task.cancel();
+                    return;
                 }
-
-            }.runTaskTimer(Finale.getPlugin(), 1L, 1L);
+                if (player.hasActiveItem()) {
+                    return;
+                }
+                task.cancel();
+            }, null, 1L, 1L);
         }
     }
 
@@ -91,25 +86,20 @@ public class ShieldListener implements Listener {
     }
 
     private void passiveResistanceCheck(Player player) {
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                ItemStack offHand = player.getInventory().getItemInOffHand();
-                ItemStack mainHand = player.getInventory().getItemInMainHand();
-                if (offHand != null && offHand.getType() == Material.SHIELD) {
-                    addPassiveResistance(player);
-                } else if (mainHand != null && mainHand.getType() == Material.SHIELD) {
-                    addPassiveResistance(player);
-                } else {
-                    if (hasPassiveResistance.contains(player.getUniqueId())) {
-                        player.removePotionEffect(PotionEffectType.RESISTANCE);
-                        hasPassiveResistance.remove(player.getUniqueId());
-                    }
+        player.getScheduler().run(Finale.getPlugin(), task -> {
+            ItemStack offHand = player.getInventory().getItemInOffHand();
+            ItemStack mainHand = player.getInventory().getItemInMainHand();
+            if (offHand != null && offHand.getType() == Material.SHIELD) {
+                addPassiveResistance(player);
+            } else if (mainHand != null && mainHand.getType() == Material.SHIELD) {
+                addPassiveResistance(player);
+            } else {
+                if (hasPassiveResistance.contains(player.getUniqueId())) {
+                    player.removePotionEffect(PotionEffectType.RESISTANCE);
+                    hasPassiveResistance.remove(player.getUniqueId());
                 }
             }
-
-        }.runTask(Finale.getPlugin());
+        }, null);
     }
 
     private void addPassiveResistance(Player player) {

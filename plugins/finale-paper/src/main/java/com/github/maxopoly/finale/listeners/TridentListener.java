@@ -64,37 +64,33 @@ public class TridentListener implements Listener {
                     return;
                 }
                 if (offhand.containsEnchantment(Enchantment.LOYALTY)) {
-                    new BukkitRunnable() {
+                    trident.getScheduler().runAtFixedRate(Finale.getPlugin(), task -> {
+                        if (trident.isDead() || !trident.isTicking()) {
+                            task.cancel();
+                            return;
+                        }
+                        if (trident.getTicksLived() < 60) {
+                            return;
+                        }
+                        List<Entity> entities = trident.getNearbyEntities(1, 1, 1);
+                        if (entities.isEmpty()) {
+                            return;
+                        }
 
-                        @Override
-                        public void run() {
-                            if (trident.isDead() || !trident.isTicking()) {
-                                cancel();
-                                return;
-                            }
-                            if (trident.getTicksLived() < 60) {
-                                return;
-                            }
-                            List<Entity> entities = trident.getNearbyEntities(1, 1, 1);
-                            if (entities.isEmpty()) {
-                                return;
-                            }
+                        for (Entity entity : entities) {
+                            if (!(entity instanceof Player)) continue;
 
-                            for (Entity entity : entities) {
-                                if (!(entity instanceof Player)) continue;
+                            Player receiver = (Player) entity;
+                            if (!(receiver.getUniqueId().equals(shooter.getUniqueId()))) continue;
 
-                                Player receiver = (Player) entity;
-                                if (!(receiver.getUniqueId().equals(shooter.getUniqueId()))) continue;
-
-                                ItemStack offhand = receiver.getInventory().getItemInOffHand();
-                                if (receiver.getInventory().firstEmpty() == -1 && (offhand == null || offhand.getType().isAir())) {
-                                    trident.remove();
-                                    receiver.getInventory().setItemInOffHand(trident.getItemStack());
-                                    cancel();
-                                }
+                            ItemStack offhandTemp = receiver.getInventory().getItemInOffHand();
+                            if (receiver.getInventory().firstEmpty() == -1 && (offhandTemp == null || offhandTemp.getType().isAir())) {
+                                trident.remove();
+                                receiver.getInventory().setItemInOffHand(trident.getItemStack());
+                                task.cancel();
                             }
                         }
-                    }.runTaskTimer(Finale.getPlugin(), 0L, 1L);
+                    }, null, 1L, 1L);
                 }
                 returnToOffhand.put(shooter.getUniqueId(), trident);
             }
@@ -212,14 +208,9 @@ public class TridentListener implements Listener {
         TridentHandler tridentHandler = Finale.getPlugin().getManager().getTridentHandler();
         if (tridentHandler.isRiptideOnCooldown(player)) {
             Location oldLoc = player.getLocation();
-            new BukkitRunnable() {
-
-                @Override
-                public void run() {
-                    player.teleport(oldLoc);
-                }
-
-            }.runTaskLater(Finale.getPlugin(), 1);
+            player.getScheduler().runDelayed(Finale.getPlugin(), task -> {
+                player.teleportAsync(oldLoc);
+            }, null, 1L);
             return;
         }
         tridentHandler.putRiptideOnCooldown(player);

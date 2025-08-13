@@ -2,9 +2,6 @@ package com.github.maxopoly.finale.misc.ally;
 
 import com.github.maxopoly.finale.Finale;
 import com.github.maxopoly.finale.misc.ParticleUtil;
-import com.sun.jna.platform.win32.COM.IConnectionPoint;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,6 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
+import vg.civcraft.mc.civmodcore.CivModCorePlugin;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -34,31 +32,29 @@ public class AllyHandler implements Listener {
 
     public AllyHandler(boolean enabled, boolean seeInvisAlly, boolean animateLinkedEnabled, double animateLinkedMaxDistance, SQLite sqlite) {
         this.enabled = enabled;
+        if (CivModCorePlugin.isFolia()) {
+            this.enabled = false;
+        }
         this.seeInvisAlly = seeInvisAlly;
         this.animateLinkedEnabled = animateLinkedEnabled;
         this.animateLinkedMaxDistance = animateLinkedMaxDistance;
         this.sqlite = sqlite;
         Bukkit.getPluginManager().registerEvents(this, Finale.getPlugin());
-        new BukkitRunnable() {
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(Finale.getPlugin(), task -> {
+            for (Map.Entry<UUID, Set<UUID>> playerAlliesEntry : playerAllies.entrySet()) {
+                Player player = Bukkit.getPlayer(playerAlliesEntry.getKey());
+                if (player == null) continue;
+                if (!player.isOnline()) continue;
 
-            @Override
-            public void run() {
-                for (Map.Entry<UUID, Set<UUID>> playerAlliesEntry : playerAllies.entrySet()) {
-                    Player player = Bukkit.getPlayer(playerAlliesEntry.getKey());
-                    if (player == null) continue;
-                    if (!player.isOnline()) continue;
-
-                    Team allyTeam = getAllyTeam(player);
-                    for (UUID allyID : playerAlliesEntry.getValue()) {
-                        Player ally = Bukkit.getPlayer(allyID);
-                        if (ally.isOnline()) {
-                            allyTeam.addEntry(ally.getName());
-                        }
+                Team allyTeam = getAllyTeam(player);
+                for (UUID allyID : playerAlliesEntry.getValue()) {
+                    Player ally = Bukkit.getPlayer(allyID);
+                    if (ally.isOnline()) {
+                        allyTeam.addEntry(ally.getName());
                     }
                 }
             }
-
-        }.runTaskTimer(Finale.getPlugin(), 0L, 1L);
+        }, 1L, 1L);
     }
 
     @EventHandler
@@ -76,26 +72,24 @@ public class AllyHandler implements Listener {
             e.printStackTrace();
         }
 
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                for (Map.Entry<UUID, Set<UUID>> entry : playerAllies.entrySet()) {
-                    Player player = Bukkit.getPlayer(entry.getKey());
-                    Set<UUID> allyIDs = entry.getValue();
-                    Iterator<UUID> allyIDIterator = allyIDs.iterator();
-                    while (allyIDIterator.hasNext()) {
-                        UUID allyID = allyIDIterator.next();
-                        Player ally = Bukkit.getPlayer(allyID);
-                        if (ally != null && ally.isOnline()) {
-                            Team allyTeam = getAllyTeam(player);
-                            allyTeam.addEntry(ally.getName());
-                        }
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(Finale.getPlugin(), task -> {
+            if (CivModCorePlugin.isFolia()) {
+                return;
+            }
+            for (Map.Entry<UUID, Set<UUID>> entry : playerAllies.entrySet()) {
+                Player player = Bukkit.getPlayer(entry.getKey());
+                Set<UUID> allyIDs = entry.getValue();
+                Iterator<UUID> allyIDIterator = allyIDs.iterator();
+                while (allyIDIterator.hasNext()) {
+                    UUID allyID = allyIDIterator.next();
+                    Player ally = Bukkit.getPlayer(allyID);
+                    if (ally != null && ally.isOnline()) {
+                        Team allyTeam = getAllyTeam(player);
+                        allyTeam.addEntry(ally.getName());
                     }
                 }
             }
-
-        }.runTaskTimer(Finale.getPlugin(), 0L, 1L);
+        }, 1L, 1L);
     }
 
     public void shutdown() {
@@ -165,23 +159,20 @@ public class AllyHandler implements Listener {
             Color.fromRGB(66, 135, 245) :
             Color.fromRGB(143, 10, 25), 1);
 
-        new BukkitRunnable() {
 
-            Player sourcePlayer = player;
-            Player destPlayer = ally;
-            Location loc;
 
-            @Override
-            public void run() {
-                Vector dir = destPlayer.getEyeLocation().clone().subtract(sourcePlayer.getEyeLocation()).toVector().normalize();
+        player.getScheduler().runAtFixedRate(Finale.getPlugin(), task -> {
+            Location loc = null;
 
-                if (loc == null) {
-                    loc = sourcePlayer.getEyeLocation().clone().add(dir);
+            Vector dir = ally.getEyeLocation().clone().subtract(player.getEyeLocation()).toVector().normalize();
 
-                    loc.getWorld().spawnParticle(Particle.DUST, loc, 1, dustOptions);
-                } else {
-                    Location prevLoc = loc;
-                    Location newLoc = loc.clone().add(dir);
+            if (loc == null) {
+                loc = player.getEyeLocation().clone().add(dir);
+
+                loc.getWorld().spawnParticle(Particle.DUST, loc, 1, dustOptions);
+            } else {
+                Location prevLoc = loc;
+                Location newLoc = loc.clone().add(dir);
 
 					/*double particles = 10;
 					Vector subDir = newLoc.clone().subtract(prevLoc).toVector();
@@ -194,25 +185,23 @@ public class AllyHandler implements Listener {
 						subLoc.add(newDir);
 						subLoc.getWorld().spawnParticle(Particle.REDSTONE, subLoc, 1, dustOptions);
 					}*/
-                    ParticleUtil.line(prevLoc, newLoc, (loc) -> {
-                        loc.getWorld().spawnParticle(Particle.DUST, loc, 1, dustOptions);
-                        return false;
-                    }, 10);
+                ParticleUtil.line(prevLoc, newLoc, (tempLoc) -> {
+                    tempLoc.getWorld().spawnParticle(Particle.DUST, tempLoc, 1, dustOptions);
+                    return false;
+                }, 10);
 
-                    loc = newLoc;
-                }
-
-                Location dest = destPlayer.getEyeLocation();
-                if (!loc.getWorld().getUID().equals(dest.getWorld())) {
-                    cancel();
-                    return;
-                }
-                if (loc.distanceSquared(dest) < (1 * 1)) {
-                    cancel();
-                }
+                loc = newLoc;
             }
 
-        }.runTaskTimer(Finale.getPlugin(), 0L, 1L);
+            Location dest = ally.getEyeLocation();
+            if (!loc.getWorld().getUID().equals(dest.getWorld())) {
+                task.cancel();
+                return;
+            }
+            if (loc.distanceSquared(dest) < (1 * 1)) {
+                task.cancel();
+            }
+        }, null, 1L, 1L);
     }
 
     public void addAlly(Player player, Player ally) {

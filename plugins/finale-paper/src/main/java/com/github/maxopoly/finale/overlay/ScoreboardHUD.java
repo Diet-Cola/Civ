@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import vg.civcraft.mc.civmodcore.CivModCorePlugin;
 import vg.civcraft.mc.civmodcore.chat.ChatUtils;
 import vg.civcraft.mc.civmodcore.inventory.items.ItemUtils;
 import vg.civcraft.mc.civmodcore.players.scoreboard.bottom.BottomLine;
@@ -32,7 +33,7 @@ import vg.civcraft.mc.civmodcore.players.settings.impl.DisplayLocationSetting;
 public class ScoreboardHUD implements Listener {
 
     //TODO Make this a configuration item so it can be changed at runtime.
-    private final static long UPDATE_PERIOD_IN_TICKS = 20L * 5L; // Every 5 seconds.
+    private final static long UPDATE_PERIOD = 5000; // Every 5 seconds.
 
     private final static Map<PotionEffectType, ChatColor> colorMapping = new HashMap<>();
 
@@ -50,22 +51,28 @@ public class ScoreboardHUD implements Listener {
     private BottomLine coordsBottomLine;
 
     public ScoreboardHUD(FinaleSettingManager settingsMan) {
+        this.settingsMan = settingsMan;
+        if (CivModCorePlugin.isFolia()) {
+            return;
+        }
         scoreBoards = new ArrayList<>();
         this.coordsBottomLine = BottomLineAPI.createBottomLine("Location", 4);
-        this.settingsMan = settingsMan;
         for (int i = 0; i < 12; i++) {
             scoreBoards.add(ScoreBoardAPI.createBoard("finaleArmor" + i));
         }
-        Bukkit.getScheduler().runTaskTimer(Finale.getPlugin(), () -> {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                updateDurabilities(p);
-                updateCoordinates(p, settingsMan.getCoordsLocation());
-                if (settingsMan.showPotionEffects(p.getUniqueId())) {
-                    updateAllPotionEffects(p);
-                }
+                p.getScheduler().runAtFixedRate(Finale.getPlugin(), task -> {
+                    updateDurabilities(p);
+                    updateCoordinates(p, settingsMan.getCoordsLocation());
+                    if (settingsMan.showPotionEffects(p.getUniqueId())) {
+                        updateAllPotionEffects(p);
+                    }
+                }, null, UPDATE_PERIOD, UPDATE_PERIOD);
             }
-        }, UPDATE_PERIOD_IN_TICKS, UPDATE_PERIOD_IN_TICKS);
         settingsMan.getArmorSetting().registerListener((player, setting, oldValue, newValue) -> {
+            if (CivModCorePlugin.isFolia()) {
+                return;
+            }
             Player p = Bukkit.getPlayer(player);
             if (p == null) {
                 return;
@@ -79,6 +86,9 @@ public class ScoreboardHUD implements Listener {
             }
         });
         settingsMan.getToolSetting().registerListener((player, setting, oldValue, newValue) -> {
+            if (CivModCorePlugin.isFolia()) {
+                return;
+            }
             Player p = Bukkit.getPlayer(player);
             if (p == null) {
                 return;
@@ -124,9 +134,11 @@ public class ScoreboardHUD implements Listener {
     }
 
     private void updateGammaBright(Player player) {
-        player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-        //after being logged in for 14 days straight, players may have to relog to refresh the effect
-        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 20 * 60 * 60 * 24 * 14, 0, false, false, false));
+        player.getScheduler().run(Finale.getPlugin(), task -> {
+            player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+            //after being logged in for 14 days straight, players may have to relog to refresh the effect
+            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 20 * 60 * 60 * 24 * 14, 0, false, false, false));
+        }, null);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -143,14 +155,15 @@ public class ScoreboardHUD implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void playerRespawn(PlayerRespawnEvent e) {
-        Bukkit.getScheduler().runTask(Finale.getPlugin(), () -> {
-            if (settingsMan.getGammaBrightSetting().getValue(e.getPlayer())) {
-                updateGammaBright(e.getPlayer());
-            }
-        });
+        if (settingsMan.getGammaBrightSetting().getValue(e.getPlayer())) {
+            e.getPlayer().getScheduler().run(Finale.getPlugin(), task -> updateGammaBright(e.getPlayer()), null);
+        }
     }
 
     private void updateAllPotionEffects(Player p) {
+        if (CivModCorePlugin.isFolia()) {
+            return;
+        }
         int boardIndex = 5;
         for (PotionEffect pot : p.getActivePotionEffects()) {
             if (boardIndex >= 11) {
@@ -188,6 +201,9 @@ public class ScoreboardHUD implements Listener {
     }
 
     private void updateDurabilities(Player p) {
+        if (CivModCorePlugin.isFolia()) {
+            return;
+        }
         if (settingsMan.showToolDurability(p.getUniqueId())) {
             scoreBoards.get(0).set(p, updateArmorPiece(p, "Tool", 0, -1));
         }
@@ -200,6 +216,9 @@ public class ScoreboardHUD implements Listener {
     }
 
     private String updateArmorPiece(Player p, String prefix, int order, int slot) {
+        if (CivModCorePlugin.isFolia()) {
+            return null;
+        }
         if (slot >= 0) {
             if (!settingsMan.showArmorDurability(p.getUniqueId())) {
                 return null;

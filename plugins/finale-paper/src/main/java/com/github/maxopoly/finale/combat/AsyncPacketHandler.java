@@ -74,36 +74,34 @@ public class AsyncPacketHandler extends PacketAdapter implements Listener {
                 return;
             }
             event.setCancelled(true);
-            new BukkitRunnable() {
-
-                @Override
-                public void run() {
+            Bukkit.getGlobalRegionScheduler().execute(Finale.getPlugin(), () -> {
                     Entity entity = packet.getEntityModifier(event).read(0);
-                    Damageable target = entity instanceof Damageable ? (Damageable) entity : null;
+                    entity.getScheduler().run(Finale.getPlugin(), task -> {
+                        Damageable target = entity instanceof Damageable ? (Damageable) entity : null;
 
-                    if (target == null || target.isDead() || target.isInvulnerable() ||
-                        !world.getUID().equals(target.getWorld().getUID()) || !(target instanceof LivingEntity)) {
-                        if (entity instanceof CraftEntity craftEntity) {
-                            DamageSources damageSources = ((CraftWorld) world).getHandle().damageSources();
-                            craftEntity.getHandle().hurt(damageSources.playerAttack(((CraftPlayer) attacker).getHandle()), (float) ((CraftPlayer) attacker).getHandle().getAttribute(Attributes.ATTACK_DAMAGE).getValue());
+                        if (target == null || target.isDead() || target.isInvulnerable() ||
+                            !world.getUID().equals(target.getWorld().getUID()) || !(target instanceof LivingEntity)) {
+                            if (entity instanceof CraftEntity craftEntity) {
+                                DamageSources damageSources = ((CraftWorld) world).getHandle().damageSources();
+                                craftEntity.getHandle().hurt(damageSources.playerAttack(((CraftPlayer) attacker).getHandle()), (float) ((CraftPlayer) attacker).getHandle().getAttribute(Attributes.ATTACK_DAMAGE).getValue());
+                            }
+                            return;
                         }
-                        return;
-                    }
 
-                    double distanceSquared = attacker.getLocation().distanceSquared(target.getLocation());
+                        double distanceSquared = attacker.getLocation().distanceSquared(target.getLocation());
 
-                    if (distanceSquared > (cc.getMaxReach() * cc.getMaxReach())) {
-                        return;
-                    }
+                        if (distanceSquared > (cc.getMaxReach() * cc.getMaxReach())) {
+                            return;
+                        }
 
-                    if (cpsHandler.getCPS(attacker.getUniqueId()) >= cc.getCPSLimit()) {
-                        attacker.sendMessage(ChatColor.RED + "You've hit CPS limit of " + cc.getCPSLimit() + "!");
-                        return;
-                    }
+                        if (cpsHandler.getCPS(attacker.getUniqueId()) >= cc.getCPSLimit()) {
+                            attacker.sendMessage(ChatColor.RED + "You've hit CPS limit of " + cc.getCPSLimit() + "!");
+                            return;
+                        }
 
-                    CombatUtil.attack(attacker, ((CraftEntity) target).getHandle());
-                }
-            }.runTask(Finale.getPlugin());
+                        CombatUtil.attack(attacker, ((CraftEntity) target).getHandle());
+                    }, null);
+                });
         } else if (packetType == PacketType.Play.Client.ENTITY_ACTION) {
             Player player = event.getPlayer();
             PacketContainer packet = event.getPacket();

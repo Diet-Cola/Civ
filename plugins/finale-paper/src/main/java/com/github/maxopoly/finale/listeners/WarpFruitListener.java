@@ -48,44 +48,40 @@ public class WarpFruitListener implements Listener {
             if (!isChorusHolder(player)) {
                 return;
             }
-            new BukkitRunnable() {
-
-                @Override
-                public void run() {
-                    if (!player.isOnline() || player.isDead()) {
-                        if (warpFruitTracker.isSpectralWhileChanneling() && player.hasPotionEffect(PotionEffectType.GLOWING)) {
-                            player.removePotionEffect(PotionEffectType.GLOWING);
-                        }
-                        cancel();
-                        return;
+            player.getScheduler().runAtFixedRate(Finale.getPlugin(), task -> {
+                if (!player.isOnline() || player.isDead()) {
+                    if (warpFruitTracker.isSpectralWhileChanneling() && player.hasPotionEffect(PotionEffectType.GLOWING)) {
+                        player.removePotionEffect(PotionEffectType.GLOWING);
                     }
-                    if (!player.getActiveItem().isEmpty()) {
-                        if (warpFruitTracker.isSpectralWhileChanneling() && player.hasPotionEffect(PotionEffectType.GLOWING)) {
-                            player.removePotionEffect(PotionEffectType.GLOWING);
-                        }
-                        cancel();
-                        return;
-                    }
-                    if (player.getActiveItem().getType() != Material.CHORUS_FRUIT) {
-                        if (warpFruitTracker.isSpectralWhileChanneling() && player.hasPotionEffect(PotionEffectType.GLOWING)) {
-                            player.removePotionEffect(PotionEffectType.GLOWING);
-                        }
-                        cancel();
-                        return;
-                    }
-                    if (warpFruitTracker.onCooldown(player)) {
-                        if (warpFruitTracker.isSpectralWhileChanneling() && player.hasPotionEffect(PotionEffectType.GLOWING)) {
-                            player.removePotionEffect(PotionEffectType.GLOWING);
-                        }
-                        cancel();
-                        return;
-                    }
-                    if (warpFruitTracker.isSpectralWhileChanneling() && !player.hasPotionEffect(PotionEffectType.GLOWING)) {
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 0));
-                    }
-                    warpFruitTracker.animate(player);
+                    task.cancel();
+                    return;
                 }
-            }.runTaskTimer(Finale.getPlugin(), 0L, 1L);
+                if (!player.getActiveItem().isEmpty()) {
+                    if (warpFruitTracker.isSpectralWhileChanneling() && player.hasPotionEffect(PotionEffectType.GLOWING)) {
+                        player.removePotionEffect(PotionEffectType.GLOWING);
+                    }
+                    task.cancel();
+                    return;
+                }
+                if (player.getActiveItem().getType() != Material.CHORUS_FRUIT) {
+                    if (warpFruitTracker.isSpectralWhileChanneling() && player.hasPotionEffect(PotionEffectType.GLOWING)) {
+                        player.removePotionEffect(PotionEffectType.GLOWING);
+                    }
+                    task.cancel();
+                    return;
+                }
+                if (warpFruitTracker.onCooldown(player)) {
+                    if (warpFruitTracker.isSpectralWhileChanneling() && player.hasPotionEffect(PotionEffectType.GLOWING)) {
+                        player.removePotionEffect(PotionEffectType.GLOWING);
+                    }
+                    task.cancel();
+                    return;
+                }
+                if (warpFruitTracker.isSpectralWhileChanneling() && !player.hasPotionEffect(PotionEffectType.GLOWING)) {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 0));
+                }
+                warpFruitTracker.animate(player);
+            }, null, 1L, 1L);
         }
     }
 

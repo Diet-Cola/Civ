@@ -61,16 +61,11 @@ public class CrossbowHandler {
                 ChatColor.RED + CooldownHandler.formatCoolDown(cooldowns, player.getUniqueId())
         );
 
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                for (AntiAirMissile antiAirMissile : antiAirMissiles.values()) {
-                    antiAirMissile.progressInstances();
-                }
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(Finale.getPlugin(), task -> {
+            for (AntiAirMissile antiAirMissile : antiAirMissiles.values()) {
+                antiAirMissile.progressInstances();
             }
-
-        }.runTaskTimer(Finale.getPlugin(), 0L, 1L);
+        }, 1L, 1L);
     }
 
     public boolean onCooldown(Player shooter) {

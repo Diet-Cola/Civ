@@ -8,11 +8,12 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
-public class SaturationHealthRegenHandler implements Runnable {
+public class SaturationHealthRegenHandler {
 
     private List<LinkedList<UUID>> ticks;
     private Map<UUID, Integer> tickMapping;
@@ -21,7 +22,7 @@ public class SaturationHealthRegenHandler implements Runnable {
     private int minimumFood;
     private float exhaustionPerHeal;
     private int interval;
-    private int PID;
+    private ScheduledTask task;
     private boolean blockPassiveHealthRegen;
     private boolean blockFoodHealthRegen;
 
@@ -37,7 +38,9 @@ public class SaturationHealthRegenHandler implements Runnable {
         this.healthPerCycle = healthPerCycle;
         this.minimumFood = minimumFood;
         this.exhaustionPerHeal = exhaustionPerHeal;
-        this.PID = Bukkit.getScheduler().scheduleSyncRepeatingTask(Finale.getPlugin(), this, 0L, 1L);
+        this.task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(Finale.getPlugin(), saturationTask -> {
+            this.run();
+        }, 1L, 1L);
         this.blockPassiveHealthRegen = blockPassiveHealthRegen;
         this.blockFoodHealthRegen = blockFoodHealthRegen;
     }
@@ -66,8 +69,8 @@ public class SaturationHealthRegenHandler implements Runnable {
         return minimumFood;
     }
 
-    public int getPID() {
-        return PID;
+    public ScheduledTask getTask() {
+        return task;
     }
 
     public void registerPlayer(UUID uuid) {
@@ -85,7 +88,6 @@ public class SaturationHealthRegenHandler implements Runnable {
         players.add(uuid);
     }
 
-    @Override
     public void run() {
         LinkedList<UUID> players = ticks.get(currentTick);
         if (players != null) {
@@ -93,35 +95,37 @@ public class SaturationHealthRegenHandler implements Runnable {
             while (iter.hasNext()) {
                 UUID player = iter.next();
                 Player p = Bukkit.getPlayer(player);
-                if (p == null) {
-                    // player is offline?
-                    iter.remove();
-                    continue;
-                }
-                if (p.isDead() || p.getHealth() <= 0.0) {
-                    continue;
-                }
-                double maxHealth = p.getAttribute(Attribute.MAX_HEALTH).getValue();
-                if (p.getFoodLevel() >= minimumFood && p.getHealth() < maxHealth) {
-                    StringBuilder alterHealth = null;
+                p.getScheduler().run(Finale.getPlugin(), feedTask -> {
+                    if (p == null) {
+                        // player is offline?
+                        iter.remove();
+                        return;
+                    }
+                    if (p.isDead() || p.getHealth() <= 0.0) {
+                        return;
+                    }
+                    double maxHealth = p.getAttribute(Attribute.MAX_HEALTH).getValue();
+                    if (p.getFoodLevel() >= minimumFood && p.getHealth() < maxHealth) {
+                        StringBuilder alterHealth = null;
 
-                    if (Finale.getPlugin().getManager().isDebug()) {
-                        alterHealth = new StringBuilder(p.getName());
-                        alterHealth.append(":").append(p.getHealth()).append("<").append(maxHealth);
-                        alterHealth.append(":").append(p.getSaturation()).append(":").append(p.getExhaustion());
-                        alterHealth.append(":").append(p.getFoodLevel());
+                        if (Finale.getPlugin().getManager().isDebug()) {
+                            alterHealth = new StringBuilder(p.getName());
+                            alterHealth.append(":").append(p.getHealth()).append("<").append(maxHealth);
+                            alterHealth.append(":").append(p.getSaturation()).append(":").append(p.getExhaustion());
+                            alterHealth.append(":").append(p.getFoodLevel());
+                        }
+                        double newHealth = p.getHealth() + healthPerCycle;
+                        newHealth = Math.min(newHealth, maxHealth);
+                        p.setExhaustion(p.getExhaustion() + exhaustionPerHeal);
+                        p.setHealth(newHealth);
+                        if (Finale.getPlugin().getManager().isDebug()) {
+                            alterHealth.append(" TO ").append(p.getHealth()).append("<").append(maxHealth);
+                            alterHealth.append(":").append(p.getSaturation()).append(":").append(p.getExhaustion());
+                            alterHealth.append(":").append(p.getFoodLevel());
+                            Finale.getPlugin().getLogger().info(alterHealth.toString());
+                        }
                     }
-                    double newHealth = p.getHealth() + healthPerCycle;
-                    newHealth = Math.min(newHealth, maxHealth);
-                    p.setExhaustion(p.getExhaustion() + exhaustionPerHeal);
-                    p.setHealth(newHealth);
-                    if (Finale.getPlugin().getManager().isDebug()) {
-                        alterHealth.append(" TO ").append(p.getHealth()).append("<").append(maxHealth);
-                        alterHealth.append(":").append(p.getSaturation()).append(":").append(p.getExhaustion());
-                        alterHealth.append(":").append(p.getFoodLevel());
-                        Finale.getPlugin().getLogger().info(alterHealth.toString());
-                    }
-                }
+                }, null);
             }
         }
         currentTick++;

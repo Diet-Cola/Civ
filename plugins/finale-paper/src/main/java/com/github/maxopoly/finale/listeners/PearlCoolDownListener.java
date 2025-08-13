@@ -77,10 +77,10 @@ public class PearlCoolDownListener implements Listener {
         cds.putOnCoolDown(shooter.getUniqueId());
         FinaleSettingManager settings = Finale.getPlugin().getSettingsManager();
         if (settings.setVanillaPearlCooldown(shooter.getUniqueId())) {
-            Bukkit.getScheduler().runTaskLater(Finale.getPlugin(), () -> {
+            shooter.getScheduler().runDelayed(Finale.getPlugin(), task -> {
                 // -1, because this is delayed by one tick
                 shooter.setCooldown(Material.ENDER_PEARL, (int) cds.getTotalCoolDown() - 1);
-            }, 1);
+            }, null, 1L);
         }
 
         if (settings.actionBarPearlCooldown(shooter.getUniqueId())) {

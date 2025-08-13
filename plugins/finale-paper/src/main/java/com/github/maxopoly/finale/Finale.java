@@ -85,7 +85,8 @@ public class Finale extends ACivMod {
         HandlerList.unregisterAll(this);
         ProtocolLibrary.getProtocolManager().removePacketListeners(this);
         ProtocolLibrary.getProtocolManager().getAsynchronousManager().unregisterAsyncHandlers(this);
-        Bukkit.getScheduler().cancelTasks(this);
+        Bukkit.getAsyncScheduler().cancelTasks(this);
+        Bukkit.getGlobalRegionScheduler().cancelTasks(this);
     }
 
     @Override

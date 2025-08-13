@@ -148,7 +148,7 @@ public class WarpFruitTracker {
         World world = warpLoc.getWorld();
         world.playSound(warpLoc, Sound.ITEM_CHORUS_FRUIT_TELEPORT, 1f, 1f);
         player.setFallDistance(0);
-        player.teleport(warpLoc);
+        player.teleportAsync(warpLoc);
         if (!afterEffects.isEmpty()) {
             player.addPotionEffects(afterEffects);
         }

@@ -78,10 +78,10 @@ public class CooldownHandler {
         cooldowns.putOnCoolDown(shooter.getUniqueId());
         FinaleSettingManager settings = Finale.getPlugin().getSettingsManager();
         if (settings.vanillaTimewarpCooldown(shooter.getUniqueId())) {
-            Bukkit.getScheduler().runTaskLater(Finale.getPlugin(), () -> {
+            shooter.getScheduler().runDelayed(Finale.getPlugin(), task -> {
                 // -1, because this is delayed by one tick
                 shooter.setCooldown(Material.CHORUS_FRUIT, (int) cooldowns.getTotalCoolDown() - 1);
-            }, 1);
+            }, null,1);
         }
 
         if (settings.actionBarTimewarpCooldown(shooter.getUniqueId())) {
