@@ -42,7 +42,7 @@ public class BastionGroupStorage {
         public Integer allowedGroupId;
     }
 
-    private static final int saveDelay = 60 * 20; //once per 1 minute
+    private static final int saveDelay = 60000; //1 min in ms
 
     private ManagedDatasource db;
     private Logger log;

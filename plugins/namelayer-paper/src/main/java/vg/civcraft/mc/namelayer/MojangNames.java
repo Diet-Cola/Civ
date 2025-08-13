@@ -26,7 +26,7 @@ public final class MojangNames {
     private static final Map<String, UUID> PROFILES = Collections.synchronizedMap(
         new TreeMap<>(String.CASE_INSENSITIVE_ORDER));
     private static final String PROFILES_FILE = "mojang.dat";
-    private static final long SAVE_DELAY = 6000; // 1 min in MS
+    private static final long SAVE_DELAY = 60000; // 1 min in MS
     private static ScheduledTask SAVE_TASK;
 
     public static void init(final NameLayerPlugin plugin) {
