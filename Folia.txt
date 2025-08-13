@@ -4,7 +4,6 @@ General:
 - All tick based schedulers are running faster due to being in ms rather than tick delays
 
 CMC:
-- scoreboard api/bottomline api disabled
 - [11:04:07 INFO]: UUID of player Diet_Cola is 638af9c6-c734-45d9-b092-13a4e184f7f6
   [11:04:07 INFO]: [HorriblePlayerLoginEventHack] You have plugins listening to the PlayerLoginEvent, this will cause re-configuration APIs to be unavailable: [CivModCore]
 
@@ -51,28 +50,8 @@ RB:
 HO:
 - No exceptions for world access in testing? - this feels wrong idk
 
-NL:
-- Async task for NameLayer v3.0.6-F generated an exception
-  java.lang.NoSuchMethodError: 'java.util.Set net.minecraft.nbt.CompoundTag.keySet()'
-          at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.nbt.NbtCompound.keys(NbtCompound.java:52) ~[civmodcore-paper-3.0.6-F-all.jar:?]
-          at namelayer-paper-3.0.6-F.jar/vg.civcraft.mc.namelayer.MojangNames.load(MojangNames.java:58) ~[namelayer-paper-3.0.6-F.jar:?]
-
- Citadel:
-- holomanager freaks out without protocol lib installed
-
-CivChat2:
-- seems to work, need to test with pm'ing
-
-FM:
-- recipe selection gui broken when hitting crafting table
-
-JA:
-
 Bastion:
 - EnderPearlManager FlightTask mini class might need a review
-
-RailSwitch:
-- suspiciously easy to convert
 
 BanStick:
 - Can't test on laptop
@@ -108,21 +87,7 @@ RandomSpawn:
           at io.papermc.paper.threadedregions.TickRegionScheduler$RegionScheduleHandle.runTick(TickRegionScheduler.java:418) ~[folia-1.21.8.jar:1.21.8-2-4ed5b66]
           at ca.spottedleaf.concurrentutil.scheduler.SchedulerThreadPool$TickThreadRunner.run(SchedulerThreadPool.java:546) ~[concurrentutil-0.0.3.jar:?]
           at java.base/java.lang.Thread.run(Thread.java:1583) ~[?:?]
-
-EP:
-- Suspiciously straight forward
-
-CivDuties:
-- Straightforward
-
-Finale:
-- Ill be very surprised if this all works
-
-SAH:
-- Straight forward
-
 CTP:
-
 - See FOLIA comment
 
 
