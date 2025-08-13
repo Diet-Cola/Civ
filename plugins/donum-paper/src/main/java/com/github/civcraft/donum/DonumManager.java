@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -48,17 +49,13 @@ public class DonumManager {
         Donum.getInstance().debug("Loading data for " + uuid.toString());
         ItemMap currentInv = ItemMapBlobHandling.constructItemMapFromInventory(i);
         int hash = currentInv.hashCode();
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                ItemMap oldInv = database.checkForInventoryInconsistency(uuid, hash);
-                if (oldInv != null) {
-                    Donum.getInstance().info("Found inventory inconsistency for " + uuid.toString());
-                    handleInventoryInconsistency(uuid, oldInv, currentInv);
-                }
+        Bukkit.getAsyncScheduler().runNow(Donum.getInstance(), task -> {
+            ItemMap oldInv = database.checkForInventoryInconsistency(uuid, hash);
+            if (oldInv != null) {
+                Donum.getInstance().info("Found inventory inconsistency for " + uuid.toString());
+                handleInventoryInconsistency(uuid, oldInv, currentInv);
             }
-        }.runTaskAsynchronously(Donum.getInstance());
+        });
 
         deliveryStorage.loadDeliveryInventory(uuid);
     }
@@ -77,14 +74,9 @@ public class DonumManager {
             }
         }
         if (async) {
-            new BukkitRunnable() {
-
-                @Override
-                public void run() {
-                    database.insertLogoutInventory(uuid, ItemMapBlobHandling.constructItemMapFromInventory(inventory));
-
-                }
-            }.runTaskAsynchronously(Donum.getInstance());
+            Bukkit.getAsyncScheduler().runNow(Donum.getInstance(), task -> {
+                database.insertLogoutInventory(uuid, ItemMapBlobHandling.constructItemMapFromInventory(inventory));
+            });
         } else {
             database.insertLogoutInventory(uuid, ItemMapBlobHandling.constructItemMapFromInventory(inventory));
         }
@@ -101,25 +93,14 @@ public class DonumManager {
     }
 
     public void stageDeliveryAddition(UUID uuid, ItemMap items) {
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                database.stageDeliveryAddition(uuid, items);
-
-            }
-        }.runTaskAsynchronously(Donum.getInstance());
+        Bukkit.getAsyncScheduler().runNow(Donum.getInstance(), task -> {
+            database.stageDeliveryAddition(uuid, items);
+        });
     }
 
     public void saveDeathInventory(UUID uuid, ItemMap inventory) {
         Donum.getInstance().debug("Saving death inventory for " + uuid.toString());
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                database.insertDeathInventory(uuid, inventory);
-            }
-        }.runTaskAsynchronously(Donum.getInstance());
+        Bukkit.getAsyncScheduler().runNow(Donum.getInstance(), task -> database.insertDeathInventory(uuid, inventory));
     }
 
     public void setDeliveryInventory(UUID player, ItemMap im) {
@@ -151,14 +132,7 @@ public class DonumManager {
     public void returnDeathInventory(DeathInventory inv) {
         inv.setReturned(true);
         DonumAPI.deliverItem(inv.getOwner(), inv.getInventory());
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                database.updateDeathInventoryReturnStatus(inv.getID(), true);
-
-            }
-        }.runTaskAsynchronously(Donum.getInstance());
+        Bukkit.getAsyncScheduler().runNow(Donum.getInstance(), task -> database.updateDeathInventoryReturnStatus(inv.getID(), true));
     }
 
     public List<DeathInventory> getDeathInventories(UUID player, int limit) {

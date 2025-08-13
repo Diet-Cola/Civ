@@ -4,6 +4,7 @@ author: Maxopoly
 version: ${version}
 depend: [ CivModCore, NameLayer ]
 api-version: 1.21.3
+folia-supported: true
 permissions:
   donum.op:
     default: op
