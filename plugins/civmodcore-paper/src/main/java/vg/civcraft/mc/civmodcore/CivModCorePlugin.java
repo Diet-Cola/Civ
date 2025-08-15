@@ -3,6 +3,7 @@ package vg.civcraft.mc.civmodcore;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.HumanEntity;
+import vg.civcraft.mc.civmodcore.async.DebugFoliaAsyncCommand;
 import vg.civcraft.mc.civmodcore.chat.dialog.DialogManager;
 import vg.civcraft.mc.civmodcore.commands.ChunkMetaCommand;
 import vg.civcraft.mc.civmodcore.commands.CommandManager;
@@ -85,6 +86,7 @@ public class CivModCorePlugin extends ACivMod {
         this.commands.registerCommand(new ConfigCommand());
         this.commands.registerCommand(new StatCommand());
         this.commands.registerCommand(new ChunkMetaCommand());
+        this.commands.registerCommand(new DebugFoliaAsyncCommand(this));
         // Load APIs
         EnchantUtils.loadEnchantAbbreviations();
         SpawnEggUtils.init();
