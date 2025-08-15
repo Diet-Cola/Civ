@@ -8,8 +8,6 @@ CMC:
   [11:04:07 INFO]: [HorriblePlayerLoginEventHack] You have plugins listening to the PlayerLoginEvent, this will cause re-configuration APIs to be unavailable: [CivModCore]
 
 RB:
-- PlantGrowthConfig L402 - Is this the best way to grab the biome?
-- Maybe revisit ChunkMeta schedulers in RBChunkCache (iterateAll)
 - [00:32:17 ERROR]: [CivModCore] Failed to load chunk data
   org.bukkit.plugin.IllegalPluginAccessException: Plugin attempted to register task while disabled
           at io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler.runDelayed(FoliaGlobalRegionScheduler.java:65) ~[folia-1.21.4.jar:?]
@@ -22,39 +20,11 @@ RB:
           at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.world.locations.chunkmeta.WorldChunkMetaManager.chunkLoadingThread(WorldChunkMetaManager.java:309) ~[civmodcore-paper-3.0.6-F-all.jar:?]
           at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.world.locations.chunkmeta.WorldChunkMetaManager.lambda$startChunkLoadingThreads$2(WorldChunkMetaManager.java:297) ~[civmodcore-paper-3.0.6-F-all.jar:?]
           at java.base/java.lang.Thread.run(Thread.java:1583) ~[?:?]
-  [00:32:17 ERROR]: [CivModCore] Failed to load chunk data
-  org.bukkit.plugin.IllegalPluginAccessException: Plugin attempted to register task while disabled
-          at io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler.runDelayed(FoliaGlobalRegionScheduler.java:65) ~[folia-1.21.4.jar:?]
-          at io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler.run(FoliaGlobalRegionScheduler.java:53) ~[folia-1.21.4.jar:?]
-          at io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler.execute(FoliaGlobalRegionScheduler.java:46) ~[folia-1.21.4.jar:?]
-          at realisticbiomes-paper-3.2.3-F.jar/com.untamedears.realisticbiomes.model.RBDAO.fill(RBDAO.java:168) ~[realisticbiomes-paper-3.2.3-F.jar:?]
-          at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.world.locations.chunkmeta.block.table.TableBasedBlockChunkMeta.populate(TableBasedBlockChunkMeta.java:102) ~[civmodcore-paper-3.0.6-F-all.jar:?]
-          at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.world.locations.chunkmeta.ChunkCoord.loadPluginChunk(ChunkCoord.java:197) ~[civmodcore-paper-3.0.6-F-all.jar:?]
-          at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.world.locations.chunkmeta.ChunkCoord.loadAll(ChunkCoord.java:180) ~[civmodcore-paper-3.0.6-F-all.jar:?]
-          at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.world.locations.chunkmeta.WorldChunkMetaManager.chunkLoadingThread(WorldChunkMetaManager.java:309) ~[civmodcore-paper-3.0.6-F-all.jar:?]
-          at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.world.locations.chunkmeta.WorldChunkMetaManager.lambda$startChunkLoadingThreads$2(WorldChunkMetaManager.java:297) ~[civmodcore-paper-3.0.6-F-all.jar:?]
-          at java.base/java.lang.Thread.run(Thread.java:1583) ~[?:?]
-  [00:32:17 ERROR]: [CivModCore] Failed to load chunk data
-  org.bukkit.plugin.IllegalPluginAccessException: Plugin attempted to register task while disabled
-          at io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler.runDelayed(FoliaGlobalRegionScheduler.java:65) ~[folia-1.21.4.jar:?]
-          at io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler.run(FoliaGlobalRegionScheduler.java:53) ~[folia-1.21.4.jar:?]
-          at io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler.execute(FoliaGlobalRegionScheduler.java:46) ~[folia-1.21.4.jar:?]
-          at realisticbiomes-paper-3.2.3-F.jar/com.untamedears.realisticbiomes.model.RBDAO.fill(RBDAO.java:168) ~[realisticbiomes-paper-3.2.3-F.jar:?]
-          at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.world.locations.chunkmeta.block.table.TableBasedBlockChunkMeta.populate(TableBasedBlockChunkMeta.java:102) ~[civmodcore-paper-3.0.6-F-all.jar:?]
-          at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.world.locations.chunkmeta.ChunkCoord.loadPluginChunk(ChunkCoord.java:197) ~[civmodcore-paper-3.0.6-F-all.jar:?]
-          at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.world.locations.chunkmeta.ChunkCoord.loadAll(ChunkCoord.java:180) ~[civmodcore-paper-3.0.6-F-all.jar:?]
-          at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.world.locations.chunkmeta.WorldChunkMetaManager.chunkLoadingThread(WorldChunkMetaManager.java:309) ~[civmodcore-paper-3.0.6-F-all.jar:?]
-          at civmodcore-paper-3.0.6-F-all.jar/vg.civcraft.mc.civmodcore.world.locations.chunkmeta.WorldChunkMetaManager.lambda$startChunkLoadingThreads$2(WorldChunkMetaManager.java:297) ~[civmodcore-paper-3.0.6-F-all.jar:?]
-          at java.base/java.lang.Thread.run(Thread.java:1583) ~[?:?]
-
-HO:
-- No exceptions for world access in testing? - this feels wrong idk
 
 Bastion:
 - EnderPearlManager FlightTask mini class might need a review
 
 BanStick:
-- Can't test on laptop
 - [12:28:29 INFO]: UUID of player Diet_Cola is 638af9c6-c734-45d9-b092-13a4e184f7f6
   [12:28:29 INFO]: [HorriblePlayerLoginEventHack] You have plugins listening to the PlayerLoginEvent, this will cause re-configuration APIs to be unavailable: [BanStick, CivModCore]
 - doKickWithCheckUp in BanStickEventHandler might need review
@@ -70,7 +40,6 @@ BanStick:
 
 RandomSpawn:
 - This is an error every few seconds
-- Updated all teleport calls to use teleportAsync
 - [12:48:03 ERROR]: [ca.spottedleaf.moonrise.common.util.TickThread] Thread failed main thread check: Async chunk retrieval, context=[thread=Region Scheduler Thread #0,class=io.papermc.paper.threadedregions.TickRegionScheduler$TickThreadRunner,region={null}], world=world, chunk_pos=[-6, -2]
   java.lang.Throwable: null
           at ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(TickThread.java:88) ~[folia-1.21.8.jar:1.21.8-2-4ed5b66]

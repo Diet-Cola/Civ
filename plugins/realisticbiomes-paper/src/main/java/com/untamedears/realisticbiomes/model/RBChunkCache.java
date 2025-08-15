@@ -74,10 +74,11 @@ public class RBChunkCache extends TableBasedBlockChunkMeta<Plant> implements Pro
     public void handleChunkCacheReuse() {
         // update all plants in the chunk and reinsert them into the growth updating
         // cache
-        iterateAll(p ->
-            Bukkit.getRegionScheduler().run(RealisticBiomes.getInstance(), p.getLocation(), task -> {
+        Bukkit.getRegionScheduler().execute(RealisticBiomes.getInstance(), this.chunkCoord.getWorld(), this.chunkCoord.getX(), this.chunkCoord.getZ(), () -> {
+            iterateAll(p -> {
                 RealisticBiomes.getInstance().getPlantLogicManager().updateGrowthTime((Plant) p, p.getLocation().getBlock());
-            }));
+            });
+        });
     }
 
     @Override

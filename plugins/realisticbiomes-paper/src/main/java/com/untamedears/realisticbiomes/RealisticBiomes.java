@@ -67,6 +67,8 @@ public class RealisticBiomes extends ACivMod {
             plantManager.shutDown();
         }
         dao.cleanupBatches();
+        Bukkit.getGlobalRegionScheduler().cancelTasks(this);
+        Bukkit.getAsyncScheduler().cancelTasks(this);
     }
 
     @Override

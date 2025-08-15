@@ -2,6 +2,7 @@ package com.untamedears.realisticbiomes.model;
 
 import com.untamedears.realisticbiomes.RealisticBiomes;
 import com.untamedears.realisticbiomes.growthconfig.PlantGrowthConfig;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import vg.civcraft.mc.civmodcore.utilities.BukkitComparators;
@@ -88,17 +89,19 @@ public class Plant extends TableBasedDataObject implements ProgressTrackable {
             return;
         }
         if (growthConfig != null) {
-            nextUpdate = growthConfig.updatePlant(this);
+            Bukkit.getRegionScheduler().execute(RealisticBiomes.getInstance(), location, () -> nextUpdate = growthConfig.updatePlant(this));
         } else {
-            Block block = location.getBlock();
-            PlantGrowthConfig newConfig = RealisticBiomes.getInstance().getGrowthConfigManager()
-                .getGrowthConfigFallback(block.getType());
-            if (newConfig != null) {
-                setGrowthConfig(newConfig);
-                nextUpdate = newConfig.updatePlant(this);
-            } else {
-                nextUpdate = Long.MAX_VALUE;
-            }
+            Bukkit.getRegionScheduler().execute(RealisticBiomes.getInstance(), location, () -> {
+                Block block = location.getBlock();
+                PlantGrowthConfig newConfig = RealisticBiomes.getInstance().getGrowthConfigManager()
+                    .getGrowthConfigFallback(block.getType());
+                if (newConfig != null) {
+                    setGrowthConfig(newConfig);
+                    nextUpdate = newConfig.updatePlant(this);
+                } else {
+                    nextUpdate = Long.MAX_VALUE;
+                }
+            });
         }
     }
 

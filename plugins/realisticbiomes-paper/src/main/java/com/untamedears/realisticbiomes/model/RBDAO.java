@@ -165,7 +165,7 @@ public class RBDAO extends TableStorageEngine<Plant> {
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Failed to load plant from db: ", e);
         }
-        Bukkit.getGlobalRegionScheduler().execute(RealisticBiomes.getInstance(), () -> {
+        Bukkit.getRegionScheduler().execute(RealisticBiomes.getInstance(), chunkData.getChunkCoord().getWorld(), chunkData.getChunkCoord().getX(), chunkData.getChunkCoord().getZ()  ,() -> {
             for (Plant plant : toUpdate) {
                 if (plant.getCacheState() == CacheState.DELETED) {
                     continue;

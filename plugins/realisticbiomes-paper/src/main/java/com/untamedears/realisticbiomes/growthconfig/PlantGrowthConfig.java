@@ -399,11 +399,7 @@ public class PlantGrowthConfig extends AbstractGrowthConfig {
             throw new IllegalStateException("Can not grow plant with different growth config, at " + plant.getLocation()
                 + " with " + plant.getGrowthConfig().getName() + ", but this is " + getName());
         }
-        AtomicReference<Biome> biome = new AtomicReference<>();
-        Bukkit.getRegionScheduler().execute(RealisticBiomes.getInstance(), block.getLocation(), () -> {
-            biome.set(block.getBiome());
-        });
-        if (!biomeGrowthConfig.canGrowIn(biome.get())) {
+        if (!biomeGrowthConfig.canGrowIn(block.getBiome())) {
             return Long.MAX_VALUE;
         }
         long totalTime = getPersistentGrowthTime(block);
