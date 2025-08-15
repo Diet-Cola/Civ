@@ -112,7 +112,7 @@ public class BastionInteractListener implements Listener {
 
             if (NameAPI.getGroupManager().hasAccess(reinforcement.getGroup(), player.getUniqueId(), PermissionType.getPermission(Permissions.BASTION_PLACE))) {
                 final Location loc = block.getLocation().clone();
-                Bukkit.getGlobalRegionScheduler().execute(Bastion.getPlugin(), () -> {
+                Bukkit.getRegionScheduler().execute(Bastion.getPlugin(), loc, () -> {
                     if (blockStorage.createBastion(loc, type, player)) {
                         TextComponent toSend = blockManager.bastionCreatedMessageComponent(loc);
                         player.spigot().sendMessage(toSend);
