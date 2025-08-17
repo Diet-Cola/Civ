@@ -59,4 +59,6 @@ RandomSpawn:
 CTP:
 - See FOLIA comment
 
+SAH:
+- AutoRespawnHack - PlayerRespawnEvent isnt fired on folia
 

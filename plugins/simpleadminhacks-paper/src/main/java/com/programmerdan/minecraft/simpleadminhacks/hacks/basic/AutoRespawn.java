@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -132,7 +133,7 @@ public final class AutoRespawn extends BasicHack {
         private final long setTime;
         private long timeRemaining;
         private long secondTimer;
-        private BukkitTask processor;
+        private ScheduledTask processor;
 
         RespawnTimer(final AutoRespawn hack, final Player player, final long delay, final Consumer<Player> handler) {
             this.handler = handler;
@@ -143,12 +144,7 @@ public final class AutoRespawn extends BasicHack {
             this.bar.setVisible(true);
             this.bar.setProgress(1.0d);
             this.bar.addPlayer(player);
-            this.processor = new BukkitRunnable() {
-                @Override
-                public void run() {
-                    tick();
-                }
-            }.runTaskTimer(hack.plugin(), 1L, 1L);
+            this.processor = player.getScheduler().runAtFixedRate(hack.plugin, task -> tick(), null, 1L, 1L);
         }
 
         private String generateBarTitle() {

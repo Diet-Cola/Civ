@@ -129,32 +129,34 @@ public final class AntiFastBreak extends BasicHack {
     private void handleFinishingDigging(final Player player, final Location location) {
         final Map<Location, Long> miningLocs = this.miningLocations
             .computeIfAbsent(player.getUniqueId(), uuid -> new HashMap<>());
-        final int ticksToBreak = getTicksToBreak(location.getBlock(), player);
-        final Long timeStarted = miningLocs.remove(location);
-        if (timeStarted == null) {
-            if (ticksToBreak > 1) {
-                plugin().debug(player.getName() + " tried to instabreak non-instabreakable block");
+        player.getScheduler().execute(this.plugin, () -> {
+            final int ticksToBreak = getTicksToBreak(location.getBlock(), player);
+            final Long timeStarted = miningLocs.remove(location);
+            if (timeStarted == null) {
+                if (ticksToBreak > 1) {
+                    plugin().debug(player.getName() + " tried to instabreak non-instabreakable block");
+                    punish(player);
+                } else {
+                    reward(player);
+                }
+                return;
+            }
+            if (ticksToBreak == 0) {
+                plugin().debug(player.getName() + " instabroke allowed block " + location.getBlock());
+                reward(player);
+                return;
+            }
+            final long msToBreak = ticksToBreak * 50L;
+            final long now = System.currentTimeMillis();
+            final long timePassed = now - timeStarted;
+            //plugin().debug("Measured " + timePassed + " for allowed time of " + TextUtil.formatDuration(msToBreak));
+            miningLocs.put(location, now);
+            if ((timePassed * this.lagLeniency) < msToBreak) {
                 punish(player);
             } else {
                 reward(player);
             }
-            return;
-        }
-        if (ticksToBreak == 0) {
-            plugin().debug(player.getName() + " instabroke allowed block " + location.getBlock());
-            reward(player);
-            return;
-        }
-        final long msToBreak = ticksToBreak * 50L;
-        final long now = System.currentTimeMillis();
-        final long timePassed = now - timeStarted;
-        //plugin().debug("Measured " + timePassed + " for allowed time of " + TextUtil.formatDuration(msToBreak));
-        miningLocs.put(location, now);
-        if ((timePassed * this.lagLeniency) < msToBreak) {
-            punish(player);
-        } else {
-            reward(player);
-        }
+        }, null, 1L);
     }
 
     private void punish(final Player player) {

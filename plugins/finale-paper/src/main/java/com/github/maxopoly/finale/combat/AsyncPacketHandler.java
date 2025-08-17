@@ -74,9 +74,8 @@ public class AsyncPacketHandler extends PacketAdapter implements Listener {
                 return;
             }
             event.setCancelled(true);
-            Bukkit.getGlobalRegionScheduler().execute(Finale.getPlugin(), () -> {
+            attacker.getScheduler().execute(Finale.getPlugin(), () -> {
                     Entity entity = packet.getEntityModifier(event).read(0);
-                    entity.getScheduler().run(Finale.getPlugin(), task -> {
                         Damageable target = entity instanceof Damageable ? (Damageable) entity : null;
 
                         if (target == null || target.isDead() || target.isInvulnerable() ||
@@ -100,8 +99,7 @@ public class AsyncPacketHandler extends PacketAdapter implements Listener {
                         }
 
                         CombatUtil.attack(attacker, ((CraftEntity) target).getHandle());
-                    }, null);
-                });
+                }, null, 1L);
         } else if (packetType == PacketType.Play.Client.ENTITY_ACTION) {
             Player player = event.getPlayer();
             PacketContainer packet = event.getPacket();
@@ -117,11 +115,13 @@ public class AsyncPacketHandler extends PacketAdapter implements Listener {
             PacketContainer packet = event.getPacket();
             Hand hand = packet.getHands().getValues().get(0);
             if (hand == Hand.MAIN_HAND && !isDigging.contains(attacker.getUniqueId())) {
-                Block targetBlock = attacker.getTargetBlockExact(4);
-                if (targetBlock != null && targetBlock.getType() != Material.AIR) {
-                    return;
-                }
-                cpsHandler.updateClicks(attacker);
+                attacker.getScheduler().execute(Finale.getPlugin(), () -> {
+                    Block targetBlock = attacker.getTargetBlockExact(4);
+                    if (targetBlock != null && targetBlock.getType() != Material.AIR) {
+                        return;
+                    }
+                    cpsHandler.updateClicks(attacker);
+                }, null, 1L);
             }
         } else if (packetType == PacketType.Play.Client.BLOCK_DIG) {
             Player attacker = event.getPlayer();
@@ -134,30 +134,32 @@ public class AsyncPacketHandler extends PacketAdapter implements Listener {
             BlockPosition position = packet.getBlockPositionModifier().getValues().get(0);
             PlayerDigType digType = packet.getPlayerDigTypes().getValues().get(0);
             if (digType == PlayerDigType.START_DESTROY_BLOCK) {
-                Block block = attacker.getWorld().getBlockAt(position.getX(), position.getY(), position.getZ());
-                if (block.getType() == Material.BEDROCK || block.getType() == Material.BARRIER && !isDigging.contains(attacker.getUniqueId())) {
-                    isDigging.add(attacker.getUniqueId());
-                    cpsHandler.updateClicks(attacker);
-                    return;
-                }
-
-                float strength = ((CraftWorld) block.getWorld()).getHandle().getBlockState((new BlockPos(position.getX(), position.getY(), position.getZ()))).destroySpeed;
-
-                long lastStartBreak = lastStartBreaks.getOrDefault(attacker.getUniqueId(), 0L);
-                long timeSinceBreak = (System.currentTimeMillis() - lastStartBreak);
-                lastStartBreaks.put(attacker.getUniqueId(), System.currentTimeMillis());
-                if (strength > 0) {
-                    long lastRemoval = lastRemovals.getOrDefault(attacker.getUniqueId(), 0L);
-                    long timeSinceRemoval = (System.currentTimeMillis() - lastRemoval);
-
-                    if (isDigging.contains(attacker.getUniqueId())) {
+                attacker.getScheduler().execute(Finale.getPlugin(), () -> {
+                    Block block = attacker.getWorld().getBlockAt(position.getX(), position.getY(), position.getZ());
+                    if (block.getType() == Material.BEDROCK || block.getType() == Material.BARRIER && !isDigging.contains(attacker.getUniqueId())) {
+                        isDigging.add(attacker.getUniqueId());
+                        cpsHandler.updateClicks(attacker);
                         return;
                     }
-                    isDigging.add(attacker.getUniqueId());
-                    if (timeSinceRemoval >= 48 && timeSinceBreak > 51) {
-                        cpsHandler.updateClicks(attacker);
+
+                    float strength = ((CraftWorld) block.getWorld()).getHandle().getBlockState((new BlockPos(position.getX(), position.getY(), position.getZ()))).destroySpeed;
+
+                    long lastStartBreak = lastStartBreaks.getOrDefault(attacker.getUniqueId(), 0L);
+                    long timeSinceBreak = (System.currentTimeMillis() - lastStartBreak);
+                    lastStartBreaks.put(attacker.getUniqueId(), System.currentTimeMillis());
+                    if (strength > 0) {
+                        long lastRemoval = lastRemovals.getOrDefault(attacker.getUniqueId(), 0L);
+                        long timeSinceRemoval = (System.currentTimeMillis() - lastRemoval);
+
+                        if (isDigging.contains(attacker.getUniqueId())) {
+                            return;
+                        }
+                        isDigging.add(attacker.getUniqueId());
+                        if (timeSinceRemoval >= 48 && timeSinceBreak > 51) {
+                            cpsHandler.updateClicks(attacker);
+                        }
                     }
-                }
+                }, null, 1L);
             } else if (digType == PlayerDigType.ABORT_DESTROY_BLOCK || digType == PlayerDigType.STOP_DESTROY_BLOCK) {
                 isDigging.remove(attacker.getUniqueId());
                 lastRemovals.put(attacker.getUniqueId(), System.currentTimeMillis());

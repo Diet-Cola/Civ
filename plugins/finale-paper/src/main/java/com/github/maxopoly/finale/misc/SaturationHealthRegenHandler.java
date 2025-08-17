@@ -95,12 +95,12 @@ public class SaturationHealthRegenHandler {
             while (iter.hasNext()) {
                 UUID player = iter.next();
                 Player p = Bukkit.getPlayer(player);
+                if (p == null) {
+                    // player is offline?
+                    iter.remove();
+                    return;
+                }
                 p.getScheduler().run(Finale.getPlugin(), feedTask -> {
-                    if (p == null) {
-                        // player is offline?
-                        iter.remove();
-                        return;
-                    }
                     if (p.isDead() || p.getHealth() <= 0.0) {
                         return;
                     }
