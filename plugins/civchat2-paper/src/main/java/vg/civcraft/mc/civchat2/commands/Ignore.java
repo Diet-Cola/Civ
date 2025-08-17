@@ -29,7 +29,7 @@ public class Ignore extends BaseCommand {
                 return;
             }
             OfflinePlayer ignoredPlayer = ignoredPlayerNonFinal;
-            Bukkit.getGlobalRegionScheduler().execute(CivChat2.getInstance(), () -> {
+            player.getScheduler().execute(CivChat2.getInstance(), () -> {
                 if (player.equals(ignoredPlayer)) {
                     player.sendMessage(ChatStrings.chatCantIgnoreSelf);
                     return;
@@ -44,7 +44,7 @@ public class Ignore extends BaseCommand {
                     db.removeIgnoredPlayer(player.getUniqueId(), ignoredPlayer.getUniqueId());
                     player.sendMessage(String.format(ChatStrings.chatStoppedIgnoring, ignoredPlayer.getName()));
                 }
-            });
+            }, null, 1L);
         });
     }
 }
