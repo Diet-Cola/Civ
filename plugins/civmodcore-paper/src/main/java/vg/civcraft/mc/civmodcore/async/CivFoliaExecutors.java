@@ -165,14 +165,14 @@ public final class CivFoliaExecutors {
     ///
     /// @see Entity#getScheduler()
     /// @apiNote This could be far less obnoxious if Java had extension methods D:
-    public <E extends Entity> @NotNull Function<@NotNull Collection<@NotNull E>, @NotNull CompletableFuture<@NotNull Collection<@NotNull E>>> entities(
-        final @NotNull Consumer<@NotNull E> task
-    ) {
-        Objects.requireNonNull(task);
-        return (entities) -> CompletableFuture.allOf(
-            entities.stream()
-                .map(entity(task))
-                .toArray(CompletableFuture[]::new)
-        ).thenApply((result) -> entities);
-    }
+//    public <E extends Entity, C extends Collection<E>> @NotNull Function<@NotNull C, @NotNull CompletableFuture<@NotNull C>> entities(
+//        final @NotNull Consumer<@NotNull E> task
+//    ) {
+//        Objects.requireNonNull(task);
+//        return (entities) -> CompletableFuture.allOf(
+//            entities.stream()
+//                .map(entity(task))
+//                .toArray(CompletableFuture[]::new)
+//        ).thenApply((result) -> entities);
+//    }
 }

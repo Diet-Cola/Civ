@@ -32,14 +32,14 @@ public final class DebugFoliaAsyncCommand extends BaseCommand {
     public void makeAllPlayersDropAllItems(
         final @NotNull CommandSender sender
     ) {
-        CompletableFuture.supplyAsync(Bukkit::getOnlinePlayers, this.executors.global())
-            .thenCompose(this.executors.entities((player) -> {
-                final Inventory inventory = player.getInventory();
-                final var items = new ArrayList<ItemStack>(Arrays.asList(inventory.getContents()));
-                items.removeIf(ItemUtils::isEmptyItem);
-                inventory.clear();
-                items.forEach((item) -> player.getWorld().dropItemNaturally(player.getLocation(), item));
-                player.sendMessage(Component.text("You've had a little accident...", NamedTextColor.YELLOW));
-            }));
+//        CompletableFuture.supplyAsync(Bukkit::getOnlinePlayers, this.executors.global())
+//            .thenCompose(this.executors.entities((player) -> {
+//                final Inventory inventory = player.getInventory();
+//                final var items = new ArrayList<ItemStack>(Arrays.asList(inventory.getContents()));
+//                items.removeIf(ItemUtils::isEmptyItem);
+//                inventory.clear();
+//                items.forEach((item) -> player.getWorld().dropItemNaturally(player.getLocation(), item));
+//                player.sendMessage(Component.text("You've had a little accident...", NamedTextColor.YELLOW));
+//            }));
     }
 }
