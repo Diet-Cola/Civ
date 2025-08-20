@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import vg.civcraft.mc.civmodcore.config.ConfigHelper;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 import vg.civcraft.mc.civmodcore.players.settings.PlayerSettingAPI;
 import vg.civcraft.mc.civmodcore.players.settings.gui.MenuSection;
 import vg.civcraft.mc.civmodcore.players.settings.impl.BooleanSetting;
@@ -34,7 +34,7 @@ public class DogFacts extends BasicHack {
     }
 
     public void startRunnable(List<String> announcements) {
-        long interval = ConfigHelper.parseTimeAsTicks(intervalTime);
+        long interval = ConfigHelpers.parseTimeAsTicks(intervalTime);
         int tickOffset = (int) (Math.random() * (interval));
         Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, task -> {
             if (announcements.isEmpty()) {

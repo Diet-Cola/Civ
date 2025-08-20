@@ -22,7 +22,7 @@ import vg.civcraft.mc.citadel.model.WorldBorderBuffers;
 import vg.civcraft.mc.citadel.reinforcementtypes.ReinforcementEffect;
 import vg.civcraft.mc.citadel.reinforcementtypes.ReinforcementType;
 import vg.civcraft.mc.civmodcore.ACivMod;
-import vg.civcraft.mc.civmodcore.config.ConfigHelper;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 import vg.civcraft.mc.civmodcore.config.ConfigParser;
 import vg.civcraft.mc.civmodcore.dao.DatabaseCredentials;
 import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
@@ -171,7 +171,7 @@ public class CitadelConfigManager extends ConfigParser {
     @Override
     protected boolean parseInternal(ConfigurationSection config) {
         database = ManagedDatasource.construct((ACivMod) plugin, (DatabaseCredentials) config.get("database"));
-        globalBlackList = ConfigHelper.parseMaterialList(config, "non_reinforceables");
+        globalBlackList = ConfigHelpers.getSafeMaterialList(config, "non_reinforceables");
         logHostileBreaks = config.getBoolean("logHostileBreaks", true);
         logFriendlyBreaks = config.getBoolean("logFriendlyBreaks", true);
         logDamage = config.getBoolean("logDamage", false);
@@ -179,7 +179,7 @@ public class CitadelConfigManager extends ConfigParser {
         logMessages = config.getBoolean("logMessages", true);
         redstoneRange = config.getDouble("redstoneDistance", 3);
         globalDecayMultiplier = config.getDouble("global_decay_multiplier", 2.0);
-        globalDecayTimer = ConfigHelper.parseTime(config.getString("global_decay_timer", "0"));
+        globalDecayTimer = ConfigHelpers.parseTime(config.getString("global_decay_timer", "0"));
         parseReinforcementTypes(config.getConfigurationSection("reinforcements"));
         parseAcidTypes(config.getConfigurationSection("acids"));
         hangersInheritReinforcements = config.getBoolean("hangers_inherit_reinforcement", false);
@@ -209,23 +209,23 @@ public class CitadelConfigManager extends ConfigParser {
         ReinforcementEffect damageEffect = getReinforcementEffect(config.getConfigurationSection("damage_effect"));
         ReinforcementEffect destructionEffect = getReinforcementEffect(
             config.getConfigurationSection("destruction_effect"));
-        long gracePeriod = ConfigHelper.parseTime(config.getString("grace_period", "0"), TimeUnit.MILLISECONDS);
-        long maturationTime = ConfigHelper.parseTime(config.getString("mature_time", "0"), TimeUnit.MILLISECONDS);
-        long acidTime = ConfigHelper.parseTime(config.getString("acid_time", "-1"), TimeUnit.MILLISECONDS);
+        long gracePeriod = ConfigHelpers.parseTime(config.getString("grace_period", "0"), TimeUnit.MILLISECONDS);
+        long maturationTime = ConfigHelpers.parseTime(config.getString("mature_time", "0"), TimeUnit.MILLISECONDS);
+        long acidTime = ConfigHelpers.parseTime(config.getString("acid_time", "-1"), TimeUnit.MILLISECONDS);
         int acidPriority = config.getInt("acid_priority", 0);
         String name = config.getString("name");
         double maturationScale = config.getInt("scale_amount", 1);
         float health = (float) config.getDouble("hit_points", 100);
         double returnChance = config.getDouble("return_chance", 1.0);
-        List<Material> reinforceables = ConfigHelper.parseMaterialList(config, "reinforceables");
-        List<Material> nonReinforceables = ConfigHelper.parseMaterialList(config, "non_reinforceables");
+        List<Material> reinforceables = ConfigHelpers.getSafeMaterialList(config, "reinforceables");
+        List<Material> nonReinforceables = ConfigHelpers.getSafeMaterialList(config, "non_reinforceables");
         short id = (short) config.getInt("id", -1);
-        long decayTimer = ConfigHelper
+        long decayTimer = ConfigHelpers
             .parseTime(config.getString("decay_timer", String.valueOf(globalDecayTimer / 1000L) + "s"));
         double decayMultiplier = config.getDouble("decay_multiplier", globalDecayMultiplier);
         double multiplerOnDeletedGroup = config.getDouble("deleted_group_multipler", 4);
         int legacyId = config.getInt("legacy_id", -1);
-        List<String> allowedWorlds = ConfigHelper.getStringList(config, "allowed_worlds");
+        List<String> allowedWorlds = ConfigHelpers.getStringList(config, "allowed_worlds");
         if (name == null) {
             logger.warning("No name specified for reinforcement type at " + config.getCurrentPath());
             name = item.getType().name();

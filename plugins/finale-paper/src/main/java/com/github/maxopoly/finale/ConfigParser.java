@@ -1,6 +1,6 @@
 package com.github.maxopoly.finale;
 
-import static vg.civcraft.mc.civmodcore.config.ConfigHelper.parseTime;
+import static vg.civcraft.mc.civmodcore.config.ConfigHelpers.parseTime;
 
 import java.io.File;
 import java.io.IOException;

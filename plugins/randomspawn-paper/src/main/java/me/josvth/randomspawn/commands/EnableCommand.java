@@ -2,8 +2,12 @@ package me.josvth.randomspawn.commands;
 
 import java.util.List;
 import me.josvth.randomspawn.RandomSpawn;
+import me.josvth.randomspawn.config.worlds.RandomSpawnArea;
+import me.josvth.randomspawn.config.worlds.RespawnFlags;
+import me.josvth.randomspawn.config.worlds.WorldConfig;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 
 public class EnableCommand extends AbstractCommand {
 
@@ -14,19 +18,18 @@ public class EnableCommand extends AbstractCommand {
     public boolean onCommand(CommandSender sender, List<String> args) {
         Player player = (Player) sender;
         String worldname = player.getWorld().getName();
-        List<String> spawnFlags = plugin.yamlHandler.worlds.getStringList(worldname + ".randomspawnon");
-        spawnFlags.add("respawn");
 
-        plugin.yamlHandler.worlds.set(worldname + ".randomspawnon", spawnFlags);
+        plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_RANDOM_SPAWN_ON, RespawnFlags.KEY_REVIVE_WITHOUT_BED), true);
 
-        if (!(plugin.yamlHandler.worlds.contains(worldname + ".spawnarea"))) {
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.x-min", -100);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.x-max", 100);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.z-min", -100);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.z-max", 100);
+        if (!(plugin.configs.worldsYaml.contains(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA)))) {
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_TYPE), RandomSpawnArea.KEY_SQUARE_TYPE);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MIN_X), -100);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MAX_X), 100);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MIN_Z), -100);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MAX_Z), 100);
         }
 
-        plugin.yamlHandler.saveWorlds();
+        plugin.configs.saveWorldsFile();
         plugin.playerInfo(player, "Random Spawn is now enabled in this world!");
 
         return true;

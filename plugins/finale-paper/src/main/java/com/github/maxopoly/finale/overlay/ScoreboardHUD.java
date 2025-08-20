@@ -21,7 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import vg.civcraft.mc.civmodcore.CivModCorePlugin;
+import vg.civcraft.mc.civmodcore.async.PaperRuntime;
 import vg.civcraft.mc.civmodcore.chat.ChatUtils;
 import vg.civcraft.mc.civmodcore.inventory.items.ItemUtils;
 import vg.civcraft.mc.civmodcore.players.scoreboard.bottom.BottomLine;
@@ -52,7 +52,7 @@ public class ScoreboardHUD implements Listener {
 
     public ScoreboardHUD(FinaleSettingManager settingsMan) {
         this.settingsMan = settingsMan;
-        if (CivModCorePlugin.isFolia()) {
+        if (PaperRuntime.isFolia()) {
             return;
         }
         scoreBoards = new ArrayList<>();
@@ -70,7 +70,7 @@ public class ScoreboardHUD implements Listener {
                 }, null, UPDATE_PERIOD, UPDATE_PERIOD);
             }
         settingsMan.getArmorSetting().registerListener((player, setting, oldValue, newValue) -> {
-            if (CivModCorePlugin.isFolia()) {
+            if (PaperRuntime.isFolia()) {
                 return;
             }
             Player p = Bukkit.getPlayer(player);
@@ -86,7 +86,7 @@ public class ScoreboardHUD implements Listener {
             }
         });
         settingsMan.getToolSetting().registerListener((player, setting, oldValue, newValue) -> {
-            if (CivModCorePlugin.isFolia()) {
+            if (PaperRuntime.isFolia()) {
                 return;
             }
             Player p = Bukkit.getPlayer(player);
@@ -161,7 +161,7 @@ public class ScoreboardHUD implements Listener {
     }
 
     private void updateAllPotionEffects(Player p) {
-        if (CivModCorePlugin.isFolia()) {
+        if (PaperRuntime.isFolia()) {
             return;
         }
         int boardIndex = 5;
@@ -201,7 +201,7 @@ public class ScoreboardHUD implements Listener {
     }
 
     private void updateDurabilities(Player p) {
-        if (CivModCorePlugin.isFolia()) {
+        if (PaperRuntime.isFolia()) {
             return;
         }
         if (settingsMan.showToolDurability(p.getUniqueId())) {
@@ -216,7 +216,7 @@ public class ScoreboardHUD implements Listener {
     }
 
     private String updateArmorPiece(Player p, String prefix, int order, int slot) {
-        if (CivModCorePlugin.isFolia()) {
+        if (PaperRuntime.isFolia()) {
             return null;
         }
         if (slot >= 0) {

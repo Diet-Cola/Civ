@@ -34,32 +34,31 @@ public class WorldChangeListener implements Listener {
         World from = event.getFrom();
         World to = player.getWorld();
 
-        if (player.getBedSpawnLocation() != null && to.equals(player.getBedSpawnLocation().getWorld()))
-            return;      // players bed is in this world
+        final Location bedLocation = player.getRespawnLocation();
+        if (bedLocation != null && to.equals(bedLocation.getWorld()))
+            return; // players bed is in this world
 
-        List<String> randomSpawnFlags = plugin.yamlHandler.worlds.getStringList(to.getName() + ".randomspawnon");
+        List<String> randomSpawnFlags = plugin.configs.worldsYaml.getStringList(to.getName() + ".randomspawnon");
 
         if (randomSpawnFlags.contains("teleport-from-" + from.getName())) {
 
-            Location spawnLocation = plugin.getSpawnSelector().getRandomSpawnLocation(to);
+            Location spawnLocation = plugin.getSpawnSelector().getRandomSpawn(to);
 
             if (spawnLocation == null) {
                 plugin.logDebug(playerName + " got unlucky and was not successfully randomspawned. Default behavior will apply");
                 return;
             }
 
-            plugin.sendGround(player, spawnLocation);
-
             player.teleportAsync(spawnLocation.add(0, 5, 0));
 
             player.setMetadata("lasttimerandomspawned", new FixedMetadataValue(plugin, System.currentTimeMillis()));
 
-            if (plugin.yamlHandler.worlds.getBoolean(to.getName() + ".keeprandomspawns", false)) {
+            if (plugin.configs.worldsYaml.getBoolean(to.getName() + ".keeprandomspawns", false)) {
                 player.setBedSpawnLocation(spawnLocation);
             }
 
-            if (plugin.yamlHandler.config.getString("messages.randomspawned") != null) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.yamlHandler.config.getString("messages.randomspawned")));
+            if (plugin.configs.configYaml.getString("messages.randomspawned") != null) {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.configs.configYaml.getString("messages.randomspawned")));
             }
         }
     }

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.configuration.ConfigurationSection;
 import vg.civcraft.mc.civmodcore.ACivMod;
-import vg.civcraft.mc.civmodcore.config.ConfigHelper;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 import vg.civcraft.mc.civmodcore.config.ConfigParser;
 import vg.civcraft.mc.civmodcore.dao.DatabaseCredentials;
 import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
@@ -36,10 +36,10 @@ public class EssenceConfigManager extends ConfigParser {
             db = ManagedDatasource.construct((ACivMod) plugin, (DatabaseCredentials) config.get("database"));
         }
         maxStreak = config.getInt("max_streak", 8);
-        streakDelay = ConfigHelper.parseTime(config.getString("streak_delay", "20 hours"));
-        streakGracePeriod = ConfigHelper.parseTime(config.getString("streak_grace_period", "1 day"));
-        timeForGain = ConfigHelper.parseTime(config.getString("online_for_reward", "30 minutes"));
-        rewards = ConfigHelper.parseItemMap(config.getConfigurationSection("rewards"));
+        streakDelay = ConfigHelpers.parseTime(config.getString("streak_delay", "20 hours"));
+        streakGracePeriod = ConfigHelpers.parseTime(config.getString("streak_grace_period", "1 day"));
+        timeForGain = ConfigHelpers.parseTime(config.getString("online_for_reward", "30 minutes"));
+        rewards = ConfigHelpers.parseItemMap(config.getConfigurationSection("rewards"));
         loginReward = config.getInt("login_reward", 1);
         votingReward = config.getInt("voting_reward", 1);
         physical = config.getBoolean("physical", true);
@@ -50,7 +50,7 @@ public class EssenceConfigManager extends ConfigParser {
             for (String key : votingKeySection.getKeys(false)) {
                 if (votingKeySection.isConfigurationSection(key)) {
                     ConfigurationSection current = votingKeySection.getConfigurationSection(key);
-                    long votingCooldown = ConfigHelper.parseTime(current.getString("voting_cooldown", "20h"));
+                    long votingCooldown = ConfigHelpers.parseTime(current.getString("voting_cooldown", "20h"));
                     String votingUrl = current.getString("voting_url");
                     String internalKey = current.getString("internal_key");
                     String name = current.getString("name");

@@ -1,156 +1,108 @@
 package me.josvth.randomspawn.listeners;
 
-import com.programmerdan.minecraft.banstick.data.BSPlayer;
-import java.util.List;
-import java.util.Set;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import me.josvth.randomspawn.RandomSpawn;
+import me.josvth.randomspawn.RandomSpawnUtils;
+import me.josvth.randomspawn.config.worlds.WorldConfig;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * Handle joins.
- */
 public class JoinListener implements Listener {
+    private final RandomSpawn plugin;
 
-    RandomSpawn plugin;
-
-    public JoinListener(RandomSpawn instance) {
-        plugin = instance;
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    public JoinListener(
+        final @NotNull RandomSpawn plugin
+    ) {
+        this.plugin = Objects.requireNonNull(plugin);
+        this.plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
-    public void onPlayerTeleport(PlayerTeleportEvent event) {
-        plugin.sendGround(event.getPlayer(), event.getTo());
-    }
-
-    private static boolean isAlt(Player player) {
-        BSPlayer bsPlayer = BSPlayer.byUUID(player.getUniqueId());
-        if (bsPlayer == null) {
-            return false;
-        }
-        Set<BSPlayer> directAssoc = bsPlayer.getTransitiveSharedPlayers(true);
-        return directAssoc.size() > 1; // directAssoc always includes the player herself
-    }
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-
-        Player player = event.getPlayer();
-        String playerName = player.getName();
-
-        World world = player.getWorld();
-        String worldName = world.getName();
-
-        if (world.getEnvironment().equals(Environment.NETHER) || world.getEnvironment().equals(Environment.THE_END))
-            return;
-
-        if (player.hasPlayedBefore()) return;
-
-        List<String> randomSpawnFlags = plugin.yamlHandler.worlds.getStringList(worldName + ".randomspawnon");
-        List<String> spawnPointFlags = plugin.yamlHandler.worlds.getStringList(worldName + ".spawnpointson");
-
-        if (!randomSpawnFlags.contains("firstjoin") && !spawnPointFlags.contains("firstjoin")) {
-            player.teleportAsync(getFirstSpawn(world));
-            plugin.logDebug(playerName + " is teleported to the first spawn of " + worldName);
+    private void on(
+        final @NotNull PlayerJoinEvent event
+    ) {
+        final Player player = event.getPlayer();
+        if (player.hasPlayedBefore()) {
             return;
         }
 
-        if (player.hasPermission("RandomSpawn.exclude")) { // checks if player should be excluded
-            plugin.logDebug(playerName + " is excluded from Random Spawning.");
+        final World world = player.getWorld();
+        switch (world.getEnvironment()) {
+            case NETHER:
+            case THE_END:
+                return;
+        }
+
+        final String worldName = world.getName();
+        final WorldConfig worldConfig = this.plugin.configs.worlds.get(worldName);
+        if (worldConfig == null) {
             return;
         }
 
-        if (spawnPointFlags.contains("firstjoin") && !isAlt(player)) {
-            plugin.logDebug(playerName + "First Join spawn point spawning");
+        if (player.hasPermission("RandomSpawn.exclude")) {
+            this.plugin.logDebug(player.getName() + " is excluded from Random Spawning.");
+            return;
+        }
 
-            Location newSpawn = plugin.getSpawnSelector().getSpawnPointLocation(world);
-
-            if (newSpawn != null) {
-                plugin.sendGround(player, newSpawn);
-                player.teleportAsync(newSpawn.add(0, 3, 0));
-                player.setMetadata("lasttimerandomspawned", new FixedMetadataValue(plugin, System.currentTimeMillis()));
-
-                if (plugin.yamlHandler.worlds.getBoolean(worldName + ".keeprandomspawns", false)) {
-                    player.setBedSpawnLocation(newSpawn);
+        if (worldConfig.spawnPointOn().firstJoin()) {
+            this.plugin.logDebug(player.getName() + " is first-join spawning at a spawn point");
+            final Location spawn = this.plugin.getSpawnSelector().getSpawnPoint(world);
+            if (spawn != null) {
+                player.teleportAsync(spawn);
+                RandomSpawnUtils.setLastTimeRandomSpawned(this.plugin, player, System.currentTimeMillis());
+                if (worldConfig.keepRandomSpawn()) {
+                    player.setRespawnLocation(spawn);
                 }
-
-                if (plugin.yamlHandler.config.getString("messages.randomspawned") != null) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.yamlHandler.config.getString("messages.randomspawned")));
+                if (plugin.configs.configYaml.getString("messages.randomspawned") instanceof final String message) {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
                 }
                 return;
             }
         }
 
-        if (randomSpawnFlags.contains("firstjoin")) {
-            plugin.logDebug(playerName + " First Join random spawning");
-            Location spawnLocation = plugin.getSpawnSelector().getRandomSpawnLocation(world);
-            if (spawnLocation == null) {
-                plugin.logDebug(playerName + " got unlucky and was not successfully randomspawned. Default behavior will apply");
+        if (worldConfig.randomSpawnOn().firstJoin()) {
+            this.plugin.logDebug(player.getName() + " is first-join spawning randomly");
+            final Location spawn = this.plugin.getSpawnSelector().getRandomSpawn(world);
+            if (spawn == null) {
+                this.plugin.logDebug(player.getName() + " got unlucky and was not successfully random spawned. Default behavior will apply.");
                 return;
             }
-
-            plugin.sendGround(player, spawnLocation);
-
-            player.teleportAsync(spawnLocation.add(0, 3, 0));
-
-            player.setMetadata("lasttimerandomspawned", new FixedMetadataValue(plugin, System.currentTimeMillis()));
-
-            if (plugin.yamlHandler.worlds.getBoolean(worldName + ".keeprandomspawns", false)) {
-                player.setBedSpawnLocation(spawnLocation);
+            player.teleportAsync(spawn);
+            RandomSpawnUtils.setLastTimeRandomSpawned(this.plugin, player, System.currentTimeMillis());
+            if (worldConfig.keepRandomSpawn()) {
+                player.setRespawnLocation(spawn);
             }
-
-            if (plugin.yamlHandler.config.getString("messages.randomspawned") != null) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.yamlHandler.config.getString("messages.randomspawned")));
+            if (plugin.configs.configYaml.getString("messages.randomspawned") instanceof final String message) {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
             }
             return;
         }
 
         // neither spawnpoints nor randomspawn were successful (or both were disabled)
-        player.teleportAsync(getFirstSpawn(world));
-        plugin.logDebug(playerName + " is teleported to the first spawn of " + worldName);
+        player.teleportAsync(worldConfig.getFirstSpawn(world));
+        this.plugin.logDebug(player.getName() + " is teleported to the first spawn of " + worldName);
     }
 
     @EventHandler
-    public void onPlayerKick(PlayerKickEvent event) {
-        if (event.getPlayer().hasMetadata("lasttimerandomspawned")) {
-            if ((event.getPlayer().getMetadata("lasttimerandomspawned").get(0).asLong() + (plugin.yamlHandler.config.getInt("nodamagetime", 5) * 1000)) > System.currentTimeMillis()) {
+    public void on(
+        final @NotNull PlayerKickEvent event
+    ) {
+        final Long timestamp = RandomSpawnUtils.getLastTimeRandomSpawned(event.getPlayer());
+        if (timestamp != null) {
+            if (timestamp + TimeUnit.SECONDS.toMillis(plugin.configs.config.damageImmunityPeriod()) > System.currentTimeMillis()) {
                 event.setReason("");
                 event.setLeaveMessage("");
                 event.setCancelled(true);
             }
         }
     }
-
-    private Location getFirstSpawn(World world) {
-        String worldName = world.getName();
-
-        if (plugin.yamlHandler.worlds.contains(worldName + ".firstspawn")) {
-
-            double x = plugin.yamlHandler.worlds.getDouble(worldName + ".firstspawn.x");
-            double y = plugin.yamlHandler.worlds.getDouble(worldName + ".firstspawn.y");
-            double z = plugin.yamlHandler.worlds.getDouble(worldName + ".firstspawn.z");
-
-            double dyaw = plugin.yamlHandler.worlds.getDouble(worldName + ".firstspawn.yaw");
-            double dpitch = plugin.yamlHandler.worlds.getDouble(worldName + ".firstspawn.pitch");
-
-            float yaw = (float) dyaw;
-            float pitch = (float) dpitch;
-
-            return new Location(world, x, y, z, yaw, pitch);
-
-        }
-
-        return world.getSpawnLocation();
-    }
-
 }

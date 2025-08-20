@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -12,7 +13,6 @@ import org.bukkit.World;
  * Utility to use with {@link java.util.stream.Stream} to efficiently remove elements from unloaded chunks.
  */
 public final class ChunkLoadedFilter {
-
     /**
      * Creates a new filter function for a given world to remove elements representing blocks in unloaded chunks.
      *
@@ -26,14 +26,14 @@ public final class ChunkLoadedFilter {
             if (position == null) {
                 return false;
             }
-            final int chunkX = position.getX() >> 4;
-            final int chunkZ = position.getZ() >> 4;
-            final long combined = ((long) chunkX << 32) | (long) chunkZ;
-            if (loadedChunks.contains(combined)) {
+            final int chunkX = WorldUtils.blockToChunkPos(position.getX());
+            final int chunkZ = WorldUtils.blockToChunkPos(position.getZ());
+            final long chunkKey = Chunk.getChunkKey(chunkX, chunkZ);
+            if (loadedChunks.contains(chunkKey)) {
                 return true;
             }
             if (world.isChunkLoaded(chunkX, chunkZ)) {
-                loadedChunks.add(combined);
+                loadedChunks.add(chunkKey);
                 return true;
             }
             return false;
@@ -53,18 +53,17 @@ public final class ChunkLoadedFilter {
             if (position == null) {
                 return false;
             }
-            final int chunkX = position.getBlockX() >> 4;
-            final int chunkZ = position.getBlockZ() >> 4;
-            final long combined = ((long) chunkX << 32) | (long) chunkZ;
-            if (loadedChunks.contains(combined)) {
+            final int chunkX = WorldUtils.blockToChunkPos(position.getBlockX());
+            final int chunkZ = WorldUtils.blockToChunkPos(position.getBlockZ());
+            final long chunkKey = Chunk.getChunkKey(chunkX, chunkZ);
+            if (loadedChunks.contains(chunkKey)) {
                 return true;
             }
             if (world.isChunkLoaded(chunkX, chunkZ)) {
-                loadedChunks.add(combined);
+                loadedChunks.add(chunkKey);
                 return true;
             }
             return false;
         };
     }
-
 }

@@ -6,7 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import vg.civcraft.mc.civchat2.CivChat2;
 import vg.civcraft.mc.civchat2.CivChat2Manager;
-import vg.civcraft.mc.civmodcore.CivModCorePlugin;
+import vg.civcraft.mc.civmodcore.async.PaperRuntime;
 import vg.civcraft.mc.civmodcore.players.scoreboard.bottom.BottomLine;
 import vg.civcraft.mc.civmodcore.players.scoreboard.bottom.BottomLineAPI;
 import vg.civcraft.mc.civmodcore.players.scoreboard.side.CivScoreBoard;
@@ -39,7 +39,7 @@ public class ScoreboardHUD {
      * @param p player to update scoreboard for
      */
     public void updateScoreboardHUD(Player p) {
-        if (CivModCorePlugin.isFolia()) {
+        if (PaperRuntime.isFolia()) {
             return;
         }
         // if player disabled chat group display, hide the scoreboard
@@ -72,7 +72,7 @@ public class ScoreboardHUD {
      * Updates the scoreboard to display the players AFK status
      */
     public void updateAFKScoreboardHUD(Player p) {
-        if (CivModCorePlugin.isFolia()) {
+        if (PaperRuntime.isFolia()) {
             return;
         }
         CivChat2Manager chatman = CivChat2.getInstance().getCivChat2Manager();

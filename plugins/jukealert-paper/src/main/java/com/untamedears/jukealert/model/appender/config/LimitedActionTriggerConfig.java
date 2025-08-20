@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.bukkit.configuration.ConfigurationSection;
-import vg.civcraft.mc.civmodcore.config.ConfigHelper;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 
 public class LimitedActionTriggerConfig implements AppenderConfig {
 
@@ -19,7 +19,7 @@ public class LimitedActionTriggerConfig implements AppenderConfig {
     public LimitedActionTriggerConfig(final ConfigurationSection config) {
         this.identifier = new HashSet<>();
         if (config.isList("trigger")) {
-            final List<String> triggers = ConfigHelper.getStringList(config, "trigger");
+            final List<String> triggers = ConfigHelpers.getStringList(config, "trigger");
             final LoggedActionFactory actionFactory = JukeAlert.getInstance().getLoggedActionFactory();
             for (String trigger : triggers) {
                 trigger = trigger.toUpperCase().trim();
@@ -29,7 +29,7 @@ public class LimitedActionTriggerConfig implements AppenderConfig {
             }
         }
         this.acceptAll = config.getBoolean("acceptAll", false);
-        this.actionLifespan = ConfigHelper.parseTime(config.getString("lifeTime", "4 weeks"), TimeUnit.MILLISECONDS);
+        this.actionLifespan = ConfigHelpers.parseTime(config.getString("lifeTime", "4 weeks"), TimeUnit.MILLISECONDS);
         this.hardCap = config.getInt("hardCap", 100_000);
     }
 

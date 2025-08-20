@@ -7,7 +7,7 @@ import java.util.Objects;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
-import vg.civcraft.mc.civmodcore.config.ConfigHelper;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 import vg.civcraft.mc.civmodcore.inventory.items.ItemUtils;
 import vg.civcraft.mc.civmodcore.inventory.items.MaterialUtils;
 import vg.civcraft.mc.civmodcore.utilities.CivLogger;
@@ -57,7 +57,7 @@ public final class OneTimeTeleportConfig extends SimpleHackConfig {
             .filter(Objects::nonNull)
             .toList();
         // Parse maximum time limit to use OTT
-        this.timeLimitOnUsage = ConfigHelper.parseTime(config.getString("ott_timeout", "2d"));
+        this.timeLimitOnUsage = ConfigHelpers.parseTime(config.getString("ott_timeout", "2d"));
         // Parse same-world limit
         this.limitToSameWorld = config.getBoolean("limitToSameWorld", false);
     }

@@ -1,23 +1,23 @@
 package me.josvth.randomspawn;
 
+import me.josvth.randomspawn.config.Configs;
 import me.josvth.randomspawn.handlers.CommandHandler;
-import me.josvth.randomspawn.handlers.YamlHandler;
-import me.josvth.randomspawn.listeners.*;
-import me.josvth.randomspawn.spawn.AsyncSpawnSelector;
-import me.josvth.randomspawn.spawn.BlockingSpawnSelector;
+import me.josvth.randomspawn.listeners.DamageListener;
+import me.josvth.randomspawn.listeners.JoinListener;
+import me.josvth.randomspawn.listeners.RespawnListener;
+import me.josvth.randomspawn.listeners.SignListener;
+import me.josvth.randomspawn.listeners.WorldChangeListener;
+import me.josvth.randomspawn.spawn.CachedSpawnSelector;
 import me.josvth.randomspawn.spawn.SpawnSelector;
+import org.apache.commons.lang3.function.Failable;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
+import vg.civcraft.mc.civmodcore.ACivMod;
 
-import java.util.ArrayList;
-import java.util.Set;
-
-public class RandomSpawn extends JavaPlugin {
-
-    public YamlHandler yamlHandler;
+public final class RandomSpawn extends ACivMod {
+    public Configs configs;
     CommandHandler commandHandler;
     RespawnListener respawnListener;
     JoinListener joinListener;
@@ -29,9 +29,15 @@ public class RandomSpawn extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveResource("config.yml", false);
+        saveResource("worlds.yml", false);
 
         // setup handlers
-        yamlHandler = new YamlHandler(this);
+        this.configs = new Configs(this);
+        Failable.run(() -> {
+            this.configs.loadConfigFile();
+            this.configs.loadWorldsFile();
+        });
         logDebug("Yamls loaded!");
 
         commandHandler = new CommandHandler(this);
@@ -44,8 +50,7 @@ public class RandomSpawn extends JavaPlugin {
         signListener = new SignListener(this);
         damageListener = new DamageListener(this);
 
-        Set<String> keys = yamlHandler.worlds.getKeys(false);
-        spawnSelector = new AsyncSpawnSelector(this, new BlockingSpawnSelector(this, yamlHandler, this.getLogger()), new ArrayList<>(keys));
+        this.spawnSelector = new CachedSpawnSelector(this);
     }
 
     public void logInfo(String message) {
@@ -53,7 +58,7 @@ public class RandomSpawn extends JavaPlugin {
     }
 
     public void logDebug(String message) {
-        if (yamlHandler.config.getBoolean("debug", false)) {
+        if (configs.configYaml.getBoolean("debug", false)) {
             getLogger().info("(DEBUG) " + message);
         }
     }
@@ -74,20 +79,12 @@ public class RandomSpawn extends JavaPlugin {
     // |
     // *------------------------------------------------------------------------------------------------------------*
 
-
-    // Methods for a safe landing :)
-    public void sendGround(Player player, Location location) {
-        if (!location.getChunk().isLoaded()) {
-            location.getChunk().load();
-        }
-    }
-
     public SpawnSelector getSpawnSelector() {
         return spawnSelector;
     }
 
     @Deprecated
     public Location chooseSpawn(World to) {
-        return spawnSelector.getRandomSpawnLocation(to);
+        return spawnSelector.getRandomSpawn(to);
     }
 }

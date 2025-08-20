@@ -21,6 +21,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.jetbrains.annotations.NotNull;
 import vg.civcraft.mc.civmodcore.chat.ChatUtils;
 import vg.civcraft.mc.civmodcore.utilities.MoreCollectionUtils;
@@ -92,6 +93,11 @@ public final class AutoRespawn extends BasicHack {
     }
 
     @EventHandler
+    public void onPlayerRespawn(final PlayerRespawnEvent event) {
+        this.respawnTimers.computeIfPresent(event.getPlayer(), (player, timer) -> timer.stop());
+    }
+
+    @EventHandler
     public void onPlayerLogout(final PlayerQuitEvent event) {
         final Player player = event.getPlayer();
         if (player.isDead()) {
@@ -131,14 +137,7 @@ public final class AutoRespawn extends BasicHack {
             this.bar.setVisible(true);
             this.bar.setProgress(1.0d);
             this.bar.addPlayer(player);
-            this.processor = player.getScheduler().runAtFixedRate(AutoRespawn.this.plugin(), (task) -> {
-                if (tick(player)) {
-                    if (!AutoRespawn.this.respawnTimers.remove(player, this)) {
-                        AutoRespawn.this.logger.warning("Could not remove respawn timer for player [" + player.getName() + "] as it doesn't match this timer!");
-                    }
-                    stop(); // Do this just in-case stop()'s processor-cancel method, which cancels THIS task, would prevent the removal above.
-                }
-            }, null, 1L, 1L);
+            this.processor = player.getScheduler().runAtFixedRate(AutoRespawn.this.plugin(), (task) -> tick(player), null, 1L, 1L);
         }
 
         private String generateBarTitle() {
@@ -157,28 +156,27 @@ public final class AutoRespawn extends BasicHack {
             return "Respawning in " + (int) Math.ceil(this.timeRemaining / 3_600_000d) + " hours.";
         }
 
-        /// @return Returns true if the timer is no longer necessary (player is alive)
-        private boolean tick(
+        private void tick(
             final @NotNull Player player
         ) {
-            if (player.isDead()) {
-                long currentTime = System.currentTimeMillis();
-                long timeDifference = currentTime - this.previousTime;
-                this.previousTime = currentTime;
-                this.timeRemaining -= timeDifference;
-                this.secondTimer -= timeDifference;
-                if (this.secondTimer > 0) {
-                    return false;
-                }
-                this.secondTimer = 1000L;
-                this.bar.setTitle(generateBarTitle());
-                this.bar.setProgress(Math.max(this.timeRemaining / (double) this.setTime, 0));
-                if (this.timeRemaining > 0) {
-                    return false;
-                }
-                this.handler.accept(player);
+            if (!player.isDead()) {
+                return;
             }
-            return true;
+            long currentTime = System.currentTimeMillis();
+            long timeDifference = currentTime - this.previousTime;
+            this.previousTime = currentTime;
+            this.timeRemaining -= timeDifference;
+            this.secondTimer -= timeDifference;
+            if (this.secondTimer > 0) {
+                return;
+            }
+            this.secondTimer = 1000L;
+            this.bar.setTitle(generateBarTitle());
+            this.bar.setProgress(Math.max(this.timeRemaining / (double) this.setTime, 0));
+            if (this.timeRemaining > 0) {
+                return;
+            }
+            this.handler.accept(player);
         }
 
         public RespawnTimer stop() {

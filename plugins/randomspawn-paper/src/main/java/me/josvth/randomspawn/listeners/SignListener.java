@@ -1,6 +1,7 @@
 package me.josvth.randomspawn.listeners;
 
 import me.josvth.randomspawn.RandomSpawn;
+import me.josvth.randomspawn.RandomSpawnUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -14,7 +15,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 
 public class SignListener implements Listener {
 
@@ -32,7 +32,7 @@ public class SignListener implements Listener {
             if (Tag.WALL_SIGNS.isTagged(mat)) {
                 Sign sign = (Sign) event.getClickedBlock().getState();
                 final Player player = event.getPlayer();
-                if (sign.getLine(0).equalsIgnoreCase(plugin.yamlHandler.config.getString("rs-sign-text", "[RandomSpawn]"))) {
+                if (sign.getLine(0).equalsIgnoreCase(plugin.configs.configYaml.getString("rs-sign-text", "[RandomSpawn]"))) {
 
                     if (player.hasPermission("RandomSpawn.usesign")) {
 
@@ -53,18 +53,16 @@ public class SignListener implements Listener {
                             return;
                         }
 
-                        plugin.sendGround(player, spawnLocation);
-
                         player.teleportAsync(spawnLocation.add(0, 5, 0));
 
-                        player.setMetadata("lasttimerandomspawned", new FixedMetadataValue(plugin, System.currentTimeMillis()));
+                        RandomSpawnUtils.setLastTimeRandomSpawned(this.plugin, player, System.currentTimeMillis());
 
-                        if (plugin.yamlHandler.worlds.getBoolean(world.getName() + ".keeprandomspawns", false)) {
+                        if (plugin.configs.worldsYaml.getBoolean(world.getName() + ".keeprandomspawns", false)) {
                             player.setBedSpawnLocation(spawnLocation);
                         }
 
-                        if (plugin.yamlHandler.config.getString("messages.randomspawned") != null) {
-                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.yamlHandler.config.getString("messages.randomspawned")));
+                        if (plugin.configs.configYaml.getString("messages.randomspawned") instanceof final String message) {
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
                         }
 
                     } else {
@@ -77,7 +75,7 @@ public class SignListener implements Listener {
 
     @EventHandler
     public void onPlayerSignPlace(SignChangeEvent event) {
-        if (event.getLine(0).equalsIgnoreCase(plugin.yamlHandler.config.getString("rs-sign-text", "[RandomSpawn]"))) {
+        if (event.getLine(0).equalsIgnoreCase(plugin.configs.configYaml.getString("rs-sign-text", "[RandomSpawn]"))) {
             Player player = event.getPlayer();
             if (player.hasPermission("RandomSpawn.placesign")) {
                 this.plugin.playerInfo(player, "Random Spawn Sign created!");

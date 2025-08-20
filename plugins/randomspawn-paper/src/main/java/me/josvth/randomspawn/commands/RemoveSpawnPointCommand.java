@@ -2,8 +2,10 @@ package me.josvth.randomspawn.commands;
 
 import java.util.List;
 import me.josvth.randomspawn.RandomSpawn;
+import me.josvth.randomspawn.config.worlds.WorldConfig;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 
 /**
  * This command removes a named spawnpoint from the config. It matches using the "name" field in the map of the spawn point.
@@ -31,24 +33,20 @@ public class RemoveSpawnPointCommand extends AbstractCommand {
         }
         name = nameSB.toString();
 
-        if (!plugin.yamlHandler.worlds.contains(world + ".spawnpoints")) {
+        if (!(this.plugin.configs.worlds.get(world) instanceof final WorldConfig worldConfig) || worldConfig.cities().isEmpty()) {
             sender.sendMessage("There are no spawn points configured for world " + world);
             return true;
         }
 
-        ConfigurationSection current = plugin.yamlHandler.worlds.getConfigurationSection(world + ".spawnpoints");
+        ConfigurationSection current = plugin.configs.worldsYaml.getConfigurationSection(ConfigHelpers.pathOf(world, WorldConfig.KEY_CITY_SPAWNS));
 
         for (String key : current.getKeys(false)) {
-            ConfigurationSection point = current.getConfigurationSection(key);
+            if (key.equalsIgnoreCase(name)) {
+                current.set(key, null);
 
-            if (point != null) {
-                if (name.equalsIgnoreCase(point.getString("name"))) {
-                    current.set(key, null);
-
-                    plugin.yamlHandler.saveWorlds();
-                    sender.sendMessage("Removed spawn point by name of " + name);
-                    return true;
-                }
+                plugin.configs.saveWorldsFile();
+                sender.sendMessage("Removed spawn point by name of " + name);
+                return true;
             }
         }
 

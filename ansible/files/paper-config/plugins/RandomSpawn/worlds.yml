@@ -1,11 +1,11 @@
 world:
   randomspawnon:
-    - firstjoin
-    - respawn
-  # - bedrespawn
+    firstJoin: true
+    reviveWithoutBed: true
+#    reviveWithBed: true
   spawnpointson:
-    - firstjoin
-    - newplayer
+    firstJoin: true
+    reviveWhileNew: true
   keeprandomspawns: false
   newplayertime: 3000
   spawnarea:

@@ -2,9 +2,12 @@ package me.josvth.randomspawn.commands;
 
 import java.util.List;
 import me.josvth.randomspawn.RandomSpawn;
+import me.josvth.randomspawn.config.worlds.CitySpawn;
+import me.josvth.randomspawn.config.worlds.WorldConfig;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 
 /**
  * Add a spawn point using current location and given radius / exclusion and requirements.
@@ -72,25 +75,24 @@ public class AddSpawnPointCommand extends AbstractCommand {
         }
 
         int nextKey = 0;
-        ConfigurationSection current = plugin.yamlHandler.worlds.getConfigurationSection(worldname + ".spawnpoints");
+        ConfigurationSection current = plugin.configs.worldsYaml.getConfigurationSection(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_CITY_SPAWNS));
         if (current == null) {
-            current = plugin.yamlHandler.worlds.createSection(worldname + ".spawnpoints");
+            current = plugin.configs.worldsYaml.createSection(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_CITY_SPAWNS));
         } else {
             nextKey = current.getKeys(false).size();
         }
 
         ConfigurationSection spawnpoint = current.createSection(String.valueOf(nextKey));
 
-        spawnpoint.set("name", name);
-        spawnpoint.set("x", x);
-        spawnpoint.set("y", y);
-        spawnpoint.set("z", z);
-        spawnpoint.set("checkradius", checkradius);
-        spawnpoint.set("radius", radius);
-        spawnpoint.set("exclusion", exclusion);
-        spawnpoint.set("nearby", requireNearby);
+        spawnpoint.set(CitySpawn.KEY_X, x);
+        spawnpoint.set(CitySpawn.KEY_Y, y);
+        spawnpoint.set(CitySpawn.KEY_Z, z);
+        spawnpoint.set(CitySpawn.KEY_REQUIRED_NEARBY_PLAYERS_RADIUS, checkradius);
+        spawnpoint.set(CitySpawn.KEY_RADIUS, radius);
+        spawnpoint.set(CitySpawn.KEY_EXCLUSION_RADIUS, exclusion);
+        spawnpoint.set(CitySpawn.KEY_REQUIRE_NEARBY_PLAYERS, requireNearby);
 
-        plugin.yamlHandler.saveWorlds();
+        plugin.configs.saveWorldsFile();
 
         plugin.playerInfo(player, "Added spawn location " + name);
 

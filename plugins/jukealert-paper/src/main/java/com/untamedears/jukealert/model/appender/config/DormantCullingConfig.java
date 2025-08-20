@@ -2,7 +2,7 @@ package com.untamedears.jukealert.model.appender.config;
 
 import java.util.concurrent.TimeUnit;
 import org.bukkit.configuration.ConfigurationSection;
-import vg.civcraft.mc.civmodcore.config.ConfigHelper;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 
 public class DormantCullingConfig implements AppenderConfig {
 
@@ -10,8 +10,8 @@ public class DormantCullingConfig implements AppenderConfig {
     private long dormantLifeTime;
 
     public DormantCullingConfig(ConfigurationSection config) {
-        lifeTime = ConfigHelper.parseTime(config.getString("lifeTime", "2 weeks"), TimeUnit.MILLISECONDS);
-        dormantLifeTime = ConfigHelper.parseTime(config.getString("dormantTime", "2 weeks"), TimeUnit.MILLISECONDS);
+        lifeTime = ConfigHelpers.parseTime(config.getString("lifeTime", "2 weeks"), TimeUnit.MILLISECONDS);
+        dormantLifeTime = ConfigHelpers.parseTime(config.getString("dormantTime", "2 weeks"), TimeUnit.MILLISECONDS);
     }
 
     /**

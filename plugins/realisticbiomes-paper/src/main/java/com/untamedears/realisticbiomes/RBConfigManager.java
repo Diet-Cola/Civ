@@ -1,6 +1,6 @@
 package com.untamedears.realisticbiomes;
 
-import static vg.civcraft.mc.civmodcore.config.ConfigHelper.parseMaterialList;
+import static vg.civcraft.mc.civmodcore.config.ConfigHelpers.getSafeMaterialList;
 
 
 import com.untamedears.realisticbiomes.growth.AgeableGrower;
@@ -49,7 +49,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import vg.civcraft.mc.civmodcore.ACivMod;
-import vg.civcraft.mc.civmodcore.config.ConfigHelper;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 import vg.civcraft.mc.civmodcore.config.ConfigParser;
 import vg.civcraft.mc.civmodcore.dao.DatabaseCredentials;
 import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
@@ -134,7 +134,7 @@ public class RBConfigManager extends ConfigParser {
         remapStemFruitConfigs();
         List<LStepConfig> rawConfigs = parseRawLStepConfigs(config.getConfigurationSection("l_steps"));
         lTrees = parseLTrees(config.getConfigurationSection("l_trees"), rawConfigs);
-        bonemealPreventedBlocks = parseMaterialList(config, "no_bonemeal_blocks");
+        bonemealPreventedBlocks = getSafeMaterialList(config, "no_bonemeal_blocks");
         return true;
     }
 
@@ -160,7 +160,7 @@ public class RBConfigManager extends ConfigParser {
 
     private Map<Material, Double> parseMaterialDoubleMap(ConfigurationSection parent, String identifier) {
         Map<Material, Double> result = new EnumMap<>(Material.class);
-        ConfigHelper.parseKeyValueMap(parent, identifier, logger, Material::valueOf, Double::parseDouble, result);
+        ConfigHelpers.parseKeyValueMap(parent, identifier, this.plugin.getSLF4JLogger(), Material::valueOf, Double::parseDouble, result);
         return result;
     }
 
@@ -182,7 +182,7 @@ public class RBConfigManager extends ConfigParser {
                 continue;
             }
             ItemStack item = current.getItemStack("item", null);
-            List<Material> vanillaMats = parseMaterialList(current, "vanilla_materials");
+            List<Material> vanillaMats = getSafeMaterialList(current, "vanilla_materials");
             if (vanillaMats == null) {
                 vanillaMats = Collections.emptyList();
             }
@@ -217,7 +217,7 @@ public class RBConfigManager extends ConfigParser {
             }
             Long persistTime = null;
             if (current.isString("persistent_growth_period")) {
-                persistTime = ConfigHelper.parseTime(current.getString("persistent_growth_period"),
+                persistTime = ConfigHelpers.parseTime(current.getString("persistent_growth_period"),
                     TimeUnit.MILLISECONDS);
             }
             String name = current.getString("name", key);
@@ -313,8 +313,8 @@ public class RBConfigManager extends ConfigParser {
             case "horizontalspread":
                 int maxAmount = section.getInt("max_amount");
                 int horRange = section.getInt("max_range");
-                List<Material> replaceableBlocks = parseMaterialList(section, "replaceable_blocks");
-                List<Material> validSoil = parseMaterialList(section, "valid_soil");
+                List<Material> replaceableBlocks = getSafeMaterialList(section, "replaceable_blocks");
+                List<Material> validSoil = getSafeMaterialList(section, "valid_soil");
                 return new HorizontalBlockSpreadGrower(material, maxAmount, horRange, replaceableBlocks, validSoil);
             case "seapickle":
                 return new SeaPickleGrower();

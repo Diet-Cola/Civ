@@ -3,13 +3,14 @@ package vg.civcraft.mc.civmodcore;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.HumanEntity;
-import vg.civcraft.mc.civmodcore.async.DebugFoliaAsyncCommand;
+import vg.civcraft.mc.civmodcore.async.PaperRuntime;
 import vg.civcraft.mc.civmodcore.chat.dialog.DialogManager;
 import vg.civcraft.mc.civmodcore.commands.ChunkMetaCommand;
 import vg.civcraft.mc.civmodcore.commands.CommandManager;
 import vg.civcraft.mc.civmodcore.commands.StatCommand;
 import vg.civcraft.mc.civmodcore.dao.DatabaseCredentials;
 import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
+import vg.civcraft.mc.civmodcore.async.FoliaTestCommand;
 import vg.civcraft.mc.civmodcore.inventory.gui.ClickableInventoryListener;
 import vg.civcraft.mc.civmodcore.inventory.items.EnchantUtils;
 import vg.civcraft.mc.civmodcore.inventory.items.SpawnEggUtils;
@@ -42,11 +43,16 @@ public class CivModCorePlugin extends ACivMod {
     private SkinCache skinCache;
 
     @Override
+    public void onLoad() {
+        instance = this;
+        getSLF4JLogger().info("Detected runtime: {}", PaperRuntime.DETECTED_RUNTIME);
+        super.onLoad();
+    }
+
+    @Override
     public void onEnable() {
         instance = this;
         registerConfigClass(DatabaseCredentials.class);
-        // Save default resources
-        saveDefaultResource("enchants.yml");
         super.onEnable();
         // Load Config
         this.config = new CivModCoreConfig(this);
@@ -68,14 +74,14 @@ public class CivModCorePlugin extends ACivMod {
             warning("Cannot get database from config.", error);
             this.database = null;
         }
-        if (!isFolia()) {
+        if (!PaperRuntime.isFolia()) {
             //Don't enable since folia doesn't support scoreboard
             ScoreBoardAPI.setDefaultHeader(this.config.getScoreboardHeader());
         }
         // Register listeners
         registerListener(new ClickableInventoryListener());
         registerListener(DialogManager.INSTANCE);
-        if (!isFolia()) {
+        if (!PaperRuntime.isFolia()) {
             //Don't enable since folia doesn't support scoreboard
             registerListener(new ScoreBoardListener());
         }
@@ -86,11 +92,11 @@ public class CivModCorePlugin extends ACivMod {
         this.commands.registerCommand(new ConfigCommand());
         this.commands.registerCommand(new StatCommand());
         this.commands.registerCommand(new ChunkMetaCommand());
-        this.commands.registerCommand(new DebugFoliaAsyncCommand(this));
+        this.commands.registerCommand(new FoliaTestCommand(this));
         // Load APIs
         EnchantUtils.loadEnchantAbbreviations();
         SpawnEggUtils.init();
-        if (!isFolia()) {
+        if (!PaperRuntime.isFolia()) {
             //Don't enable since folia doesn't support scoreboard
             BottomLineAPI.init();
         }
@@ -151,14 +157,4 @@ public class CivModCorePlugin extends ACivMod {
     public SkinCache getSkinCache() {
         return this.skinCache;
     }
-
-    public static boolean isFolia() {
-        try {
-            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
-
 }

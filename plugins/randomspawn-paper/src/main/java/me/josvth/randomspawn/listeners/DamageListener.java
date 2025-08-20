@@ -22,7 +22,7 @@ public class DamageListener implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player && event.getEntity().hasMetadata("lasttimerandomspawned") && !event.getCause().equals(DamageCause.SUICIDE)) {
-            if ((event.getEntity().getMetadata("lasttimerandomspawned").get(0).asLong() + (plugin.yamlHandler.config.getInt("nodamagetime", 5) * 1000)) > System.currentTimeMillis()) {
+            if ((event.getEntity().getMetadata("lasttimerandomspawned").get(0).asLong() + (plugin.configs.configYaml.getInt("nodamagetime", 5) * 1000)) > System.currentTimeMillis()) {
                 event.setCancelled(true);
             }
         }

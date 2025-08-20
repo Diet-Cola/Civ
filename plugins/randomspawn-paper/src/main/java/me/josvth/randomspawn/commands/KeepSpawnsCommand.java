@@ -2,8 +2,10 @@ package me.josvth.randomspawn.commands;
 
 import java.util.List;
 import me.josvth.randomspawn.RandomSpawn;
+import me.josvth.randomspawn.config.worlds.WorldConfig;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 
 public class KeepSpawnsCommand extends AbstractCommand {
 
@@ -17,29 +19,29 @@ public class KeepSpawnsCommand extends AbstractCommand {
         String worldname = player.getWorld().getName();
 
         if (args.size() == 0) {
-            if (plugin.yamlHandler.worlds.getBoolean(worldname + ".keeprandomspawns", false)) {
-                plugin.yamlHandler.worlds.set(worldname + ".keeprandomspawns", false);
+            if (plugin.configs.worlds.get(worldname) instanceof final WorldConfig config && config.keepRandomSpawn()) {
+                plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_KEEP_RANDOM_SPAWN), false);
                 plugin.playerInfo(player, "Keep random spawns is now disabled.");
-                plugin.yamlHandler.saveWorlds();
+                plugin.configs.saveWorldsFile();
                 return true;
             } else {
-                plugin.yamlHandler.worlds.set(worldname + ".keeprandomspawns", true);
+                plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_KEEP_RANDOM_SPAWN), true);
                 plugin.playerInfo(player, "Random Spawn will now save the spawn locations.");
-                plugin.yamlHandler.saveWorlds();
+                plugin.configs.saveWorldsFile();
                 return true;
             }
         }
         if (args.size() == 1) {
             if (args.get(0).matches("true")) {
-                plugin.yamlHandler.worlds.set(worldname + ".keeprandomspawns", true);
+                plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_KEEP_RANDOM_SPAWN), true);
                 plugin.playerInfo(player, "Random Spawn will now save the spawn locations.");
-                plugin.yamlHandler.saveWorlds();
+                plugin.configs.saveWorldsFile();
                 return true;
             }
             if (args.get(0).matches("false")) {
-                plugin.yamlHandler.worlds.set(worldname + ".keeprandomspawns", false);
+                plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_KEEP_RANDOM_SPAWN), false);
                 plugin.playerInfo(player, "Keep random spawns is now disabled.");
-                plugin.yamlHandler.saveWorlds();
+                plugin.configs.saveWorldsFile();
                 return true;
             }
         }

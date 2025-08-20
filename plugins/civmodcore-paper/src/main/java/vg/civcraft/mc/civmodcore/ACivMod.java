@@ -5,16 +5,14 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.java.JavaPluginLoader;
 import org.jetbrains.annotations.NotNull;
+import vg.civcraft.mc.civmodcore.async.VirtualExecutor;
 
 public abstract class ACivMod extends JavaPlugin {
 
@@ -42,6 +40,7 @@ public abstract class ACivMod extends JavaPlugin {
     @Override
     public void onDisable() {
         this.configClasses.forEach(ConfigurationSerialization::unregisterClass);
+        VirtualExecutor.stop(this);
     }
 
     /**
@@ -85,15 +84,19 @@ public abstract class ACivMod extends JavaPlugin {
         return new File(getDataFolder(), Objects.requireNonNull(path));
     }
 
-    /**
-     * Saves a default resource to the plugin's data folder if the file does not already exist.
-     *
-     * @param path The path to the default resource <i>AND</i> the data file.
-     */
-    public void saveDefaultResource(@NotNull final String path) {
-        if (!getDataFile(path).exists()) {
+    /// Saves a default resource to the plugin's data folder if the file doesn't already exist.
+    ///
+    /// @apiNote While [#saveResource(String, boolean)] exists, if you set "replace" to false, it will emit a warning
+    ///          that the file was not saved. Yes...? That was the point? So this exists to avoid that unnecessary
+    ///          warning. As the saying goes: if the alarm is always sounding, it's no longer an alarm.
+    public @NotNull File ensureDataFile(
+        final @NotNull String path
+    ) {
+        final var file = getDataFile(path);
+        if (!file.exists()) {
             saveResource(path, false);
         }
+        return file;
     }
 
     /**

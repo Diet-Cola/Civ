@@ -1,11 +1,14 @@
 package me.josvth.randomspawn.commands;
 
-import java.util.ArrayList;
 import java.util.List;
 import me.josvth.randomspawn.RandomSpawn;
+import me.josvth.randomspawn.config.worlds.RandomSpawnArea;
+import me.josvth.randomspawn.config.worlds.RespawnFlags;
+import me.josvth.randomspawn.config.worlds.WorldConfig;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 
 public class SetAreaCommand extends AbstractCommand {
 
@@ -36,14 +39,15 @@ public class SetAreaCommand extends AbstractCommand {
 
             String worldname = reference.getWorld().getName();
 
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.x-min", xmin);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.x-max", xmax);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.z-min", zmin);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.z-max", zmax);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MIN_X), xmin);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MAX_X), xmax);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MIN_Z), zmin);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MAX_Z), zmax);
 
-            plugin.yamlHandler.worlds.set(worldname + ".randomspawnenabled", true);
+            // TODO: What?
+            plugin.configs.worldsYaml.set(worldname + ".randomspawnenabled", true);
 
-            plugin.yamlHandler.saveWorlds();
+            plugin.configs.saveWorldsFile();
 
             plugin.playerInfo(player, "Spawn area set!");
 
@@ -68,25 +72,22 @@ public class SetAreaCommand extends AbstractCommand {
 
             String worldname = reference.getWorld().getName();
 
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.x-min", xmin);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.x-max", xmax);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.z-min", zmin);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.z-max", zmax);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MIN_X), xmin);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MAX_X), xmax);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MIN_Z), zmin);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MAX_Z), zmax);
 
-            List<String> rsflags = new ArrayList<String>();
-            rsflags.add("respawn");
-
-            plugin.yamlHandler.worlds.set(worldname + ".randomspawnon", rsflags);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_RANDOM_SPAWN_ON, RespawnFlags.KEY_REVIVE_WITHOUT_BED), true);
 
             if (args.get(0).matches("circle")) {
-                plugin.yamlHandler.worlds.set(worldname + ".spawnarea.type", "circle");
+                plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_TYPE), RandomSpawnArea.KEY_CIRCLE_TYPE);
             } else {
-                plugin.yamlHandler.worlds.set(worldname + ".spawnarea.type", "square");
+                plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_TYPE), RandomSpawnArea.KEY_SQUARE_TYPE);
             }
 
             plugin.playerInfo(player, "Spawn area set!");
 
-            plugin.yamlHandler.saveWorlds();
+            plugin.configs.saveWorldsFile();
 
             return true;
         }
@@ -108,17 +109,14 @@ public class SetAreaCommand extends AbstractCommand {
 
             String worldname = reference.getWorld().getName();
 
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.x-min", xmin);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.x-max", xmax);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.z-min", zmin);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.z-max", zmax);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MIN_X), xmin);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MAX_X), xmax);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MIN_Z), zmin);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MAX_Z), zmax);
 
-            List<String> rsflags = new ArrayList<String>();
-            rsflags.add("respawn");
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_RANDOM_SPAWN_ON, RespawnFlags.KEY_REVIVE_WITHOUT_BED), true);
 
-            plugin.yamlHandler.worlds.set(worldname + ".randomspawnon", rsflags);
-
-            plugin.yamlHandler.saveWorlds();
+            plugin.configs.saveWorldsFile();
 
             plugin.playerInfo(player, "Spawn area set!");
 
@@ -142,17 +140,14 @@ public class SetAreaCommand extends AbstractCommand {
 
             String worldname = reference.getWorld().getName();
 
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.x-min", xmin);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.x-max", xmax);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.z-min", zmin);
-            plugin.yamlHandler.worlds.set(worldname + ".spawnarea.z-max", zmax);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MIN_X), xmin);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MAX_X), xmax);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MIN_Z), zmin);
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_AREA, RandomSpawnArea.KEY_SQUARE_MAX_Z), zmax);
 
-            List<String> rsflags = new ArrayList<String>();
-            rsflags.add("respawn");
+            plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_RANDOM_SPAWN_ON, RespawnFlags.KEY_REVIVE_WITHOUT_BED), true);
 
-            plugin.yamlHandler.worlds.set(worldname + ".randomspawnon", rsflags);
-
-            plugin.yamlHandler.saveWorlds();
+            plugin.configs.saveWorldsFile();
 
             plugin.playerInfo(player, "Spawn area set!");
 

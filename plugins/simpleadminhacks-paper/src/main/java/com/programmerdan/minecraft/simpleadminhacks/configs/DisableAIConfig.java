@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import vg.civcraft.mc.civmodcore.config.ConfigHelper;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 import vg.civcraft.mc.civmodcore.utilities.CivLogger;
 
 public final class DisableAIConfig extends SimpleHackConfig {
@@ -36,7 +36,7 @@ public final class DisableAIConfig extends SimpleHackConfig {
                 this.logger.warning("EntityType [" + entityType.name() + "] is not alive.");
                 continue;
             }
-            final List<String> rawSpecifiedReasons = ConfigHelper.getStringList(config, entityType.name());
+            final List<String> rawSpecifiedReasons = ConfigHelpers.getStringList(config, entityType.name());
             rawSpecifiedReasons.removeIf(StringUtils::isBlank);
             if (CollectionUtils.isEmpty(rawSpecifiedReasons)) {
                 this.logger.warning("EntityType [" + entityType.name() + "] did not specify any spawn reasons; " +

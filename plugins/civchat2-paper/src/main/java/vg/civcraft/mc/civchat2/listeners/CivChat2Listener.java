@@ -19,7 +19,7 @@ import vg.civcraft.mc.civchat2.CivChat2Manager;
 import vg.civcraft.mc.civchat2.database.CivChatDAO;
 import vg.civcraft.mc.civchat2.event.GlobalChatEvent;
 import vg.civcraft.mc.civchat2.utility.CivChat2SettingsManager;
-import vg.civcraft.mc.civmodcore.CivModCorePlugin;
+import vg.civcraft.mc.civmodcore.async.PaperRuntime;
 import vg.civcraft.mc.namelayer.GroupManager;
 import vg.civcraft.mc.namelayer.GroupManager.PlayerType;
 import vg.civcraft.mc.namelayer.NameAPI;
@@ -86,7 +86,7 @@ public class CivChat2Listener implements Listener {
         }
 
         // Set current chat group in scoreboard
-        if (!CivModCorePlugin.isFolia()) {
+        if (!PaperRuntime.isFolia()) {
             chatman.getScoreboardHUD().updateScoreboardHUD(playerJoinEvent.getPlayer());
             chatman.getScoreboardHUD().updateAFKScoreboardHUD(playerJoinEvent.getPlayer());
         }

@@ -11,13 +11,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
-import vg.civcraft.mc.civmodcore.CivModCorePlugin;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import vg.civcraft.mc.civmodcore.async.PaperRuntime;
 
 public class AllyHandler implements Listener {
 
@@ -32,7 +32,7 @@ public class AllyHandler implements Listener {
 
     public AllyHandler(boolean enabled, boolean seeInvisAlly, boolean animateLinkedEnabled, double animateLinkedMaxDistance, SQLite sqlite) {
         this.enabled = enabled;
-        if (CivModCorePlugin.isFolia()) {
+        if (PaperRuntime.isFolia()) {
             this.enabled = false;
         }
         this.seeInvisAlly = seeInvisAlly;
@@ -73,7 +73,7 @@ public class AllyHandler implements Listener {
         }
 
         Bukkit.getGlobalRegionScheduler().runAtFixedRate(Finale.getPlugin(), task -> {
-            if (CivModCorePlugin.isFolia()) {
+            if (PaperRuntime.isFolia()) {
                 return;
             }
             for (Map.Entry<UUID, Set<UUID>> entry : playerAllies.entrySet()) {

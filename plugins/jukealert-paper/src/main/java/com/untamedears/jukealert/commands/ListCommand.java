@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.command.CommandSender;
@@ -66,22 +65,26 @@ public class ListCommand extends BaseCommand {
         }
         player.sendMessage(ChatColor.GREEN + "Retrieving snitches for a total of " + groupNames.size()
             + " group instances. This may take a moment.");
-        JukeAlert.getInstance().getTaskChainFactory().newChain()
-            .async((unused) -> JukeAlert.getInstance().getDAO().loadSnitchesByGroupID(groupIds).parallel()
-                .map((snitch) -> {
-                    final DormantCullingAppender appender = snitch.getAppender(DormantCullingAppender.class);
-                    if (appender == null) {
-                        return null;
-                    }
-                    return new SnitchCache(snitch, appender.getTimeUntilCulling());
-                })
-                .filter(Objects::nonNull)
-                .sorted(Comparator.comparingLong((entry) -> entry.timeUntilCulling))
-                .map((entry) -> entry.snitch)
-                .collect(Collectors.toList()))
-            .syncLast((snitches) -> new SnitchOverviewGUI(player, snitches, "Your snitches",
-                player.hasPermission("jukealert.admin")).showScreen())
-            .execute();
+
+        final List<Snitch> snitches = JukeAlert.getInstance().getDAO().loadSnitchesByGroupID(groupIds).parallel()
+            .map((snitch) -> {
+                final DormantCullingAppender appender = snitch.getAppender(DormantCullingAppender.class);
+                if (appender == null) {
+                    return null;
+                }
+                return new SnitchCache(snitch, appender.getTimeUntilCulling());
+            })
+            .filter(Objects::nonNull)
+            .sorted(Comparator.comparingLong((entry) -> entry.timeUntilCulling))
+            .map((entry) -> entry.snitch)
+            .toList();
+
+        new SnitchOverviewGUI(
+            player,
+            snitches,
+            "Your snitches",
+            player.hasPermission("jukealert.admin")
+        ).showScreen();
     }
 
     private static class SnitchCache {

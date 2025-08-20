@@ -5,8 +5,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Utility class that fills in the gaps of {@link MapUtils}.
@@ -14,7 +18,6 @@ import org.apache.commons.lang3.ArrayUtils;
  * @author Protonull
  */
 public final class MoreMapUtils {
-
     /**
      * Determines whether a Map Entry is valid in that it exists and so does the key and value.
      *
@@ -137,6 +140,17 @@ public final class MoreMapUtils {
         }
     }
 
+    /// This differs from [Map#putIfAbsent(Object, Object)] as that allows assigned-nulls, as in, if the map contains
+    /// a key mapped to null, then that's not considered "absent". This function treats all null-values as absent.
+    @Contract("_, _, !null -> !null")
+    public static <K, V> @Nullable V putIfAbsent(
+        final @NotNull Map<K, V> map,
+        final K key,
+        final @NotNull Supplier<V> valueGetter
+    ) {
+        return map.compute(key, (_key, currentValue) -> currentValue == null ? valueGetter.get() : currentValue);
+    }
+
     /**
      * @param <T> The type of the map's values.
      * @return Returns a new TreeMap with a String keys that are <b>NOT</b> case sensitive.
@@ -144,5 +158,4 @@ public final class MoreMapUtils {
     public static <T> TreeMap<String, T> newStringKeyMap() {
         return new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     }
-
 }

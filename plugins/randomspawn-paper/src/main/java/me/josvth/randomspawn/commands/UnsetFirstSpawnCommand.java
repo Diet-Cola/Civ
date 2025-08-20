@@ -2,8 +2,10 @@ package me.josvth.randomspawn.commands;
 
 import java.util.List;
 import me.josvth.randomspawn.RandomSpawn;
+import me.josvth.randomspawn.config.worlds.WorldConfig;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 
 public class UnsetFirstSpawnCommand extends AbstractCommand {
 
@@ -14,11 +16,8 @@ public class UnsetFirstSpawnCommand extends AbstractCommand {
     public boolean onCommand(CommandSender sender, List<String> args) {
         Player player = (Player) sender;
         String worldname = player.getWorld().getName();
-        if (plugin.yamlHandler.worlds.contains((worldname + ".firstspawn"))) {
-
-            plugin.yamlHandler.worlds.set(worldname + ".firstspawn", null);
-
-            plugin.yamlHandler.saveWorlds();
+        if (ConfigHelpers.remove(plugin.configs.worldsYaml, ConfigHelpers.pathOf(worldname, WorldConfig.KEY_FIRST_SPAWN))) {
+            plugin.configs.saveWorldsFile();
 
             plugin.playerInfo(player, "The first spawn location of this world is removed!");
             plugin.playerInfo(player, "Now refering to world spawn.");

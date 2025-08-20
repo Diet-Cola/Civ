@@ -2,6 +2,7 @@ package me.josvth.randomspawn.commands;
 
 import java.util.List;
 import me.josvth.randomspawn.RandomSpawn;
+import me.josvth.randomspawn.config.worlds.WorldConfig;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -54,11 +55,11 @@ public class SpawnCommand extends AbstractCommand {
 
         target.setMetadata("lasttimerandomspawned", new FixedMetadataValue(plugin, System.currentTimeMillis()));
 
-        if (plugin.yamlHandler.worlds.getBoolean(world.getName() + ".keeprandomspawns", false))
+        if (plugin.configs.worlds.get(world.getName()) instanceof final WorldConfig config && config.keepRandomSpawn())
             target.setBedSpawnLocation(spawn);
 
-        if (plugin.yamlHandler.config.getString("messages.randomspawned") != null)
-            target.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.yamlHandler.config.getString("messages.randomspawned")));
+        if (plugin.configs.configYaml.getString("messages.randomspawned") != null)
+            target.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.configs.configYaml.getString("messages.randomspawned")));
 
         if (target != sender)
             sender.sendMessage("Player: " + target.getName() + " was random teleported!");

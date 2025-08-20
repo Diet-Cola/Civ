@@ -2,9 +2,8 @@ name: RandomSpawn
 version: ${version}
 main: me.josvth.randomspawn.RandomSpawn
 author: Josvth
-depend: [ BanStick ]
 softdepend: [ Bastion ]
-api-version: 1.21.3
+api-version: 1.21.8
 folia-supported: true
 commands:
   randomspawn:

@@ -2,6 +2,8 @@ package vg.civcraft.mc.civmodcore.world;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,7 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.IntegerRange;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -24,6 +28,9 @@ import org.bukkit.block.data.type.Chest;
 import org.bukkit.block.data.type.Switch;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 import vg.civcraft.mc.civmodcore.inventory.items.MaterialUtils;
 import vg.civcraft.mc.civmodcore.utilities.NullUtils;
 
@@ -210,8 +217,8 @@ public final class WorldUtils {
             return false;
         }
         final World world = Objects.requireNonNull(location.getWorld());
-        final int chunkX = location.getBlockX() >> 4;
-        final int chunkZ = location.getBlockZ() >> 4;
+        final int chunkX = blockToChunkPos(location.getBlockX());
+        final int chunkZ = blockToChunkPos(location.getBlockZ());
         return world.isChunkLoaded(chunkX, chunkZ);
     }
 
@@ -225,7 +232,7 @@ public final class WorldUtils {
      * @return Returns the loaded block, or null.
      */
     public static Block getLoadedBlock(final World world, final int x, final int y, final int z) {
-        if (!isChunkLoaded(world, x >> 4, z >> 4)) {
+        if (!isChunkLoaded(world, blockToChunkPos(x), blockToChunkPos(z))) {
             return null;
         }
         return world.getBlockAt(x, y, z);
@@ -520,5 +527,134 @@ public final class WorldUtils {
             && switch (block.getType()) { case WATER, LAVA -> true; default -> false; }
             && block.getBlockData() instanceof final Levelled levelled
             && levelled.getLevel() == 0;
+    }
+
+    /// @param blockPos The blockX or blockZ position
+    public static int blockToChunkPos(
+        final int blockPos
+    ) {
+        return blockPos >> 4;
+    }
+
+    public static @Range(from = 0, to = 15) int blockToInternalChunkPos(
+        final int blockPos
+    ) {
+        return blockPos & 0x0F;
+    }
+
+    /// Convenience shortcut
+    /// @param blockPos The blockX or blockZ position
+    public static int blockToChunkPos(
+        final double blockPos
+    ) {
+        return blockToChunkPos(Location.locToBlock(blockPos));
+    }
+
+    /// @param chunkPos The chunkX or chunkZ position
+    /// @param offset The internal-chunk X or Z offset (0-15)
+    public static int chunkToBlockPos(
+        final int chunkPos,
+        final @Range(from = 0, to = 15) int offset
+    ) {
+        return (chunkPos << 4) + offset;
+    }
+
+    /// Attempts to find a suitable spawn position within a given chunk, checking all columns.
+    ///
+    /// @return Returns the foot location, not the floor-block location. Or null.
+    ///
+    /// @apiNote This uses [#isValidSpawn(Block, Block, Block, Set)] to find the spawn location.
+    public static @Nullable Location findValidSpawnInChunk(
+        final @NotNull Chunk chunk,
+        final @NotNull IntegerRange buildHeight,
+        final boolean scanFromTop,
+        final @NotNull Set<@NotNull Material> blacklist
+    ) {
+        final IntList blocksX = new IntArrayList(new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+        final IntList blocksZ = new IntArrayList(new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+        Collections.shuffle(blocksX, ThreadLocalRandom.current());
+        Collections.shuffle(blocksZ, ThreadLocalRandom.current());
+        for (final int blockX : blocksX) for (final int blockZ : blocksZ) {
+            final Location location = WorldUtils.findValidSpawnInColumn(
+                chunk,
+                blockX,
+                blockZ,
+                buildHeight,
+                scanFromTop,
+                blacklist
+            );
+            if (location == null) {
+                continue;
+            }
+            return location;
+        }
+        return null;
+    }
+
+    /// Attempts to find a suitable spawn position within a given chunk column.
+    ///
+    /// @return Returns the foot location, not the floor-block location. Or null.
+    ///
+    /// @apiNote This uses [#isValidSpawn(Block, Block, Block, Set)] to find the spawn location.
+    public static @Nullable Location findValidSpawnInColumn(
+        final @NotNull Chunk chunk,
+        final @Range(from = 0, to = 15) int internalBlockX,
+        final @Range(from = 0, to = 15) int internalBlockZ,
+        final @NotNull IntegerRange buildHeight,
+        final boolean scanFromTop,
+        final @NotNull Set<@NotNull Material> blacklist
+    ) {
+        boolean found = false;
+        Block floorBlock, feetBlock, headBlock;
+        if (scanFromTop) {
+            floorBlock = chunk.getBlock(internalBlockX, buildHeight.getMaximum(), internalBlockZ);
+            feetBlock = floorBlock.getRelative(0, 1, 0);
+            headBlock = floorBlock.getRelative(0, 2, 0);
+            while (floorBlock.getY() >= buildHeight.getMinimum()) {
+                if (isValidSpawn(headBlock, feetBlock, floorBlock, blacklist)) {
+                    found = true;
+                    break;
+                }
+                final Block nextBlock = floorBlock.getRelative(0, -1, 0);
+                headBlock = feetBlock;
+                feetBlock = floorBlock;
+                floorBlock = nextBlock;
+            }
+        }
+        else {
+            floorBlock = chunk.getBlock(internalBlockX, buildHeight.getMinimum(), internalBlockZ);
+            feetBlock = floorBlock.getRelative(0, 1, 0);
+            headBlock = floorBlock.getRelative(0, 2, 0);
+            while (floorBlock.getY() <= buildHeight.getMaximum()) {
+                if (isValidSpawn(headBlock, feetBlock, floorBlock, blacklist)) {
+                    found = true;
+                    break;
+                }
+                final Block nextBlock = headBlock.getRelative(0, 1, 0);
+                floorBlock = feetBlock;
+                feetBlock = headBlock;
+                headBlock = nextBlock;
+            }
+        }
+        if (!found) {
+            return null;
+        }
+        return feetBlock.getLocation().toCenterLocation();
+    }
+
+    /**
+     * This is a 1x3 area predicate where the bottom-most block (ie the "floorBlock") must be solid, and the two blocks
+     * above it must not be solid. This function defers to Minecraft what "solid" means. See {@link Block#isSolid()} for
+     * more information there. Also, all blocks must not be made of blacklisted materials.
+     */
+    public static boolean isValidSpawn(
+        final @NotNull Block headBlock,
+        final @NotNull Block feetBlock,
+        final @NotNull Block floorBlock,
+        final @NotNull Set<@NotNull Material> blacklist
+    ) {
+        return floorBlock.isSolid() && !blacklist.contains(floorBlock.getType())
+            && !feetBlock.isSolid() && !blacklist.contains(feetBlock.getType())
+            && !headBlock.isSolid() && !blacklist.contains(headBlock.getType());
     }
 }

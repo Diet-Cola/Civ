@@ -2,8 +2,12 @@ package me.josvth.randomspawn.commands;
 
 import java.util.List;
 import me.josvth.randomspawn.RandomSpawn;
+import me.josvth.randomspawn.config.worlds.FirstSpawn;
+import me.josvth.randomspawn.config.worlds.RespawnFlags;
+import me.josvth.randomspawn.config.worlds.WorldConfig;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import vg.civcraft.mc.civmodcore.config.ConfigHelpers;
 
 public class SetFirstSpawnCommand extends AbstractCommand {
 
@@ -23,24 +27,16 @@ public class SetFirstSpawnCommand extends AbstractCommand {
         double yaw = (double) player.getLocation().getYaw();
         double pitch = (double) player.getLocation().getPitch();
 
-        plugin.yamlHandler.worlds.set(worldname + ".firstspawn.x", x);
-        plugin.yamlHandler.worlds.set(worldname + ".firstspawn.y", y);
-        plugin.yamlHandler.worlds.set(worldname + ".firstspawn.z", z);
-        plugin.yamlHandler.worlds.set(worldname + ".firstspawn.yaw", yaw);
-        plugin.yamlHandler.worlds.set(worldname + ".firstspawn.pitch", pitch);
+        plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_FIRST_SPAWN, FirstSpawn.KEY_X), x);
+        plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_FIRST_SPAWN, FirstSpawn.KEY_Y), y);
+        plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_FIRST_SPAWN, FirstSpawn.KEY_Z), z);
+        plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_FIRST_SPAWN, FirstSpawn.KEY_YAW), yaw);
+        plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_FIRST_SPAWN, FirstSpawn.KEY_PITCH), pitch);
 
-        List<String> randomSpawnOn = plugin.yamlHandler.worlds.getStringList(worldname + ".randomspawnon");
-        if (randomSpawnOn != null && randomSpawnOn.contains("firstjoin")) {
-            randomSpawnOn.remove("firstjoin");
-            plugin.yamlHandler.worlds.set(worldname + ".randomspawnon", randomSpawnOn);
-        }
-        List<String> spawnPointsOn = plugin.yamlHandler.worlds.getStringList(worldname + ".spawnpointson");
-        if (spawnPointsOn != null && spawnPointsOn.contains("firstjoin")) {
-            spawnPointsOn.remove("firstjoin");
-            plugin.yamlHandler.worlds.set(worldname + ".spawnpointson", spawnPointsOn);
-        }
+        plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_RANDOM_SPAWN_ON, RespawnFlags.KEY_FIRST_JOIN), false);
+        plugin.configs.worldsYaml.set(ConfigHelpers.pathOf(worldname, WorldConfig.KEY_SPAWN_POINT_ON, RespawnFlags.KEY_FIRST_JOIN), false);
 
-        plugin.yamlHandler.saveWorlds();
+        plugin.configs.saveWorldsFile();
 
         plugin.playerInfo(player, "First spawn location set!");
         plugin.playerInfo(player, "Random spawning on first join is now disabled!");
