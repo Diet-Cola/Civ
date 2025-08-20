@@ -2,7 +2,7 @@ plugins {
     id("io.papermc.paperweight.userdev")
 }
 
-version = "2.0.2"
+version = "2.0.2-F"
 
 dependencies {
     paperweight {

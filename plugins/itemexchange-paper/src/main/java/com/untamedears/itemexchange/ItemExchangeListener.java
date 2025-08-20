@@ -20,6 +20,7 @@ import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.WallSign;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -221,28 +222,33 @@ public final class ItemExchangeListener implements Listener {
         }
         CraftingInventory inventory = event.getInventory();
         inventory.setResult(null);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemExchangePlugin.getInstance(), () -> {
-            final var rules = new ArrayList<ExchangeRule>();
-            for (final ItemStack item : inventory.getMatrix()) {
-                if (!ItemUtils.isValidItem(item)) {
-                    continue;
-                }
-                ExchangeRule exchangeRule = ExchangeRule.fromItem(item);
-                if (Validation.checkValidity(exchangeRule)) {
-                    rules.add(exchangeRule);
-                    continue;
-                }
-                BulkExchangeRule bulkRule = BulkExchangeRule.fromItem(item);
-                if (Validation.checkValidity(bulkRule)) {
-                    rules.addAll(bulkRule.rules());
-                    continue;
-                }
-                return;
+        for (final HumanEntity viewer : inventory.getViewers()) {
+            if (!(viewer instanceof final Player player)) {
+                continue;
             }
-            final var rule = new BulkExchangeRule(rules);
-            inventory.setResult(rule.toItem());
-            InventoryUtils.getViewingPlayers(inventory).forEach(Player::updateInventory);
-        });
+            player.getScheduler().runDelayed(ItemExchangePlugin.getInstance(), (task) -> {
+                final var rules = new ArrayList<ExchangeRule>();
+                for (final ItemStack item : inventory.getMatrix()) {
+                    if (!ItemUtils.isValidItem(item)) {
+                        continue;
+                    }
+                    ExchangeRule exchangeRule = ExchangeRule.fromItem(item);
+                    if (Validation.checkValidity(exchangeRule)) {
+                        rules.add(exchangeRule);
+                        continue;
+                    }
+                    BulkExchangeRule bulkRule = BulkExchangeRule.fromItem(item);
+                    if (Validation.checkValidity(bulkRule)) {
+                        rules.addAll(bulkRule.rules());
+                        continue;
+                    }
+                    return;
+                }
+                final var rule = new BulkExchangeRule(rules);
+                inventory.setResult(rule.toItem());
+                player.updateInventory();
+            }, null, 1L);
+        }
     }
 
     /**

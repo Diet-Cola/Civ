@@ -153,7 +153,7 @@ public final class Utilities {
                     button.setPowered(true);
                     buttonBlock.setBlockData(button);
                     // Wait to de-power the block
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(ItemExchangePlugin.getInstance(), () -> {
+                    Bukkit.getRegionScheduler().runDelayed(ItemExchangePlugin.getInstance(), buttonBlock.getLocation(), (task) -> {
                         final Block newBlock = buttonBlock.getLocation().getBlock(); // Refresh block
                         if (!(newBlock.getBlockData() instanceof Switch newButton)
                             || !button.matches(newButton)) {
