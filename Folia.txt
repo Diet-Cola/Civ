@@ -2,6 +2,9 @@ Folia notes:
 
 General:
 - All tick based schedulers are running faster due to being in ms rather than tick delays
+- PlayerRespawnEvent does not fire
+- PlayerTeleportEvent probably doesnt fire
+- Diagnose all non-working events and either make alternative or work around lack of implementation
 
 CMC:
 - [11:04:07 INFO]: UUID of player Diet_Cola is 638af9c6-c734-45d9-b092-13a4e184f7f6
@@ -58,7 +61,4 @@ RandomSpawn:
           at java.base/java.lang.Thread.run(Thread.java:1583) ~[?:?]
 CTP:
 - See FOLIA comment
-
-SAH:
-- AutoRespawnHack - PlayerRespawnEvent isnt fired on folia
 
