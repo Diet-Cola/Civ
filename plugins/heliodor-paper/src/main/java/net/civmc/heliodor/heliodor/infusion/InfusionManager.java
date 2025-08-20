@@ -24,7 +24,7 @@ public class InfusionManager {
     private final List<CauldronInfusion> infusions = new ArrayList<>();
 
     public InfusionManager() {
-        Bukkit.getScheduler().runTaskTimer(JavaPlugin.getPlugin(HeliodorPlugin.class), () -> {
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(JavaPlugin.getPlugin(HeliodorPlugin.class), task -> {
             try {
                 this.tickInfusionParticles();
             } catch (RuntimeException e) {

@@ -66,7 +66,7 @@ public class HeliodorDebugCommand implements CommandExecutor {
                     player.sendMessage(Component.text("Invalid meteoric iron config. Cannot spawn"));
                     return true;
                 }
-                Bukkit.getScheduler().runTaskAsynchronously(JavaPlugin.getPlugin(HeliodorPlugin.class), () -> {
+                Bukkit.getAsyncScheduler().runNow(JavaPlugin.getPlugin(HeliodorPlugin.class), task -> {
                     if (!spawner.trySpawnMeteoricIron()) {
                         player.sendMessage(Component.text("Spawn attempt failed. Try again?"));
                     } else {

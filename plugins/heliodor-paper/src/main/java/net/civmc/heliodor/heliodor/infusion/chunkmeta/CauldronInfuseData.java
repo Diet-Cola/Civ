@@ -21,7 +21,7 @@ public class CauldronInfuseData extends TableBasedBlockChunkMeta<CauldronInfusio
 
     @Override
     public void handleChunkCacheReuse() {
-        Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(HeliodorPlugin.class),
+        Bukkit.getRegionScheduler().execute(JavaPlugin.getPlugin(HeliodorPlugin.class), chunkCoord.getWorld(), chunkCoord.getX(), chunkCoord.getZ(),
             () -> iterateAll(o -> {
                 infusions.add((CauldronInfusion) o);
                 if (!infusionManager.addInfusion((CauldronInfusion) o)) {
@@ -32,7 +32,7 @@ public class CauldronInfuseData extends TableBasedBlockChunkMeta<CauldronInfusio
 
     @Override
     public void handleChunkUnload() {
-        Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(HeliodorPlugin.class),
+        Bukkit.getRegionScheduler().execute(JavaPlugin.getPlugin(HeliodorPlugin.class), chunkCoord.getWorld(), chunkCoord.getX(), chunkCoord.getZ(),
             () -> {
                 infusionManager.removeInfusions(infusions);
                 infusions.clear();

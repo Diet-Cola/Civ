@@ -71,7 +71,6 @@ public class HeliodorPlugin extends ACivMod {
             if (!database.updateDatabase()) {
                 Bukkit.shutdown();
             }
-            this.veinCache.load();
 
             Supplier<CauldronInfuseData> newData = () -> new CauldronInfuseData(false, dao, infusionManager);
             this.chunkMetaView = ChunkMetaAPI.registerBlockBasedPlugin(this, newData, dao, true);
@@ -80,7 +79,7 @@ public class HeliodorPlugin extends ACivMod {
             getServer().getPluginManager().registerEvents(new InfusionListener(infusionManager, chunkMetaView), this);
         }
 
-        Bukkit.getScheduler().runTaskTimer(this, this.recipes, 15 * 20, 15 * 20);
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, task -> this.recipes.run(), 15 * 20, 15 * 20);
 
         getCommand("heliodor").setExecutor(new HeliodorDebugCommand(veinCache, veinSpawner, oreLocationsKey));
 
@@ -131,6 +130,7 @@ public class HeliodorPlugin extends ACivMod {
         SqlVeinDao veinDao = new SqlVeinDao(database);
         veinDao.registerMigrations();
         veinCache = new VeinCache(this, veinDao);
+        this.veinCache.load();
         oreLocationsKey = new NamespacedKey(this, "ore_locations");
         getServer().getPluginManager().registerEvents(new OreBreakListener(oreLocationsKey), this);
         getServer().getPluginManager().registerEvents(new VeinBreakListener(oreLocationsKey, veinCache), this);

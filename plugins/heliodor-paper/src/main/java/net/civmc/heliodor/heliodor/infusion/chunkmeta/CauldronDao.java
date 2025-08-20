@@ -169,7 +169,8 @@ public class CauldronDao extends TableStorageEngine<CauldronInfusion> {
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Failed to load cauldron from db: ", e);
         }
-        Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(HeliodorPlugin.class), () -> {
+        Bukkit.getRegionScheduler().execute(JavaPlugin.getPlugin(HeliodorPlugin.class), chunkData.getChunkCoord().getWorld(), chunkData.getChunkCoord().getX(), chunkData.getChunkCoord().getZ(),
+            () -> {
             for (CauldronInfusion infusion : toUpdate) {
                 if (infusion.getCacheState() == CacheState.DELETED) {
                     continue;
