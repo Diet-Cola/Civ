@@ -2,6 +2,8 @@ package me.josvth.randomspawn.listeners;
 
 import java.util.List;
 import me.josvth.randomspawn.RandomSpawn;
+import me.josvth.randomspawn.RandomSpawnUtils;
+import me.josvth.randomspawn.config.worlds.WorldConfig;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -9,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 
 public class WorldChangeListener implements Listener {
 
@@ -34,13 +35,16 @@ public class WorldChangeListener implements Listener {
         World from = event.getFrom();
         World to = player.getWorld();
 
+        WorldConfig toConfig = plugin.configs.worlds.get(to.getName());
+        if (toConfig == null) {
+            plugin.logDebug("Could not find WorldConfig for " + to.getName());
+        }
+
         final Location bedLocation = player.getRespawnLocation();
         if (bedLocation != null && to.equals(bedLocation.getWorld()))
             return; // players bed is in this world
 
-        List<String> randomSpawnFlags = plugin.configs.worldsYaml.getStringList(to.getName() + ".randomspawnon");
-
-        if (randomSpawnFlags.contains("teleport-from-" + from.getName())) {
+        if (toConfig.randomSpawnOn().teleportsFrom().contains(from.getName())) {
 
             Location spawnLocation = plugin.getSpawnSelector().getRandomSpawn(to);
 
@@ -49,11 +53,11 @@ public class WorldChangeListener implements Listener {
                 return;
             }
 
-            player.teleportAsync(spawnLocation.add(0, 5, 0));
+            player.teleportAsync(spawnLocation);
 
-            player.setMetadata("lasttimerandomspawned", new FixedMetadataValue(plugin, System.currentTimeMillis()));
+            RandomSpawnUtils.setLastTimeRandomSpawned(plugin, player, System.currentTimeMillis());
 
-            if (plugin.configs.worldsYaml.getBoolean(to.getName() + ".keeprandomspawns", false)) {
+            if (toConfig.keepRandomSpawn()) {
                 player.setBedSpawnLocation(spawnLocation);
             }
 

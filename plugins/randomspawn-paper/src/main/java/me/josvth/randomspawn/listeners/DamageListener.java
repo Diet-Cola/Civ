@@ -1,6 +1,7 @@
 package me.josvth.randomspawn.listeners;
 
 import me.josvth.randomspawn.RandomSpawn;
+import me.josvth.randomspawn.RandomSpawnUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,8 +22,8 @@ public class DamageListener implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player && event.getEntity().hasMetadata("lasttimerandomspawned") && !event.getCause().equals(DamageCause.SUICIDE)) {
-            if ((event.getEntity().getMetadata("lasttimerandomspawned").get(0).asLong() + (plugin.configs.configYaml.getInt("nodamagetime", 5) * 1000)) > System.currentTimeMillis()) {
+        if (event.getEntity() instanceof Player player && RandomSpawnUtils.hasLastTimeRandomSpawned(player) && !event.getCause().equals(DamageCause.SUICIDE)) {
+            if ((RandomSpawnUtils.getLastTimeRandomSpawned(player) + (plugin.configs.config.damageImmunityPeriod() * 1000)) > System.currentTimeMillis()) {
                 event.setCancelled(true);
             }
         }

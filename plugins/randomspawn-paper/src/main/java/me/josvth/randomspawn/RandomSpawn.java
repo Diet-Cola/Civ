@@ -58,7 +58,7 @@ public final class RandomSpawn extends ACivMod {
     }
 
     public void logDebug(String message) {
-        if (configs.configYaml.getBoolean("debug", false)) {
+        if (configs.config.debug()) {
             getLogger().info("(DEBUG) " + message);
         }
     }

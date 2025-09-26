@@ -2,6 +2,7 @@ package me.josvth.randomspawn.listeners;
 
 import me.josvth.randomspawn.RandomSpawn;
 import me.josvth.randomspawn.RandomSpawnUtils;
+import me.josvth.randomspawn.config.worlds.WorldConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -32,7 +33,7 @@ public class SignListener implements Listener {
             if (Tag.WALL_SIGNS.isTagged(mat)) {
                 Sign sign = (Sign) event.getClickedBlock().getState();
                 final Player player = event.getPlayer();
-                if (sign.getLine(0).equalsIgnoreCase(plugin.configs.configYaml.getString("rs-sign-text", "[RandomSpawn]"))) {
+                if (sign.getLine(0).equalsIgnoreCase(plugin.configs.config.signText())) {
 
                     if (player.hasPermission("RandomSpawn.usesign")) {
 
@@ -53,11 +54,17 @@ public class SignListener implements Listener {
                             return;
                         }
 
-                        player.teleportAsync(spawnLocation.add(0, 5, 0));
+                        player.teleportAsync(spawnLocation);
 
                         RandomSpawnUtils.setLastTimeRandomSpawned(this.plugin, player, System.currentTimeMillis());
 
-                        if (plugin.configs.worldsYaml.getBoolean(world.getName() + ".keeprandomspawns", false)) {
+                        WorldConfig config = plugin.configs.worlds.get(worldName);
+                        if (config == null) {
+                            plugin.logDebug("WorldConfig couldn't be found for world: " + worldName);
+                            return;
+                        }
+
+                        if (config.keepRandomSpawn()) {
                             player.setBedSpawnLocation(spawnLocation);
                         }
 
@@ -75,7 +82,7 @@ public class SignListener implements Listener {
 
     @EventHandler
     public void onPlayerSignPlace(SignChangeEvent event) {
-        if (event.getLine(0).equalsIgnoreCase(plugin.configs.configYaml.getString("rs-sign-text", "[RandomSpawn]"))) {
+        if (event.getLine(0).equalsIgnoreCase(plugin.configs.config.signText())) {
             Player player = event.getPlayer();
             if (player.hasPermission("RandomSpawn.placesign")) {
                 this.plugin.playerInfo(player, "Random Spawn Sign created!");

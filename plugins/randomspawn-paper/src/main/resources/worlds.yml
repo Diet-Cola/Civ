@@ -1,14 +1,23 @@
 #edit the following example world to your preferences
 #remember to change 'exampleworld' into your world name
 exampleworld:
+  #Respawn Flags which determine when a player is random spawned.
   randomspawnon:
+    #Used where the player does NOT have a respawn anchor or bed spawn set
     reviveWithoutBed: true
+    # Used where the player DOES have a respawn anchor or bed spawn set
     reviveWithBed: true
+    #On first join
     firstJoin: true
+  # Keeps random spawning players
   keeprandomspawns: false
+  #Respawn Flags which determine when a player is spawned near a defined "spawn point" in the selection below
   spawnpointson:
     firstJoin: true
+    # When a player first joins, the new player time below is used to determine how long they are considered "new"
+    # This is helpful for making sure new players spawn near established locations while getting to grips with things
     reviveWhileNew: true
+  # Uses milliseconds to determine how long a player is considered "new" for the reviveWhileNew respawn flag
   newplayertime: 3000
   spawnpoints:
     '0':
@@ -16,22 +25,45 @@ exampleworld:
       x: 500
       y: 70
       z: 1000
+      #Spawn points are only circular
       radius: 500
+      # Area from the middle in which the player cannot be spawned
       exclusion: 100
+      # Should a player be nearby to spawn them here?
       nearby: true
+      # How large of an area to check for a player
       checkradius: 500
+  # Should we try to spawn players near other people?
   spawnbyplayer: true
   spawnbyplayerarea:
+    # Circle area
     exclusionradius: 200
     radius: 500
+  # RandomSpawn definitions. Supports circle OR square
   spawnarea:
-    type: "circle"
+    type: circle
+    xcenter: 0
+    zcenter: 0
     radius: 10000
+    exclusionradius: 100
+#  spawnarea:
+#    EXAMPLE CONFIG FOR A SQUARE WORLD
+#    type: square
+#    xcenter: 0
+#    zcenter: 0
+#    x-min: -10000
+#    x-max: 10000
+#    z-min: -10000
+#    z-max: 10000
+#    exclusionradius: 100
+#    *Thickness is a modifier applied to the Z coord (North/South), it stops players spawning directly on the border
+#    thickness: 1000
+  # Blacklist in which blocks player cannot spawn on.
+  # Use definitions here: https://jd.papermc.io/paper/1.21.9/org/bukkit/Material.html
+  # MAKE SURE YOU ARE LOOKING AT THE VERSION YOU ARE RUNNING - Minor name changes occur between versions
   spawnblacklist:
-    - 8
-    - 9
-    - 10
-    - 11
-    - 18
-    - 51
-    - 81
+    - LAVA
+    - WATER
+    - FIRE
+    - MAGMA_BLOCK
+    - CACTUS

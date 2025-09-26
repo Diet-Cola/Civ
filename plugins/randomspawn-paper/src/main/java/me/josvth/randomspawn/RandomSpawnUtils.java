@@ -32,4 +32,10 @@ public final class RandomSpawnUtils {
 			new FixedMetadataValue(plugin, timestamp)
 		);
 	}
+
+    public static boolean hasLastTimeRandomSpawned(
+        final @NotNull Player player
+    ) {
+        return player.hasMetadata(LAST_TIME_RANDOM_SPAWNED_KEY);
+    }
 }

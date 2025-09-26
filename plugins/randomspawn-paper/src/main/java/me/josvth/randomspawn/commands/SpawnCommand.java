@@ -2,13 +2,13 @@ package me.josvth.randomspawn.commands;
 
 import java.util.List;
 import me.josvth.randomspawn.RandomSpawn;
+import me.josvth.randomspawn.RandomSpawnUtils;
 import me.josvth.randomspawn.config.worlds.WorldConfig;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 
 public class SpawnCommand extends AbstractCommand {
 
@@ -53,7 +53,7 @@ public class SpawnCommand extends AbstractCommand {
 
         target.teleportAsync(spawn);
 
-        target.setMetadata("lasttimerandomspawned", new FixedMetadataValue(plugin, System.currentTimeMillis()));
+        RandomSpawnUtils.setLastTimeRandomSpawned(plugin, target, System.currentTimeMillis());
 
         if (plugin.configs.worlds.get(world.getName()) instanceof final WorldConfig config && config.keepRandomSpawn())
             target.setBedSpawnLocation(spawn);

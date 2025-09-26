@@ -1,5 +1,8 @@
 debug: false
+#Messages displayed to the player when respawning
 messages:
   randomspawned: "You wake up in an unfamiliar place."
+#Time in seconds a player cannot be damaged after spawning
 nodamagetime: 5
+#Text required for signs that when right clicked, will random spawn players
 rs-sign-text: "[RandomSpawn]"
